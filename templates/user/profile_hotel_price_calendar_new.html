@@ -1,0 +1,433 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static cards %}
+{% block main_block %}
+
+<style>
+  #scheduler .scheduler_default_cell.scheduler_default_cellparent {
+    background-color: rgb(214 214 214);
+  }
+
+  #setToDay {
+    width: min-content;
+    background: #e6e6e6;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #setToDay:hover {
+    background: #cccccc;
+  }
+
+  #range_width {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  #nav_shess {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+
+  .popup_new_close {
+    width: 343px;
+    padding: 35px;
+    height: 100%;
+    position: fixed;
+    right: 0;
+    background: white;
+    border-left: 1px solid black;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
+    top: 0;
+    /* align-items: center; */
+    padding-top: 61px;
+    z-index: 99;
+  }
+
+  .popup_new_close>div {
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+  }
+
+  .popup_new_close .grupe_dates,
+  .popup_new_close .buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .popup_new_close .button {
+    background: #eeeeee;
+    color: black;
+    border-radius: 5px;
+    padding: 8px;
+    width: max-content;
+    margin-top: 5px;
+  }
+
+  .popup_new_close input {
+    border: 1px solid #D2D2D2;
+    padding: 5px;
+  }
+
+  .popup-lebel-radio {
+    display: flex;
+    gap: 5px;
+  }
+
+  .info_booking {
+    display: flex;
+    flex-direction: column;
+  }
+
+
+  .cell_full {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .def_cell {
+    color: #2b2b2b
+  }
+
+  .value_cell {
+    color: #000000
+  }
+
+  .scheduler_default_rowheader_inner_indent {
+    margin-left: -17px  !important;
+  }
+
+  @media screen and (max-width: 768px){
+    .scheduler_default_main {
+      font-size: 10px !important;
+    }
+  }
+</style>
+
+
+<script src="{% static 'js/daypilot-all.min.js' %}"></script>
+
+{% hotel_shift_tab %}
+
+
+<span class="discription" style="color: red">Закрыть номера на определенные даты можно в <a href="/profile/hotel/booking/chess/" style="color: blue">Шахматке бронирования</a></span>
+
+
+<div id="nav_shess">
+  <div id="range_width">Длина ячейки:<input type="range"
+      min="10"
+      max="200"
+      step="10"
+      id="cellwidth"
+      value="60"><span id="label">60</span>
+  </div>
+
+  <div id="setToDay">
+    <span>Сегодня</span>
+  </div>
+</div>
+
+
+<div id="scheduler" style="user-select: unset"></div>
+
+<script>
+  date_ppd = {}
+
+  async function loadRooms() {
+    let csrftoken = getCookie('csrftoken');
+
+    $.ajax({
+      method: "GET",
+      url: "{% url 'form_get_room_ppd' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (response) {
+        dp.resources = response.data;
+        dp.update();
+        $(".scheduler_default_corner").html("")
+      }
+    });
+  }
+
+  function loadPPD() {
+    let csrftoken = getCookie('csrftoken');
+    start = start_date_dps.toString("yyyy-MM-dd");
+    end = end_date_dps.toString("yyyy-MM-dd");
+    load_start()
+    $.ajax({
+      method: "GET",
+      data: { "start": start, "end": end },
+      url: "{% url 'form_get_value_ppd' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (response) {
+        date_ppd = response.data;
+        dp.update();
+        $(".scheduler_default_corner").html("")
+        load_end()
+      }
+    });
+  }
+
+  function savePPD(inputs_val) {
+    data_result = inputs_val
+    let csrftoken = getCookie('csrftoken');
+    console.log(data_result)
+    load_start()
+    $.ajax({
+      method: "POST",
+      data: data_result,
+      url: "{% url 'form_edit_price_calendar' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (response) {
+        load_end()
+        loadPPD()
+      }
+    });
+  }
+
+  function savePPDs(inputs_val) {
+    dates = generateDatesInRange(inputs_val["date_start"], inputs_val["date_end"])
+    data_result = inputs_val
+    for (const date of dates) {
+      data_result["date"] = date
+      let csrftoken = getCookie('csrftoken');
+      console.log(data_result)
+      $.ajax({
+        method: "POST",
+        data: data_result,
+        url: "{% url 'form_edit_price_calendar' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", csrftoken);
+        },
+        success: function (response) {
+        }
+      });
+    }
+    loadPPD()
+  }
+
+  $("#setToDay").click(function () {
+    setToDay();
+  })
+
+  function setToDay() {
+    dp.scrollTo(DayPilot.Date.today());
+  }
+
+  function generateDatesInRange(startDateStr, endDateStr) {
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    const dates = [];
+    let currentDate = startDate;
+    while (currentDate <= endDate) {
+      dates.push(DayPilot.Date(currentDate).toString("yyyy-MM-dd"));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+  }
+</script>
+
+<script>
+  const start_date_dps = DayPilot.Date.today()
+  const end_date_dps = start_date_dps.addDays(365)
+  loadPPD()
+
+  let rowHeaderWidth = 160
+
+  if (window.innerWidth < 768) {
+    rowHeaderWidth = 120
+  }
+
+  const dp = new DayPilot.Scheduler("scheduler", {
+    locale: "ru-ru",
+    allowEventOverlap: false,
+    eventMoveHandling: "Disabled",
+    // timeRangeSelectedHandling: "Disabled",
+    scale: "Day",
+    cellWidth: 60,
+    eventHeight: 60,
+    eventHoverHandling: "Disabled",
+    eventClickHandling: "Bubble",
+    eventHtmlEnabled: true,
+    smoothscroll: true,
+    scrollDelay: 50,
+    timeHeaders: [
+      { groupBy: "Month", format: "MMM yyyy" },
+      { groupBy: "Cell", format: "d" }
+    ],
+    rowHeaderWidthAutoFit: false,
+    rowHeaderWidth: rowHeaderWidth,
+    floatingTimeHeaders: false,
+    // days: DayPilot.Date.today().daysInYear(),
+    startDate: start_date_dps,
+    days: (end_date_dps.getTime() - start_date_dps.getTime()) / (1000 * 60 * 60 * 24),
+    // startDate: DayPilot.Date.today(),
+    treeEnabled: true,
+    onBeforeCellRender: function (args) {
+      let str = args.cell.resource
+      let list_param = str.split(".")
+      let id = list_param[0]
+      let type = list_param[1]
+      // console.log("id - ", id)
+      // console.log("type - ", type)
+      start_date = args.cell.start
+      start_date_str = start_date.toString("yyyy-MM-dd");
+      // console.log("start_date_str", start_date_str)
+      id_div = args.cell.i
+      // console.log(args.cell)
+      if (type == "free") {
+        data_default = dp.rows.find(`${id}.free`).data.default
+        value = date_ppd[id] && date_ppd[id][type] && date_ppd[id][type][start_date_str] ? date_ppd[id][type][start_date_str] : 0;
+        args.cell.properties.html = `<span style="userSelect: auto" class="cell_full" data-cell-id="${id_div}">${value}</span>`;
+      }
+      if (type == "price") {
+        data_default = dp.rows.find(`${id}.price`).data.default
+        value = date_ppd[id] && date_ppd[id][type] && date_ppd[id][type][start_date_str] ? date_ppd[id][type][start_date_str] : data_default;
+        if (value == data_default) {
+          args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #b7ffc1;" class="cell_full def_cell" data-cell-id="${id_div}">${value}</span>`;
+        }
+        else {
+          args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #b7ffc1;" class="cell_full value_cell" data-cell-id="${id_div}">${value}</span>`;
+        }
+      }
+      if (type == "min_days") {
+        data_default = dp.rows.find(`${id}.min_days`).data.default
+        value = date_ppd[id] && date_ppd[id][type] && date_ppd[id][type][start_date_str] ? date_ppd[id][type][start_date_str] : data_default;
+        if (value == data_default) {
+          args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #bcf8fc;" class="cell_full def_cell" data-cell-id="${id_div}">${value}</span>`;
+        }
+        else {
+          args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #bcf8fc;" class="cell_full value_cell" data-cell-id="${id_div}">${value}</span>`;
+        }
+      }
+    },
+    onTimeRangeSelected: function (args) {
+      // console.log(args)
+      let str = args.resource
+      let list_param = str.split(".")
+      let id = list_param[0]
+      let type = list_param[1]
+
+      let date_1 = args.start.toString("yyyy-MM-dd");
+      let date_2 = args.end.addDays(-1).toString("yyyy-MM-dd");
+      let rc = id
+      if (args.end.getTime() - args.start.getTime() > 86400000) { //86400000 - количество миллисекунд в одном дне
+        if (type == "price") {
+          popup_create(
+            "Изменить на выбраный период",
+            "Изменение цены",
+            [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPDs }],
+            [
+              [{ type: "hidden", name: "type", val: "price" }, { type: "hidden", name: "rc", val: rc }],
+              [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_2, name: "date_end" }],
+              [{ type: "number", "label": "Цена", name: "value" }]
+            ]
+          );
+        }
+        if (type == "min_days") {
+          popup_create(
+            "Изменить на выбраный период",
+            "Изменение минимального количества дней до заселения",
+            [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPDs }],
+            [
+              [{ type: "hidden", name: "type", val: "min_days" }, { type: "hidden", name: "rc", val: rc }],
+              [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_2, name: "date_end" }],
+              [{ type: "number", "label": "Дней", name: "value" }]
+            ]
+          );
+        }
+      }
+      else {
+        if (type == "price") {
+          popup_create(
+            "Изменить на выбраный период",
+            "Изменения цены",
+            [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPD }],
+            [
+              [{ type: "hidden", name: "type", val: "price" }, { type: "hidden", name: "rc", val: rc }],
+              [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_1, name: "date_end" }],
+              [{ type: "number", "label": "Цена", name: "value" }],
+            ]
+          );
+
+        }
+        if (type == "min_days") {
+          popup_create(
+            "Изменить на выбраный период",
+            "Изменение минимального количества дней до заселения",
+            [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPD }],
+            [
+              [{ type: "hidden", name: "type", val: "min_days" }, { type: "hidden", name: "rc", val: rc }],
+              [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_1, name: "date_end" }],
+              [{ type: "number", "label": "Дней", name: "value" }],
+            ]
+          );
+        }
+      }
+      dp.clearSelection();
+    }
+  });
+
+  dp.init();
+  $(".scheduler_default_corner").html("")
+  loadRooms()
+
+  document.querySelector("#cellwidth").addEventListener("input", function (ev) {
+    var cellwidth = parseInt(this.value);
+    document.querySelector("#label").innerText = cellwidth;
+    var start = dp.getViewPort().start;
+
+    dp.cellWidth = cellwidth;
+    dp.update();
+    $(".scheduler_default_corner").html("")
+    dp.scrollTo(start);
+  });
+</script>
+
+
+<script defer>
+  $(document).ready(function () {
+    fast_addStep("#scheduler",
+      `Если в разные дни у вас разная стоимость проживания, указать все расценки можно в блоке «Календарь цен».`
+    )
+
+    fast_addStep("#scheduler",
+      `Левой кнопкой мыши выберете дату или диапазон, зажав ее.`
+    )
+
+    fast_addStep("#scheduler",
+      `Все изменения отображаются на календаре. Вы можете сразу видеть стоимость проживания в определенный день — можно быстро проверить все расценки.`
+    )
+
+    fast_addStep("#scheduler",
+      `При отправке запроса на бронь гость будет сразу видеть правильную стоимость, с учетом всех расценок на конкретные дни. Вам не придется уточнять стоимость проживания при каждом отдельном бронировании.`
+    )
+
+    if (!getTutorialProgress()) {
+      tour.start();
+      saveTutorialProgress()
+    }
+  });
+
+</script>
+
+{% endblock main_block %}

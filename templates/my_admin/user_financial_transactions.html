@@ -1,0 +1,224 @@
+{% extends "template/base_profile.html" %}
+{% load humanize form static %}
+{% block main_block %}
+<style>
+  .switch {
+    background: #dedede;
+    width: 55px;
+    height: 22px;
+    border-radius: 5px;
+    position: relative;
+    top: 8px;
+  }
+
+  .part {
+    position: relative;
+    width: 28px;
+    height: 22px;
+    border-radius: 5px;
+    transition: left 0.5s;
+  }
+
+  .user_item.select {
+    background: #dfdfdf;
+  }
+
+  .user_item.select .divTableCell {
+    border-color: #dfdfdf;
+  }
+
+  .switch.on .part {
+    background: #FC7201;
+    left: 27px;
+  }
+
+  .switch.off .part {
+    background: #242424;
+  }
+
+  .divTableCell.action .del {
+    color: rgb(255, 74, 74)
+  }
+
+  .divTableCell.action .edit {
+    color: rgb(74, 110, 255)
+  }
+
+
+  div.greyGridTable {
+    border: 3px solid #FFFFFF;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+
+  .divTable.greyGridTable .divTableCell,
+  .divTable.greyGridTable .divTableHead {
+    border: 1px solid #FFFFFF;
+    padding: 10px;
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell {
+    font-size: 14px;
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell[data-active="True"] {
+    color: rgb(42, 213, 42)
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell[data-active="False"] {
+    color: rgb(255 15 15)
+  }
+
+  .divTable.greyGridTable .divTableHeading {
+    background: #FFFFFF;
+    border-bottom: 2px solid #CDCDCD;
+  }
+
+  .divTable.greyGridTable .divTableHeading .divTableHead {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 2px solid #CDCDCD;
+    text-align: left;
+  }
+
+  .greyGridTable .tableFootStyle {
+    font-size: 14px;
+  }
+
+  /* DivTable.com */
+  .divTable {
+    display: table;
+  }
+
+  .divTableRow {
+    display: table-row;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableCell,
+  .divTableHead {
+    display: table-cell;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableFoot {
+    display: table-footer-group;
+  }
+
+  .divTableBody {
+    display: table-row-group;
+  }
+
+  .hidden_cell {
+    display: none;
+  }
+
+
+  #search-form {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  #search-form #search-input {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #D2D2D2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+</style>
+
+<style>
+  .price_green {
+    color: rgb(0 216 0)
+  }
+
+  .price_red {
+    color: rgb(255, 91, 91);
+  }
+
+  .balans_card {
+    display: flex;
+    border: 1px solid #959595;
+    width: 200px;
+    padding: 23px;
+    padding-bottom: 33px;
+    flex-direction: column;
+    border-radius: 10px;
+  }
+
+  .balans.active {
+    background: #f2f2f2;
+  }
+
+  .balans_card .title {
+    color: #bfbfbf;
+  }
+
+  .balans .two_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .balans .value {
+    font-size: 20px;
+  }
+
+  .balans .card {
+    background: #ebebeb;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+</style>
+
+<span class="title">Финансовые операции пользователя</span>
+<div class="section" data-table="FOs">
+  <div class="divTable greyGridTable">
+    <div class="divTableHeading">
+      <div class="divTableRow">
+        <div class="divTableHead">Сумма</div>
+        <div class="divTableHead">Описание</div>
+        <div class="divTableHead">Дата и время</div>
+      </div>
+    </div>
+    <div class="divTableBody">
+      {% for fo in FOs %}
+      <div class="divTableRow">
+        {% if fo.isBonus == True %}
+        <div class="divTableCell {% if fo.price <= 0 %}price_red{% else %}price_green{% endif %}">{{fo.price|intcomma}}
+          бонусов</div>
+        {% else %}
+        <div class="divTableCell {% if fo.price <= 0 %}price_red{% else %}price_green{% endif %}">{{fo.price|intcomma}}
+          ₽</div>
+        {% endif %}
+        <div class="divTableCell">{{fo.comments}}</div>
+        <div class="divTableCell">{{fo.datetime|date:"d.m.Y H:i"}}</div>
+      </div>
+      {% empty %}
+      <div class="divTableRow">
+        У вас нет финансовых операций
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+{% endblock main_block %}

@@ -1,0 +1,81 @@
+.upform {
+  border-radius: 13px;
+  background: #FFF;
+  box-shadow: 0px 0px 18px 0px #D9D9D9;
+  max-width: 528px;
+  width: 100%;
+  font-family: "Manrope", sans-serif;
+}
+.upform .tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 40px;
+}
+.upform .tabs .item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.upform .tabs .item:first-child {
+  border-bottom-right-radius: 13px;
+  border-top-left-radius: 13px;
+}
+.upform .tabs .item:last-child {
+  border-bottom-left-radius: 13px;
+  border-top-right-radius: 13px;
+}
+.upform .tabs .item:not(:first-child):not(:last-child) {
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
+}
+.upform .content {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px;
+}
+.upform .content .label {
+  display: flex;
+  flex-direction: column;
+  color: #868695;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.upform .content .label .input {
+  border: 1px solid #b9b9b9;
+  outline: none;
+  border-radius: 3px;
+  padding: 12px 8px;
+  font-size: 16px;
+}
+.upform .content .label.error .input {
+  border: 1px solid #ff7e7e;
+}
+.upform .content .label.success .input {
+  border: 1px solid rgb(145, 232, 157);
+}
+.upform .content .label .error {
+  color: #ff7e7e;
+}
+.upform .content .button {
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 8px;
+  border-radius: 9px;
+  font-size: 32px;
+  margin-bottom: 8px;
+  height: auto;
+  width: 100%;
+  line-height: 100%;
+}
+
+/*# sourceMappingURL=/static/css/upform.css.map */

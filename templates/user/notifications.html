@@ -1,0 +1,42 @@
+{% extends 'template/base_profile.html' %}
+{% load form static reglog %}
+{% block main_block %}
+
+
+
+{% comment %} {% reglog_popup %} {% endcomment %}
+
+
+<style>
+    .notification_item {
+        display: flex;
+        flex-direction: column;
+        background: #d4d4d4;
+        padding: 8px;
+        border-radius: 5px;
+    }
+    .notifications_item_grupe {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+</style>
+
+
+
+<div class="section">
+    <div class="title">Список уведомлений</div>
+
+    <div class="notifications_item_grupe">
+        {% for notif in notifications %}
+        <div data-id="{{notif.id}}" class="notification_item">
+            <span class="notif_item_title">{{notif.title}}</span>
+            <span class="notif_item_text">{{notif.text}}</span>
+            <span class="notif_item_date">{{notif.datetime}}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}

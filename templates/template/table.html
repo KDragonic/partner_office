@@ -1,0 +1,33 @@
+<label class="table">
+	<span class="name">{{label}}</span>
+	<section>
+		<table>
+			<thead>
+				<tr>
+					{% for cell in th %}
+					<th>{{cell}}</th>
+					{% endfor %}
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in items %}
+				{% if click == False %}
+				<tr>
+					{% for cell in item %}
+					<td>{{cell}}</td>
+					{% endfor %}
+				</tr>
+				{% else %}
+				<tr>
+					<td style="color:black; text-align: center; cursor: pointer;" onclick="load_an_entry({{item.0}})">✎</td>
+					<td style="cursor: pointer;" onclick="load_an_entry({{item.0}})">{{item.1}}</td>
+					{% for cell in item|slice:"2:" %}
+					<td>{{cell}}</td>
+					{% endfor %}
+				</tr>
+				{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
+</label>

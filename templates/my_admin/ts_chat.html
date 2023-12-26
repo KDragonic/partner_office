@@ -1,0 +1,593 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load menu form static sass_tags %}
+{% block main_block %}
+
+<link href="{% static 'css/scss/chat.css' %}"
+    rel="stylesheet"
+    type="text/css" />
+
+<style>
+    #main_block {
+        background: transparent !important;
+    }
+
+    #main_section {
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .chat_list {
+        margin-top: 20px !important;
+        border: 1px solid #CFCFCF !important;
+        border-radius: 20px !important;
+        padding: 15px;
+        padding-top: 27px;
+        margin-bottom: 20px !important;
+        background: #ffffff !important;
+    }
+
+    .chat_item_ts {
+        background: white;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 9px;
+        padding-left: 72px;
+        position: relative;
+        border-radius: 10px;
+        min-height: 73px;
+        justify-content: center;
+        border: 1px solid #CFCFCF;
+    }
+
+    .chat_item_ts.select {
+        filter: drop-shadow(0px 0px 8px #B7B9FF);
+        border: 1px solid #FC7201;
+    }
+
+    .chat_item_ts img {
+        width: 56px;
+        position: absolute;
+        left: 6px;
+    }
+
+    .chat_item_ts .chat_user {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: 900;
+        font-size: 14px;
+        line-height: 16px;
+        color: #000000;
+    }
+
+    .chat_item_ts .chat_title {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 14px;
+        color: #A2A2A2;
+        margin-top: 8px;
+    }
+
+    .chat_item_ts .not_read_messages_count {
+        position: absolute;
+        top: 20px;
+        right: 14px;
+        font-size: 20px;
+        color: #ff6a6a;
+    }
+
+    .not_select_chat {
+        background: #ffffff !important;
+        margin-top: 20px !important;
+        border: 1px solid #CFCFCF !important;
+        border-radius: 20px !important;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        height: auto;
+        background: #ffffff;
+    }
+
+    #content .right #main_block .section {
+        gap: 17px;
+    }
+
+    #chat_max {
+        background: #ffffff !important;
+        margin-top: 20px !important;
+        border: 1px solid #CFCFCF !important;
+        border-radius: 20px !important;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        height: auto;
+        background: #ffffff;
+    }
+
+    #entering_message {
+        border-radius: 0 0 20px 20px;
+        background: transparent !important;
+        border-top: 1px solid #b9b9b9;
+        font-size: 15px;
+        display: flex;
+        flex-direction: row;
+        min-height: 60px;
+        padding: 10px 14px 10px 10px;
+        height: auto;
+        position: relative;
+        gap: 10px;
+    }
+
+    #entering_message .buttons {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 9px;
+        flex-grow: 1;
+        flex-shrink: 0;
+    }
+
+    #entering_message .send_messages {
+        position: static;
+        cursor: pointer;
+    }
+
+    #entering_message .send_file {
+        position: static;
+        cursor: pointer;
+    }
+
+    #entering_message .send_messages,
+    #entering_message .send_file {
+        transform-origin: 50%;
+        transition-duration: 0.1s;
+    }
+
+    #entering_message .send_messages:hover,
+    #entering_message .send_file:hover {
+        transform: scale(1.1);
+    }
+
+
+    #entering_message #entering_a_message_text {
+        flex-grow: 1;
+        resize: none;
+        font-size: 16px;
+        border: none;
+        display: block;
+        padding: 0px;
+        width: 100%;
+        margin-bottom: 21px;
+        max-height: 200px;
+        overflow: auto;
+    }
+
+    #entering_a_message_text:empty::before {
+        content: "Введите сообщение...";
+        color: gray;
+    }
+
+    #messages {
+        height: 100%;
+        max-height: 71vh;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        display: flex;
+        gap: 5px;
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    #info_user {
+        max-width: 100%;
+        border: 1px solid #CFCFCF !important;
+        margin: 0px 8px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        font-size: 13px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    #info_user .item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #info_user .name {
+        font-size: 17px;
+        line-height: 19px;
+        color: #a0a0a0;
+    }
+
+    .admin-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-info .item {
+        font-size: 10px;
+    }
+
+    .admin-info .item .name {
+        font-weight: 700;
+    }
+
+</style>
+<div class="section" id="main_section">
+
+    <div class="chat_list {% if full_chat %}hide{% endif %}">
+        {% for chat in chats %}
+        <a href="{{chat.url}}"
+            class="chat_item_ts {% if full_chat == chat.id %}select{% endif %}"
+            data-chat-id="{{chat.id}}">
+            <img src="{% static 'img/av_user_ts.png' %}"></img>
+            <span class="chat_user">{{chat.username}}</span>
+            <span class="chat_title">{{chat.title}}</span>
+            {% if chat.unread_count > 0 %}
+            <span class="unread_count" style="font-size: 21px; position: absolute; right: 10px; top: 0px; color: red;">+ {{chat.unread_count}}</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% if full_chat %}
+    <div id="chat_max">
+        <div class="button_prev d-none" style="cursor: pointer;position: relative;top: -28px;">Назад</div>
+        <div class="back_button d-xl-none"></div>
+        <div id="messages">
+            {% if user_full_chat %}
+            <div id="info_user">
+                <div class="item id"><span class="name">ID</span><span class="value">{{user_full_chat.id}}</span></div>
+                <div class="item fio"><span class="name">ФИО</span><a href="/admin/page/list/user/?search={{user_full_chat.email}}" target="_blank" class="value">{{user_full_chat.fio}}</a></div>
+                <div class="item phone"><span class="name">Телефон</span><span class="value">{{user_full_chat.phone}}</span></div>
+                <div class="item email"><span class="name">Почта</span><span class="value">{{user_full_chat.email}}</span></div>
+                {% if user_full_chat.hotel %}
+                <div class="item hotel"><span class="name">Отель</span><span class="value">{{user_full_chat.hotel}}</span></div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        <div id="entering_message">
+            <span id="entering_a_message_text" contenteditable='true' required></span>
+            <div class="buttons">
+                <img src="{% static 'img/chat_send_button.png' %}" class="send_messages">
+                <label class="send_file" for="file_input">
+                    <img src="{% static 'img/chat_send_a_file.png' %}"
+                        style="width: 17px;">
+                    <input type="file"
+                        id="file_input"
+                        accept="image/*"
+                        style="display: none;">
+                </label>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="not_select_chat">
+        Чат не выбран
+    </div>
+    {% endif %}
+</div>
+
+{% if full_chat != None %}
+<script defer>
+    chat = {
+        "isGetMessages": false,
+    }
+
+    get_chat()
+
+    function get_chat() {
+        data = {
+            "chat": "{{full_chat}}",
+        }
+
+        load_start()
+
+        $.ajax({
+            method: "POST",
+            data: data,
+            url: "{% url 'get_chat' %}",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (data) {
+
+                chat["id"] = data["chat"]["id"]
+                chat["date_start"] = data["chat"]["date_start"]
+                chat["user_id"] = data["chat"]["user_id"]
+
+                if ($(document).width() < 1000) {
+                    $(".button_prev").removeClass("d-none")
+                }
+
+                get_messages(false)
+                load_end()
+            }
+        });
+    }
+
+    $("body").on("click", ".button_prev", function () {
+        location.href = "/admin/page/ts/chat/"
+    });
+
+
+    function get_messages(isRestart) {
+        chat["isGetMessages"] = true
+        data_get = {
+            "chat": chat.id,
+            "isRestart": isRestart,
+        }
+        $.ajax({
+            method: "GET",
+            data: data_get,
+            url: "{% url 'chat_messages' %}",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (data) {
+                chat["isGetMessages"] = false
+                if (data.status && data.status == "not_now_messages") {
+                    console.log("Нету новых сообщений")
+                }
+                else {
+                    add_messages_to_html(data.messages)
+                }
+            }
+        });
+    }
+    setInterval(function () {
+        if (chat["isGetMessages"] == false) {
+            get_messages(true);
+        }
+    }, 5000);
+
+
+    $(document).on('keydown', 'textarea', function(e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            sendMessages();
+        }
+    });
+
+
+    count_mess = 0
+
+    function add_messages_to_html(messages) {
+        if (count_mess >= messages.length) {
+            return
+        }
+
+        count_mess = messages.length
+
+        $("#messages > .media").remove()
+        $("#messages > .title-date-messages").remove()
+        savedDay = null
+
+        messages.forEach(message => {
+            // получаем дату сообщения
+            console.log(message.date)
+            let messageDate = new Date(message.date);
+            // получаем день сообщения
+            let messageDay = messageDate.getDate();
+
+            // сравниваем дни
+            if (messageDay != savedDay) {
+                // добавляем дату перед сообщением
+                let date = messageDate.toLocaleString('ru-RU', { day: 'numeric', month: 'numeric', year: 'numeric' });
+                $("#messages").append(`<p class="title-date-messages text-muted text-center">${date}</p>`)
+                // сохраняем текущий день
+                savedDay = messageDay;
+            }
+
+            if (message.belong == "user" || message.belong == "client" || message.belong == "hotel") {
+                html = $(`<div class="media media-his">
+                    <div class="media-left media-fix-width">
+                        <img class="media-object img-circle" src="{% static '/img/av_user.png' %}" style="max-width:75px;">
+                    </div>
+                    <div class="media-right media-fix-width">
+                    </div>
+                    <div class="media-body media-body-left">
+                        <div class="message-body">
+                            ${message.text}
+                        </div>
+                        <div class="admin-info"></div>
+                    </div>
+                    <div class="message-data-right text-muted">
+                        ${message.time}
+                    </div>
+                </div>`)
+                if (message?.admin_info) {
+                    message.admin_info.forEach((item) => {
+
+                        let name = item[0]
+
+                        let text = item[1]
+                        if (Array.isArray(text)) {
+                            let buff_text = ""
+                            text.forEach(item => {
+                                buff_text += `<div class="value" style="color: ${item["color"]}">${item['name']}</div>`
+                            })
+
+                            let el = $(`
+                            <span class="item" style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                <span class="name">${name}:</span>
+                                ${buff_text}
+                            </span>
+                            `)
+                            $(html).find(".admin-info").append(el)
+
+                        }
+                        else {
+                            let el = $(`
+                            <span class="item" style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                <span class="name">${name}:</span>
+                                <span class="value">${text}</span>
+                            </span>
+                            `)
+                            $(html).find(".admin-info").append(el)
+                        }
+
+                    })
+                }
+            }
+            else if (message.belong == "info") {
+                html = $(message.text)
+
+
+                if (message?.admin_info) {
+                    message.admin_info.forEach((item) => {
+
+                        let name = item[0]
+
+                        let text = item[1]
+                        if (Array.isArray(text)) {
+                            let buff_text = ""
+                            text.forEach(item => {
+                                buff_text += `<div class="value" style="color: ${item["color"]}">${item['name']}</div>`
+                            })
+
+                            let el = $(`
+                            <span class="item" style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                <span class="name">${name}:</span>
+                                ${buff_text}
+                            </span>
+                            `)
+                            $(html).find(".admin-info").append(el)
+
+                        }
+                        else {
+                            let el = $(`
+                            <span class="item" style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                <span class="name">${name}:</span>
+                                <span class="value">${text}</span>
+                            </span>
+                            `)
+                            $(html).find(".admin-info").append(el)
+                        }
+
+                    })
+                }
+            }
+            else if (message.belong == "admin") {
+                html = $(`
+                <div class="media media-my">
+                    <div class="media-left message-data-left text-muted">
+                        ${message.time}
+                    </div>
+                    <div class="media-right media-fix-width">
+                        <img class="media-object img-circle" src="{% static '/img/av_user_ts.png' %}" style="max-width:75px;">
+                    </div>
+                    <div class="media-body media-body-right">
+                        <div class="message-body">
+                            ${message.text}
+                        </div>
+                        <div class="admin-info"></div>
+                    </div>
+                </div>
+                `)
+
+                if (message?.admin_info) {
+                    message.admin_info.forEach((item) => {
+
+                        let name = item[0]
+
+                        let text = item[1]
+                        if (Array.isArray(text)) {
+                            let buff_text = ""
+                            text.forEach(item => {
+                                buff_text += `<div class="value" style="color: ${item["color"]}">${item['name']}</div>`
+                            })
+
+                            let el = $(`
+                            <span class="item" style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                <span class="name">${name}:</span>
+                                ${buff_text}
+                            </span>
+                            `)
+                            $(html).find(".admin-info").append(el)
+
+                        }
+                        else {
+                            let el = $(`
+                            <span class="item" style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                <span class="name">${name}:</span>
+                                <span class="value">${text}</span>
+                            </span>
+                            `)
+                            $(html).find(".admin-info").append(el)
+                        }
+
+                    })
+                }
+            }
+
+            if (message.file_url) {
+                file = $(`<a class="file_message" href="${message.file_url}">`);
+                $(file).attr("target", "_blank");
+                $(file).text("Файл")
+                $(html).find(".message-body").prepend(file);
+            }
+
+            $("#messages").append(html)
+        });
+
+        $("#messages").scrollTop($("#messages").scrollTop() + $("#messages").height());
+    }
+
+    $(".send_messages").click(function () {
+        sendMessages()
+    });
+
+    $('#file_input').on('change', function () {
+        if ($("#file_input").val()) {
+            // файл выбран
+            sendMessages();
+        }
+    });
+
+    function sendMessages() {
+        var text = $("#entering_a_message_text").text();
+        var file = $("#file_input").prop('files')[0];
+        if (text != "" || file) {
+            var data_post = new FormData();
+            data_post.append("text", text);
+            data_post.append("chat", chat.id);
+            if (file) {
+                var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.bmp)$/i;
+                if (!allowedExtensions.exec(file.name)) {
+                    alert('Допустимы только файлы с расширениями: .jpg, .jpeg, .png, .bmp.');
+                    return false;
+                }
+                data_post.append("file", file);
+            }
+
+            $("#entering_a_message_text").text("");
+            $("#file_input").val("")
+
+            $.ajax({
+                method: "POST",
+                data: data_post,
+                url: "{% url 'chat_send' %}",
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                },
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    text = $("#entering_a_message_text").text("");
+                    $("#file_input").val("");
+                    get_messages(false);
+                }
+            });
+        }
+    }
+</script>
+{% endif %}
+{% endblock main_block %}

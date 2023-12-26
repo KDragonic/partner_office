@@ -1,0 +1,503 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form %}
+{% block main_block %}
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  table {
+    border: 2px solid #f0f0f0;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+  table th {
+    border: 1px solid #fff;
+    padding: 10px;
+  }
+  table td {
+    border: 1px solid #fff;
+    padding: 10px;
+    background: #fff !important;
+  }
+  table tbody td {
+    font-size: 14px;
+  }
+  table thead {
+    background: #fff;
+    border-bottom: 2px solid #cdcdcd;
+  }
+  table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    background: #f0f0f0;
+    border-bottom: 2px solid #cdcdcd;
+    text-align: left;
+  }
+  #search-form {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  #search-form #search-input {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .search-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .search-buttons .item {
+    background: #dfdfdf;
+    color: black;
+    padding: 10px;
+    color: black;
+    border-radius: 5px;
+    width: max-content;
+    cursor: pointer;
+  }
+  .search-buttons span {
+    margin-right: 8px;
+  }
+  .search-buttons .item:hover {
+    background: #b6b6b6;
+  }
+  .search-buttons .item.select {
+    background: #fc7201;
+    color: white;
+  }
+  .search-buttons .item.select:hover {
+    background: #ff8929;
+  }
+  .search-buttons[data-type="page"] {
+    justify-content: center;
+  }
+  .search-buttons[data-type="page"] .item {
+    padding: 0;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    max-width: 95px;
+  }
+  .click_user, .click_hotel {
+    color: #0039ff;
+    cursor: pointer;
+  }
+  .click_user:hover, .click_hotel:hover {
+    color: #567bff;
+  }
+  progress.percentage {
+    max-width: 78px;
+  }
+  .section_flex {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+  }
+  progress.percentage::-webkit-progress-value {
+    background-color: linear-gradient(to right, red, yellow, green) !important;
+  }
+  .stars {
+    color: #fc7201;
+  }
+  .accordion_header, .white_space_nowrap {
+    white-space: nowrap;
+  }
+  .accordion_body {
+    display: flex;
+    flex-direction: column;
+  }
+  #main_table tr[data-is_report="true"] {
+    background-color: #d7ffdc;
+  }
+  table td {
+    vertical-align: top;
+    border: 1px solid #aeaeae;
+  }
+  table td > .list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  table td > .list .item {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  table td > .list .item .name {
+    color: #adadad;
+  }
+  table td > .list .item .value {
+    color: #000;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  table td > .list .item .value.active {
+    color: #00d200;
+  }
+  table td > .list .item .value.notactive {
+    color: red;
+  }
+  table td > .list .item.notactive .value, table td > .list .item.notactive .name {
+    color: #ff9f9f;
+  }
+  table td > .list .item_add {
+    cursor: pointer;
+    margin-top: 18px;
+  }
+  table td > .list .item_add .name {
+    color: #fc7201;
+  }
+  table td > .list .item_add .text {
+    color: #bcbcbc;
+  }
+  table td[data-type-col="hotels"] > .list .item {
+    color: #000eff;
+  }
+  table td[data-type-col="hotels"] > .list .item .name {
+    color: #000eff;
+    cursor: pointer;
+  }
+  table td[data-type-col="status"] > .list .item .name {
+    color: #000;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Взял в работу"] .value {
+    color: #5383e1;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Связался"] .value {
+    color: #cfbb05;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Ожидание обратной связи"] .value {
+    color: #17a1a1;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Передан"] .value {
+    color: #f300da;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Завершен"] .value {
+    color: #1af34a;
+  }
+  #search-form {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  #search-form #search-input {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .search-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .search-buttons .item {
+    background: #dfdfdf;
+    color: black;
+    padding: 10px;
+    color: black;
+    border-radius: 5px;
+    width: max-content;
+    cursor: pointer;
+  }
+  .search-buttons span {
+    margin-right: 8px;
+  }
+  .search-buttons .item:hover {
+    background: #b6b6b6;
+  }
+  .search-buttons .item.select {
+    background: #fc7201;
+    color: white;
+  }
+  .search-buttons .item.select:hover {
+    background: #ff8929;
+  }
+  .search-buttons[data-type="page"] {
+    justify-content: center;
+  }
+  .search-buttons[data-type="page"] .item {
+    padding: 0;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    max-width: 95px;
+  }
+  .hotel_place_select_popup {
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0px 0px 18px 0px #d9d9d9;
+    padding: 28px 30px;
+    font-family: Manrope;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 300px;
+    min-width: 300px;
+    max-width: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+
+  td[data-type-col="select"] {
+    cursor: pointer;
+    transition: background-color 1s;
+  }
+
+  td[data-type-col="select"]:hover {
+    background: #beffdc !important;
+    transition: background-color 0.2s;
+  }
+
+  td[data-type-col="select"].selected {
+    background: #39e086 !important;
+    transition: background-color 0s;
+  }
+
+</style>
+
+<div id="search-form">
+  <input type="text"
+    id="search-input"
+    name="search"
+    placeholder="Поиск..."
+    value="">
+</div>
+
+
+<h2 style="margin-bottom: 10px;">Фильтрация</h2>
+
+<section class="search-buttons" data-type="hotel_status" style="margin-bottom: 5px;">
+  <span>Статус отеля</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="active">Активен</div>
+  <div class="item" data-type="on_moderation">На модерации</div>
+  <div class="item" data-type="off">Выключен</div>
+  <div class="item" data-type="on">Включён</div>
+</section>
+
+<section class="search-buttons" data-type="hotel_type" style="margin-bottom: 5px;">
+  <span>Тип отеля</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="apart-hotel">Апарт-отель</div>
+  <div class="item" data-type="apartments">Апартамент</div>
+  <div class="item" data-type="flat">Квартира</div>
+  <div class="item" data-type="recreation center">База отдыха</div>
+  <div class="item" data-type="hotel_1">Гостиница</div>
+  <div class="item" data-type="bungalow">Бунгало</div>
+  <div class="item" data-type="boutique hotel">Бутик-отель</div>
+  <div class="item" data-type="villa">Вилла</div>
+  <div class="item" data-type="glamping">Глэмпинг</div>
+  <div class="item" data-type="guest house">Гостевой дом</div>
+  <div class="item" data-type="residential premises">Жилое помещение</div>
+  <div class="item" data-type="castle">Замок</div>
+  <div class="item" data-type="camping">Кемпинг</div>
+  <div class="item" data-type="resort hotel">Курортный отель</div>
+  <div class="item" data-type="furnished rooms">Меблированные комнаты</div>
+  <div class="item" data-type="mini-hotel">Мини-отель</div>
+  <div class="item" data-type="bed and breakfast (b&b)">Ночлег и завтрак (B&B)</div>
+  <div class="item" data-type="hotel">Отель</div>
+  <div class="item" data-type="sanatorium">Санаторий</div>
+  <div class="item" data-type="farm">Ферма</div>
+  <div class="item" data-type="hostel">Хостел</div>
+  <div class="item" data-type="private house">Частный дом</div>
+  <div class="item" data-type="chalet">Шале</div>
+</section>
+
+
+<section class="search-buttons" data-type="work_status" style="margin-bottom: 5px;">
+  <span>Аккаунт</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="transferred">Передан</div>
+  <div class="item" data-type="refused">Отказались</div>
+  <div class="item" data-type="at_work">В работе</div>
+  <div class="item" data-type="client_account">Аккаунт клиента</div>
+</section>
+
+<section class="search-buttons" data-type="user_status" style="margin-bottom: 5px;">
+  <span>Статус пользователя</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="confirmed">Подтверждён (почта или телефон)</div>
+</section>
+
+<section class="search-buttons" data-type="last_status_work" style="margin-bottom: 5px;">
+  <span>Статус работы</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="Взял в работу">Взял в работу</div>
+  <div class="item" data-type="Связался">Связался</div>
+  <div class="item" data-type="Ожидание обратной связи">Ожидание обратной связи</div>
+  <div class="item" data-type="Передан">Передан</div>
+  <div class="item" data-type="Завершен">Завершен</div>
+</section>
+
+
+<section class="search-buttons" data-type="hotel_place" style="margin-bottom: 5px;">
+  <span>Выбраное место</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="city" id="hotel_place_select">Выбрать город</div>
+</section>
+
+
+<section class="search-buttons" data-type="user_staff_id" style="margin-bottom: 5px;">
+  <span>Персонал</span>
+  <div class="item select" data-type="all">Все</div>
+  {% for user in users_staff %}
+    <div class="item" data-type="{{user.id}}">{{user.name}}</div>
+  {% endfor %}
+</section>
+
+<script>
+function open_hotel_place_select_popup() {
+  hotel_place_select_id = null
+
+  hotel_place_select_popup = $(`
+    <div class="hotel_place_select_popup">
+      <span style="font-size: 21px;">Выбирете город</span>
+      <select style="width: 100%">
+        {% for place in places %}
+        <option value="{{place.id}}">{{place.title}}</option>
+        {% endfor %}
+
+      </select>
+      <button class="button hotel_place_select_popup_button" style="background: #5bd565">Выбрать</button>
+    </div>
+    `)
+
+    hotel_place_select_popup.find("select").select2({
+      width : '100%',
+    })
+    $("body").append(hotel_place_select_popup)
+
+    hotel_place_select_popup.find(".hotel_place_select_popup_button").click(function() {
+      let val = hotel_place_select_popup.find("select").val()
+      let name = hotel_place_select_popup.find(`select option[value=${val}]`).text()
+      $(`#hotel_place_select`).attr("data-type", val).text(name)
+      hotel_place_select_popup.remove()
+
+      hotel_place_select_id = name
+
+      filter_apply()
+    })
+
+    hotel_place_select
+
+}
+
+$(`#hotel_place_select`).click(function() {
+  open_hotel_place_select_popup()
+});
+</script>
+
+<table class="main_table">
+  <thead>
+    <tr>
+      <th scope="col" data-type-col="select">Выбрать</th>
+      <th scope="col" data-type-col="staff">Персонал</th>
+      <th scope="col" data-type-col="hotels">Объекты размещения</th>
+      <th scope="col" data-type-col="contacts">Контактные данные</th>
+      <th scope="col" data-type-col="notes">Комментарий</th>
+      <th scope="col" data-type-col="work_status">Аккаунт передан</th>
+      <th scope="col" data-type-col="profile"><span>Данные в аккаунте</span><br><span style="font-size: 12px">(профиль пользователя)</span></th>
+      <th scope="col" data-type-col="reminders">Календарь напоминаний</th>
+      <th scope="col" data-type-col="status">Статус работы</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<style>
+  .toolbar {
+    position: fixed;
+    background: white;
+    width: calc(100% - 20px);
+    bottom: 0px;
+    left: 0;
+    min-height: 110px;
+    margin: 10px;
+    box-shadow: 0px 0px 18px 0px #D9D9D9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .toolbar .buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .toolbar .buttons .item {
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    transition: background-color 0.1s;
+    cursor: pointer;
+  }
+
+  .toolbar .buttons .item.transfer {
+    background: #a2a0ff;
+  }
+
+  .toolbar .buttons select {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+
+</style>
+
+<div class="toolbar">
+  <span>Вы выбрали [<span class="value">34</span>] записи, что вы хотите с ними сделать?</span>
+  <div class="buttons">
+    <select>
+      {% for user in users_staff %}
+      <option value="{{user.id}}">{{user.name}}</option>
+      {% endfor %}
+    </select>
+    <div class="item transfer" long-press data-orig-color="#a2a0ff" data-gradient-color="#6663ff" data-max-time="1" data-funcName="toolbar_transfer">Передать</div>
+  </div>
+</div>
+
+
+
+
+<script src="/static/js/admin_moderwork.js"></script>
+{% endblock %}

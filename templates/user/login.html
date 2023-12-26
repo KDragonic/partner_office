@@ -1,0 +1,75 @@
+{% extends "main/base_base.html" %}
+{% load static crispy_forms_tags sass_tags %}
+{% block base %}
+
+<link href="{% static 'css/scss/logreg.css' %}"
+    rel="stylesheet"
+    type="text/css" />
+
+<body class="login">
+    <div class="left">
+        <form method="POST">
+            <a href="/"
+                class="logo_turcity">Тургородок</a>
+            <span class="span_title_1">Войти</span>
+            <span class="span_title_2">Авторизируйтесь</span>
+            {% csrf_token %}
+            <label for="login">
+                <span class="name">Логин (Почта)</span>
+                <input type="text"
+                    name="login"
+                    id="id_login"
+                    placeholder=""
+                    required>
+            </label>
+            <label for="password">
+                <span class="name">Пароль</span>
+                <input type="text"
+                    name="password"
+                    id="id_password"
+                    placeholder=""
+                    required>
+            </label>
+            <a href="{% url 'password_recovery' %}" class="forgot_my_password">Забыл пароль</a>
+            <button class="button">Войти</button>
+            <span class="span_no_account">У меня нет аккаунта. <a href="{% url 'register' %}">Регистрация</a></span>
+            <span class="through_a_social_network">или войдите через социальную сеть</span>
+            <div class="social-icons">
+                <a href="{{vk_auth_url}}"><img src="{% static 'img/vk-icon.png' %}"></a>
+                <a href="{{google_auth_url}}"><img src="{% static 'img/google-icon.png' %}"></a>
+            </div>
+        <div class="button_back_go" onclick="window.history.back();" style="font-size: 20px;cursor: pointer;margin: 10px;">Назад</div>
+
+            <style>
+                .social-icons {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .social-icons a {
+                    margin-right: 10px;
+                    position: relative;
+                }
+
+                .social-icons a img {
+                    width: 30px;
+                    height: 30px;
+                }
+
+                .social-icons a:hover:before {
+                    content: "";
+                    position: absolute;
+                    top: -10px;
+                    left: -10px;
+                    bottom: -10px;
+                    right: -10px;
+                    background-color: rgba(255, 255, 255, 0.5);
+                    border-radius: 50%;
+                    z-index: -1;
+                }
+            </style>
+        </form>
+    </div>
+    <div class="right"></div>
+</body>
+{% endblock base %}

@@ -1,0 +1,303 @@
+{% extends "template/base_profile.html" %}
+{% load humanize menu form static %}
+{% block main_block %}
+
+{% if hotel_mod == True %}
+{% hotel_shift_tab %}
+{% endif %}
+
+
+<style>
+  .price_green {
+    color: rgb(0 216 0)
+  }
+
+  .price_red {
+    color: rgb(255, 91, 91);
+  }
+
+  .balans_card {
+    display: flex;
+    border: 1px solid #959595;
+    width: 200px;
+    padding: 23px;
+    padding-bottom: 33px;
+    flex-direction: column;
+    border-radius: 10px;
+  }
+
+  .balans.active {
+    background: #f2f2f2;
+  }
+
+  .balans_card .title {
+    color: #bfbfbf;
+  }
+
+  .balans .two_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .balans .value {
+    font-size: 20px;
+  }
+
+  .balans .card {
+    background: #ebebeb;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+</style>
+
+<style>
+  .price_green {
+    color: rgb(0 216 0)
+  }
+
+  .price_red {
+    color: rgb(255, 91, 91);
+  }
+
+  div.greyGridTable {
+    border: 3px solid #FFFFFF;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+
+  .divTable.greyGridTable .divTableCell,
+  .divTable.greyGridTable .divTableHead {
+    border: 1px solid #FFFFFF;
+    padding: 10px;
+  }
+
+  @media only screen and (max-width:1066px) {
+    .divTable.greyGridTable .divTableHeading .divTableHead {
+      font-size: 12px !important;
+    }
+
+    .divTable.greyGridTable .divTableBody .divTableCell {
+      font-size: 12px !important;
+    }
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell {
+    font-size: 14px;
+  }
+
+  .divTable.greyGridTable .divTableHeading {
+    background: #FFFFFF;
+    border-bottom: 2px solid #CDCDCD;
+  }
+
+  .divTable.greyGridTable .divTableHeading .divTableHead {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 2px solid #CDCDCD;
+    text-align: left;
+  }
+
+  .greyGridTable .tableFootStyle {
+    font-size: 14px;
+  }
+
+  /* DivTable.com */
+  .divTable {
+    display: table;
+  }
+
+  .divTableRow {
+    display: table-row;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableCell,
+  .divTableHead {
+    display: table-cell;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableFoot {
+    display: table-footer-group;
+  }
+
+  .divTableBody {
+    display: table-row-group;
+  }
+</style>
+
+<div class="section"
+  style="gap: 10px;">
+  <div class="title">Мой баланс</div>
+  <div style="display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap;">
+    <section class="balans active c_point"
+      data-table="bonuses">
+      <div class="balans_card">
+        <span class="title">Мой счёт</span>
+        <div class="two_div">
+          <span class="value">{{balance_sum.real|intcomma}} ₽</span>
+        </div>
+      </div>
+    </section>
+    <section class="balans c_point"
+      data-table="FOs">
+      <div class="balans_card">
+        <span class="title">Мои бонусы</span>
+        <div class="two_div">
+          <span class="value">{{balance_sum.bonus|intcomma}} бонусов</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="section"
+  style="gap: 10px; margin-top: 10px;">
+  <div class="title">Пополнение счёта</div>
+  <div class="discripton">Пополнение счёта личного кабинета, при нажатии на кнопку нужно будет выбрать сумму пополнение и оплатить картой.
+  </div>
+  <div class="button"
+    id="add_rubl_button">Пополнение счёта</div>
+</div>
+
+<script>
+  $("#add_rubl_button").click(function () {
+    popup_create("Пополнение счёта",
+      "Выберите суму от 1 рубля до 20000 рублей, и оплатите картой",
+      [
+        { type: "close", name: "Закрыть" },
+        { type: "send-inputs", name: "Пополнить", fun: pay_add_rubl }
+      ],
+      [
+        [
+          { type: "number", "label": "Сумма", name: "price", setting: {max: 20000, min: 1} }
+        ],
+      ]
+    )
+  })
+
+
+  function pay_add_rubl(params) {
+    $.ajax({
+				method: "POST",
+				data: params,
+				url: "{% url 'add_rubl_lk' %}",
+				beforeSend: function (request) {
+					request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+				},
+				success: function (response) {
+					if ("url" in response & response.url != null) {
+            location.href = response.url
+					}
+					else {
+            popup_create("Не оплачено", `<p>Создание оплаты не удалось.</p>`, [], [], "error")
+          }
+				},
+			});
+  }
+</script>
+
+
+<div class="section"
+  style="gap: 10px; margin-top: 10px;">
+  <div class="section"
+    data-table="bonuses"
+    style="display: none;">
+    <div class="title">Список бонусов</div>
+    <div class="divTable greyGridTable">
+      <div class="divTableHeading">
+        <div class="divTableRow">
+          <div class="divTableHead">Сумма</div>
+          <div class="divTableHead">Дата получения</div>
+          <div class="divTableHead">Описание</div>
+          <div class="divTableHead">Осталось дней</div>
+        </div>
+      </div>
+      <div class="divTableBody">
+        {% for bonus in bonuses %}
+        <div class="divTableRow">
+          <div class="divTableCell">{{bonus.value|intcomma}} бонусов</div>
+          <div class="divTableCell">{{bonus.date|date:"d.m.Y"}}</div>
+          <div class="divTableCell">{{bonus.text}}</div>
+          <div class="divTableCell">{{bonus.del_days|intcomma}}</div>
+        </div>
+        {% empty %}
+        <div class="divTableRow">
+          У вас нет бонусов
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="section"
+    data-table="FOs">
+    <div class="title">Список операций</div>
+    <div class="divTable greyGridTable">
+      <div class="divTableHeading">
+        <div class="divTableRow">
+          <div class="divTableHead">Сумма</div>
+          <div class="divTableHead">Описание</div>
+          <div class="divTableHead">Дата и время</div>
+        </div>
+      </div>
+      <div class="divTableBody">
+        {% for fo in FOs %}
+        <div class="divTableRow">
+          {% if fo.isBonus == True %}
+          <div class="divTableCell {% if fo.price <= 0 %}price_red{% else %}price_green{% endif %}">
+            {{fo.price|intcomma}}
+            бонусов
+          </div>
+          {% else %}
+          <div class="divTableCell {% if fo.price <= 0 %}price_red{% else %}price_green{% endif %}">
+            {{fo.price|intcomma}}
+            ₽
+          </div>
+          {% endif %}
+          <div class="divTableCell">{{fo.comments}}</div>
+          <div class="divTableCell">{{fo.datetime|date:"d.m.Y H:i"}}</div>
+        </div>
+        {% empty %}
+        <div class="divTableRow">
+          У вас нет финансовых операций
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script defer>
+  $(".balans").click(function () {
+    table = $(this).attr("data-table")
+    $(".balans").removeClass("active")
+    $(this).addClass("active")
+    console.log(table)
+    if (table == "FOs") {
+      $(".section[data-table='FOs']").hide()
+      $(".section[data-table='bonuses']").show()
+    }
+    if (table == "bonuses") {
+      $(".section[data-table='bonuses']").hide()
+      $(".section[data-table='FOs']").show()
+    }
+  }
+  )
+</script>
+
+
+{% endblock main_block %}

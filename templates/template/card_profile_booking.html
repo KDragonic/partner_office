@@ -1,0 +1,803 @@
+<style>
+
+  .limiter_group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 25px;
+  }
+
+
+  .card_booking #card_bookingDIV_5.status_new {
+    background-color: #54d39c
+  }
+
+  .card_booking #card_bookingDIV_5.status_verified {
+    background-color: #60C0FF
+  }
+
+  .card_booking #card_bookingDIV_5.status_settled {
+    background-color: #c600ff;
+  }
+
+  .card_booking #card_bookingDIV_5.status_left {
+    background-color: #B3BAC4
+  }
+
+  .card_booking #card_bookingDIV_5.status_cancelled {
+    background-color: #444444;
+  }
+
+  #card_bookingDIV_17,
+  #card_bookingDIV_28 {
+    width: 100% !important;
+  }
+
+  #card_bookingDIV_12 {
+    display: flex !important;
+    width: 100% !important;
+  }
+
+  #card_bookingA_1 {
+    box-shadow: rgba(0, 0, 0, 0.06) 0 0.857143px 9.42857px 0;
+    color: #11223e;
+    display: block;
+    height: 178.432px;
+    inline-size: 385.773px;
+    text-decoration: none;
+    width: min-content !important;
+    background: #fff;
+    border: 0.727273px solid rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    overflow: hidden;
+    padding: 8.57143px;
+  }
+
+  #card_bookingA_1:before {
+    color: #11223e;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_2 {
+    color: #11223e;
+    cursor: pointer;
+    height: 49.3182px;
+    inline-size: 367.182px;
+    text-decoration: none;
+    width: max-content !important;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_2:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_3 {
+    align-items: center;
+    color: #11223e;
+    cursor: pointer;
+    display: flex;
+    height: 26.3864px;
+    inline-size: 367.182px;
+    text-decoration: none;
+    width: max-content;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_3:before {
+    color: #11223e;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_4 {
+    color: #11223e;
+    cursor: pointer;
+    height: 8.56818px;
+    inline-size: 15.4205px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    width: 15.4205px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    padding: 0 6.85714px 0 0;
+  }
+
+  #card_bookingDIV_4:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_5 {
+    color: #11223e;
+    cursor: pointer;
+    height: 8.56818px;
+    inline-size: 8.56818px;
+    text-decoration: none;
+    width: 8.56818px;
+    background: #54d39c;
+    border: 0 none #11223e;
+    border-radius: 100%;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_5:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_6 {
+    bottom: 0;
+    color: #11223e;
+    cursor: pointer;
+    height: 26.3864px;
+    inline-size: 270.341px;
+    inset-block-end: 0;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
+    left: 0;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    position: relative;
+    right: 0;
+    text-decoration: none;
+    top: 0;
+    width: 270.341px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    flex: 1 1 auto;
+    font: 12px/13.2px 'Manrope', 'Arial', sans-serif;
+    overflow: hidden;
+    padding: 0 12.8571px 0 0;
+  }
+
+  #card_bookingDIV_6:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/13.2px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_7 {
+    color: #11223e;
+    cursor: pointer;
+    height: 15.0795px;
+    inline-size: 257.489px;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 257.489px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 13.7143px/15.0857px 'Cera Pro Medium';
+    overflow: hidden;
+  }
+
+  #card_bookingDIV_7:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 13.7143px/15.0857px 'Cera Pro Medium';
+  }
+
+  #card_bookingSPAN_8 {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 13.7143px/15.0857px 'Cera Pro Medium';
+  }
+
+  #card_bookingSPAN_8:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 13.7143px/15.0857px 'Cera Pro Medium';
+  }
+
+  #card_bookingDIV_9 {
+    color: #a4aab5;
+    cursor: pointer;
+    height: 11.3068px;
+    inline-size: 257.489px;
+    text-decoration: none solid #a4aab5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 257.489px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 10.2857px/11.3143px 'Manrope', 'Arial', sans-serif;
+    overflow: hidden;
+  }
+
+  #card_bookingDIV_9:before {
+    color: #a4aab5;
+    cursor: pointer;
+    text-decoration: none solid #a4aab5;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 10.2857px/11.3143px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingSPAN_10 {
+    color: #a4aab5;
+    cursor: pointer;
+    text-decoration: none solid #a4aab5;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 10.2857px/11.3143px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingSPAN_10:before {
+    color: #a4aab5;
+    cursor: pointer;
+    text-decoration: none solid #a4aab5;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 10.2857px/11.3143px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_11 {
+    color: #11223e;
+    cursor: pointer;
+    height: 13.7727px;
+    inline-size: 81.4205px;
+    max-inline-size: 81.4286px;
+    max-width: 81.4286px;
+    min-height: auto;
+    min-inline-size: 81.4286px;
+    min-width: 81.4286px;
+    text-align: right;
+    text-decoration: none;
+    width: 81.4205px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 10.2857px/13.7829px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_11:before {
+    color: #11223e;
+    cursor: pointer;
+    text-align: right;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 10.2857px/13.7829px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_12 {
+    align-items: center;
+    color: #11223e;
+    cursor: pointer;
+    display: flex;
+    height: 22.9318px;
+    inline-size: 367.182px;
+    justify-content: space-between;
+    text-decoration: none;
+    width: max-content;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    padding: 6.85714px 0 0 0.857143px;
+  }
+
+  #card_bookingDIV_12:before {
+    color: #11223e;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_13 {
+    color: #11223e;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 94.6364px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    width: 94.6364px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_13:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_14 {
+    width: max-content;
+    color: #a4aab5;
+    cursor: pointer;
+    height: 13.7727px;
+    inline-size: 29.5114px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none solid #a4aab5;
+    width: 29.5114px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 10.2857px/13.7829px 'Manrope', 'Arial', sans-serif;
+    width: 60px;
+    transform: matrix(1, 0, 0, 1, 0, 0);
+    text-align: center;
+  }
+
+  #card_bookingDIV_14:before {
+    color: #a4aab5;
+    cursor: pointer;
+    text-decoration: none solid #a4aab5;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 10.2857px/13.7829px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_15 {
+    width: max-content !important;
+    color: #11223e;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 93.8523px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    width: 93.8523px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_15:before {
+    color: #11223e;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_16,
+  #card_bookingDIV_33 {
+    color: #11223e;
+    cursor: pointer;
+    height: 0.852273px;
+    inline-size: 367.182px;
+    margin-block-end: 8.57143px;
+    margin-block-start: 8.57143px;
+    text-decoration: none;
+    width: max-content;
+    background: #edf0f4;
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    margin: 8.57143px 0;
+  }
+
+  #card_bookingDIV_17 {
+    color: #11223e;
+    cursor: pointer;
+    height: 58.4659px;
+    inline-size: 367.182px;
+    text-decoration: none;
+    width: max-content;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_18,
+  #card_bookingDIV_23,
+  #card_bookingDIV_28 {
+    align-items: center;
+    color: #11223e;
+    cursor: pointer;
+    display: flex;
+    height: 19.4886px;
+    inline-size: 367.182px;
+    justify-content: space-between;
+    text-decoration: none;
+    width: max-content;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    padding: 1.71429px 0;
+  }
+
+  #card_bookingDIV_19 {
+    color: #a4aab5;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 57.2955px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none solid #a4aab5;
+    width: 57.2955px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingSPAN_20,
+  #card_bookingSPAN_25,
+  #card_bookingSPAN_30 {
+    color: #a4aab5;
+    cursor: pointer;
+    text-decoration: none solid #a4aab5;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_21 {
+    color: #34425a;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 53px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 53px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    overflow: hidden;
+    padding: 0 0 0 8.57143px;
+  }
+
+  #card_bookingSPAN_22,
+  #card_bookingSPAN_27,
+  #card_bookingSPAN_32 {
+    color: #34425a;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_24 {
+    color: #a4aab5;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 39.0568px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none solid #a4aab5;
+    width: 39.0568px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_26 {
+    color: #34425a;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 136.307px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 136.307px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    overflow: hidden;
+    padding: 0 0 0 8.57143px;
+  }
+
+  #card_bookingDIV_29 {
+    width: 100% !important;
+    color: #a4aab5;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 67.125px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none solid #a4aab5;
+    width: 67.125px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #a4aab5;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_31 {
+    color: #34425a;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 27.375px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 27.375px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+    padding: 0;
+    margin: 0;
+    width: max-content;
+    overflow: visible;
+  }
+
+  #card_bookingDIV_34 {
+    align-items: center;
+    color: #11223e;
+    cursor: pointer;
+    display: flex;
+    height: 16.0795px;
+    inline-size: 367.182px;
+    justify-content: space-between;
+    text-decoration: none;
+    width: max-content;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #11223e;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_35 {
+    align-items: center;
+    color: #34425a;
+    cursor: pointer;
+    display: flex;
+    height: 16.0795px;
+    inline-size: 54.8409px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    width: 54.8409px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_36 {
+    color: #34425a;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 39.4205px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    width: 39.4205px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingSPAN_37,
+  #card_bookingSPAN_42 {
+    color: #34425a;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_38 {
+    bottom: -0.857143px;
+    color: #34425a;
+    cursor: pointer;
+    height: 14.9318px;
+    inline-size: 15.4205px;
+    inset-block-end: -0.857143px;
+    inset-block-start: 0.857143px;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
+    left: 0;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    position: relative;
+    right: 0;
+    text-decoration: none;
+    top: 0.857143px;
+    width: 15.4205px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 11.1429px/14.9314px 'Manrope', 'Arial', sans-serif;
+    padding: 0 0 0 8.57143px;
+  }
+
+  #card_bookingSPAN_39,
+  #card_bookingSPAN_44 {
+    color: #34425a;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 11.1429px/14.9314px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_40 {
+    align-items: center;
+    color: #34425a;
+    cursor: pointer;
+    display: flex;
+    height: 16.0795px;
+    inline-size: 88.3636px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    width: 88.3636px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_41 {
+    color: #34425a;
+    cursor: pointer;
+    height: 16.0795px;
+    inline-size: 33.4886px;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    text-decoration: none;
+    width: 33.4886px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 12px/16.08px 'Manrope', 'Arial', sans-serif;
+  }
+
+  #card_bookingDIV_43 {
+    bottom: -0.857143px;
+    color: #34425a;
+    cursor: pointer;
+    height: 14.9318px;
+    inline-size: 54.875px;
+    inset-block-end: -0.857143px;
+    inset-block-start: 0.857143px;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
+    left: 0;
+    min-height: auto;
+    min-inline-size: auto;
+    min-width: auto;
+    position: relative;
+    right: 0;
+    text-decoration: none;
+    top: 0.857143px;
+    width: 54.875px;
+    background: rgba(0, 0, 0, 0);
+    border: 0 none #34425a;
+    font: 11.1429px/14.9314px 'Manrope', 'Arial', sans-serif;
+    padding: 0 0 0 8.57143px;
+  }
+</style>
+
+<div class="limiter_group">
+  {% for card in cards %}
+    <a class="card_booking {{ card.booking.status_code }}" href="{{ card.booking.url }}" id="card_bookingA_1">
+      <div id="card_bookingDIV_2">
+        <div id="card_bookingDIV_3">
+          <div id="card_bookingDIV_4">
+            <div id="card_bookingDIV_5" class="status_{{ card.booking.status_code }}"></div>
+          </div>
+          <div id="card_bookingDIV_6">
+            <div id="card_bookingDIV_7" style="display: flex; justify-content: space-between; width: 100%; overflow: visible;">
+              <span id="card_bookingSPAN_8">{{ card.user.username }}</span>
+              <span id="card_bookingSPAN_8" style="color: #727272; font-size: 13px;">{{ card.booking.id }}</span>
+            </div>
+            <div id="card_bookingDIV_9">
+              <span id="card_bookingSPAN_10">{{ card.room.name }}</span>
+            </div>
+          </div>
+        </div>
+        <div id="card_bookingDIV_12">
+          <div id="card_bookingDIV_13">{{ card.booking.datetime_start }}</div>
+          <div id="card_bookingDIV_14">{{ card.booking.days }}</div>
+          <div id="card_bookingDIV_15">{{ card.booking.datetime_end }}</div>
+        </div>
+      </div>
+      <div id="card_bookingDIV_16"></div>
+      <div id="card_bookingDIV_17">
+        <div id="card_bookingDIV_28">
+          <div id="card_bookingDIV_29">
+            <span id="card_bookingSPAN_30">Взр./Детей:</span>
+          </div>
+          <div id="card_bookingDIV_31">
+            <span id="card_bookingSPAN_32">{{ card.booking.count_a }}/{{ card.booking.count_c }}</span>
+          </div>
+        </div>
+        <div id="card_bookingDIV_28" style="display: flex; justify-content: space-between;">
+          <div id="card_bookingDIV_29">
+            <span id="card_bookingSPAN_30">Статус:</span>
+          </div>
+          <div id="card_bookingDIV_31" style="width: 100%; text-align: end;">
+            <span id="card_bookingSPAN_32">{{ card.booking.status }}</span>
+          </div>
+        </div>
+        <div id="card_bookingDIV_28" style="display: flex; justify-content: space-between;">
+          <div id="card_bookingDIV_29">
+            <span id="card_bookingSPAN_30">Дата создания:</span>
+          </div>
+          <div id="card_bookingDIV_31" style="width: 100%; text-align: end;">
+            <span id="card_bookingSPAN_32">{{ card.booking.created_at }}</span>
+          </div>
+        </div>
+      </div>
+      <div id="card_bookingDIV_33"></div>
+      <div id="card_bookingDIV_34">
+        <div id="card_bookingDIV_40">
+          <div id="card_bookingDIV_41">
+            <span id="card_bookingSPAN_42">Итого</span>
+          </div>
+          <div id="card_bookingDIV_43">
+            <span id="card_bookingSPAN_44">{{ card.booking.price }} ₽</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  {% endfor %}
+</div>

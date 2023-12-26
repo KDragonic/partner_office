@@ -1,0 +1,22 @@
+{% extends "main/base.html" %}
+{% load static form menu %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<script src="https://securecardpayment.ru/payment/docsite/assets/js/ipay.js"></script>
+<script>
+	var ipay = new IPAY({api_token: 'YRF3C5RFICWISEWFR6GJ'});
+</script>
+
+<a onclick="ipayCheckout({
+	amount:120,
+	currency:'RUB',
+	order_number:'{{randstr}}',
+	description: 'Бронь'},
+	function(order) { console.log(order) },
+	function(order) { console.log(order) })"
+
+	class="btn btn-xs btn-outline btn-primary">Оплатить
+</a>
+
+{% endblock %}

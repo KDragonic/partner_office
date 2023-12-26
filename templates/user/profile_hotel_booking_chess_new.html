@@ -1,0 +1,512 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static cards %}
+{% block main_block %}
+
+<style>
+  #setToDay {
+    width: min-content;
+    background: #e6e6e6;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #setToDay:hover {
+    background: #cccccc;
+  }
+
+  #range_width {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  #nav_shess {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+
+  .popup_new_close {
+    width: 343px;
+    padding: 35px;
+    height: 100%;
+    position: fixed;
+    right: 0;
+    background: white;
+    border-left: 1px solid black;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
+    top: 0;
+    /* align-items: center; */
+    padding-top: 61px;
+    z-index: 99;
+  }
+
+  .popup_new_close>div {
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+  }
+
+  .popup_new_close .grupe_dates,
+  .popup_new_close .buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .popup_new_close .button {
+    background: #eeeeee;
+    color: black;
+    border-radius: 5px;
+    padding: 8px;
+    width: max-content;
+    margin-top: 5px;
+  }
+
+  .popup_new_close input {
+    border: 1px solid #D2D2D2;
+    padding: 5px;
+  }
+
+  .popup-lebel-radio {
+    display: flex;
+    gap: 5px;
+  }
+
+  .info_booking {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #FIO_search_div {
+    display: flex;
+    gap: 13px;
+  }
+
+  #FIO_search_div button {
+    width: min-content;
+    background: #e6e6e6;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .scheduler_default_rowheader_inner_indent {
+    margin-left: -17px  !important;
+  }
+
+  @media screen and (max-width: 768px){
+    .scheduler_default_main {
+      font-size: 10px !important;
+    }
+  }
+
+  .scheduler_default_cell:not(.scheduler_default_cellparent) {
+    background: #d5ffdb;
+  }
+</style>
+
+<script src="{% static 'js/daypilot-all.min.js' %}"></script>
+
+
+{% hotel_shift_tab %}
+
+<span class="discription" style="color: red">Изменить цену категории номеров на определенные даты можно в <a href="/profile/hotel/price_calendar/" style="color: blue">Календаре цен</a></span>
+
+
+<div class="popup_new_close"
+  style="display: none">
+  <span class="title">Закрыть для бронирования</span>
+  <section class="grupe_dates">
+    <input type="hidden"
+      id="popup-room-id"
+      name="room-id">
+
+    <input type="date"
+      name="start-date"
+      id="popup-start-date" />
+
+    <input type="date"
+      name="end-date"
+      id="popup-end-date" />
+
+
+  </section>
+  <textarea name="comment"
+    style="padding: 5px; border-radius: 5px; border: 1px solid rgb(210, 210, 210); max-height: 446px; min-height: 43px; resize: vertical;"
+    id="popup-comment"
+    cols="30"
+    rows="10"
+    placeholder="Комментарий"></textarea>
+  <section class="buttons">
+    <button class="button"
+      onclick="closeRoomAjax()">Сохранить</button>
+    <button class="button"
+      onclick="$('.popup_new_close').hide()">Отмена</button>
+  </section>
+</div>
+
+<div id="nav_shess">
+  <div id="range_width">Длина ячейки:<input type="range"
+      min="10"
+      max="200"
+      step="10"
+      id="cellwidth"
+      value="60"><span id="label">60</span>
+  </div>
+
+  <div id="setToDay">
+    <span>Сегодня</span>
+  </div>
+
+  <div id="FIO_search_div">
+    <input type="text"
+      id="FIO_search_input"
+      placeholder="ФИО"
+      required>
+    <button id="find">Найти</button>
+  </div>
+</div>
+
+
+<div id="scheduler"></div>
+
+<script>
+  async function loadRooms() {
+
+    let csrftoken = getCookie('csrftoken');
+    load_start()
+    $.ajax({
+      method: "GET",
+      url: "{% url 'form_rcs_rooms_chess' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (response) {
+        dp.resources = response.rooms;
+        dp.update();
+        $(".scheduler_default_corner").html("")
+        load_end()
+      }
+    });
+  }
+
+  $("#setToDay").click(function () {
+    setToDay();
+  })
+
+  function setToDay() {
+    dp.scrollTo(DayPilot.Date.today());
+  }
+
+  async function loadBooking() {
+    let csrftoken = getCookie('csrftoken');
+
+    $.ajax({
+      method: "GET",
+      url: "{% url 'form_booking_chess' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (response) {
+        dp.events.list = response.bookings;
+        dp.update();
+        $(".scheduler_default_corner").html("")
+        setToDay()
+      }
+    });
+  }
+
+  async function reLoadBooking() {
+    let csrftoken = getCookie('csrftoken');
+
+    $.ajax({
+      method: "GET",
+      url: "{% url 'form_booking_chess' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (response) {
+        dp.events.list = response.bookings;
+        dp.update();
+        $(".scheduler_default_corner").html("")
+      }
+    });
+  }
+
+
+
+  function closeRoomAjax(data) {
+    // data = {
+    //   "room": id,
+    //   "start_date": start_date,
+    //   "end_date": end_date,
+    //   "comment": comment,
+    // }
+    load_start()
+    $.ajax({
+      method: "POST",
+      data: data,
+      url: "{% url 'form_close_room' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (response) {
+        $(".popup_new_close").hide()
+        load_end()
+        reLoadBooking()
+      }
+    });
+  }
+</script>
+
+<script>
+  function openRoom(id) {
+    date_openRoom = {
+      "id": id,
+    }
+    load_start()
+    $.ajax({
+      method: "POST",
+      data: date_openRoom,
+      url: "{% url 'form_open_room' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (response) {
+        dp.update()
+        $(".scheduler_default_corner").html("")
+        load_end()
+        reLoadBooking()
+        all_popup_close()
+      }
+    });
+  }
+
+
+  document.querySelector("#find").addEventListener("click", function () {
+    var query = document.querySelector("#FIO_search_input").value;
+    var e = dp.events.find(function (e) {
+      var match = e.data.fio.toUpperCase().indexOf(query.toUpperCase()) > -1 || e.data.id.toUpperCase().indexOf(query.toUpperCase()) > -1
+      return match;
+    });
+    dp.multiselect.clear();
+    if (e) {
+      dp.multiselect.add(e);
+      dp.events.scrollIntoView(e);
+    }
+  });
+</script>
+
+<script>
+  booking_id_list = []
+
+  let rowHeaderWidth = 160
+
+  if (window.innerWidth < 768) {
+    rowHeaderWidth = 120
+  }
+  {% comment %}
+    $("#scheduler").on("click",`.scheduler_default_event[aria-label="Закрыто"]`, function() {
+      let id = $(this).find(".data_booking_hidden").data("id")
+
+      let comment = dp.events.find(`${id}`).data["comment"]
+
+      popup_create(
+        "Открыть комнату",
+        `Вы уверены что хотите открыть команту?<br>${comment}`,
+        [{ type: "close", name: "Нет" }, { type: "open_room", name: "Да", fun: openRoom, param: [id] }],
+      );
+    }); {% endcomment %}
+
+  const dp = new DayPilot.Scheduler("scheduler", {
+    locale: "ru-ru",
+    allowEventOverlap: false,
+    treePreventParentUsage: true,
+    eventMoveHandling: "Disabled",
+    scale: "Day",
+    cellWidth: 60,
+    eventHeight: 60,
+    eventHoverHandling: "Disabled",
+    eventClickHandling: "Bubble",
+    // smoothscroll: true,
+    scrollDelay: 0,
+    scrollDelayDynamic: 0,
+    rowHeaderWidthAutoFit: false,
+    rowHeaderWidth: rowHeaderWidth,
+    timeHeaders: [
+      { groupBy: "Month", format: "MMM yyyy" },
+      { groupBy: "Cell", format: "d" }
+    ],
+    {% comment %} floatingTimeHeaders: false, {% endcomment %}
+    days: DayPilot.Date.today().daysInYear(),
+    startDate: DayPilot.Date.today(),
+    infiniteScrollingEnabled: true,
+    // startDate: DayPilot.Date.today(),
+    timeRangeSelectedHandling: "Enabled",
+    onEventFilter: (args) => {
+      if (args.e.text().toUpperCase().indexOf(args.filter.toUpperCase()) === -1) {
+        args.visible = false;
+      }
+    },
+    onTimeRangeSelected: async (args) => {
+      const dp = args.control;
+
+      let c_d_1 = args.start.addDays(1).value
+      let c_d_2 = args.end.value
+      let room = args.resource
+
+      c_d_1 = new Date(c_d_1).toISOString().split('T')[0]
+      c_d_2 = new Date(c_d_2).toISOString().split('T')[0]
+
+      popup_create(
+        "Закрыть на выбранный период",
+        "",
+        [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Закрыть", fun: closeRoomAjax }],
+        [
+          [{ type: "hidden", name: "room", val: room }],
+          [{ type: "date", "label": "Дата 1", val: c_d_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: c_d_2, name: "date_end" }],
+          [{ type: "textarea", "label": "Комментарий", name: "comment" }]
+        ]
+      );
+
+      dp.clearSelection();
+    },
+    eventDeleteHandling: "Update",
+    onEventDelete: (args) => {
+      args.preventDefault();
+      popup_create(
+        "Открыть комнату",
+        "Вы уверены что хотите открыть команту?",
+        [{ type: "close", name: "Нет" }, { type: "open_room", name: "Да", fun: openRoom, param: [args.e.data.id] }],
+      );
+    },
+    treeEnabled: true,
+    onBeforeEventRender: (args) => {
+      const start = new DayPilot.Date(args.data.start);
+      const end = new DayPilot.Date(args.data.end);
+      const status = args.data.status;
+      const today = DayPilot.Date.today();
+      const now = new DayPilot.Date();
+
+      args.data.html = `<div class="data_booking_hidden" style="display: none" data-id="${args.data.id}"></div>` + DayPilot.Util.escapeHtml(args.data.text);
+
+      switch (status) {
+        case "new":
+          {
+            args.data.barColor = '#54d39c';
+            args.data.toolTip = 'Новое';
+            break;
+          }
+        case "verified":
+          {
+            args.data.barColor = '#60C0FF';
+            args.data.toolTip = 'Подтверждено';
+            break;
+          }
+        case "settled":
+          {
+            args.data.barColor = '#54d39c';
+            args.data.toolTip = 'Заселен';
+            break;
+          }
+        case "left":
+          {
+            args.data.barColor = '#B3BAC4';
+            args.data.toolTip = 'Выехал';
+            break;
+          }
+        case "cancelled":
+          {
+            args.data.barColor = '#D34141';
+            args.data.toolTip = 'Отменен';
+            break;
+          }
+        case "close": {
+          args.data.barColor = '#D34141';
+          args.data.toolTip = 'Закрыт';
+          break;
+        }
+      }
+      if (status == "close") {
+        args.data.html = `<div class='close_item_event' >${args.data.html}</div>`;
+        args.data.deleteDisabled = false;
+      }
+      else {
+        args.data.deleteDisabled = true;
+        args.data.html = `<div>` + args.data.html + "<br /><span style='color:gray'>" + args.data.toolTip + "</span></div>";
+      }
+
+      args.e.bubbleHtml = args.data.info_html;
+    },
+  });
+  dp.init();
+  $(".scheduler_default_corner").html("")
+  loadRooms()
+  loadBooking()
+
+  dp.onEventClick = function(args) {
+    console.log(args.e.id(), args.e.data)
+
+    if (args.e.data["status"] == "close") {
+      let comment = args.e.data["comment"]
+      let id = args.e.id
+
+      popup_create(
+        "Открыть комнату",
+        `Вы уверены что хотите открыть команту?<br>${comment}`,
+        [{ type: "close", name: "Нет" }, { type: "open_room", name: "Да", fun: openRoom, param: [id] }],
+      );
+    }
+  };
+
+  dp.scrollTo(DayPilot.Date.today(), null);
+
+  document.querySelector("#cellwidth").addEventListener("input", function (ev) {
+    var cellwidth = parseInt(this.value);
+    document.querySelector("#label").innerText = cellwidth;
+    var start = dp.getViewPort().start;
+
+    dp.cellWidth = cellwidth;
+    dp.update();
+    $(".scheduler_default_corner").html("")
+    dp.scrollTo(start);
+  });
+
+  setInterval(function () {
+      remove_bookin_dubl()
+  }, 2000);
+
+  remove_bookin_dubl()
+
+  function remove_bookin_dubl() {
+    id_list = {};
+    $(".data_booking_hidden[data-id]").map(function () {
+      id = $(this).data("id")
+      if (id in id_list) {
+        id_list[id] += 1;
+      } else {
+        id_list[id] = 1;
+      }
+    });
+
+    for (let key in id_list) {
+      if (id_list[key] > 1) {
+        all_id_elem = $(`.data_booking_hidden[data-id="${key}"]`)
+        del_elem = $(all_id_elem).first()
+        parent_del_elem = $(del_elem).parents(".scheduler_default_event")
+        // console.log({all_id_elem, key, del_elem, parent_del_elem})
+        parent_del_elem.remove()
+      }
+    }
+  }
+</script>
+
+
+{% endblock main_block %}

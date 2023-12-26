@@ -1,0 +1,323 @@
+{% extends "main/base_base.html" %}
+{% load static header sass_tags %}
+{% block base %}
+
+
+<link href="{% static 'css/scss/base.css' %}?v2"
+  rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'css/scss/common.css' %}?v4"
+  rel="stylesheet"
+  type="text/css" />
+
+<script src="{% static 'js/popup_create.js'%}?v4"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css" />
+
+<body>
+  {% header %}
+  {% block content %}
+  {% endblock %}
+
+  {% if user.is_authenticated == False %}
+  <style>
+    .exit-intent-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 1;
+      background: rgba(33, 33, 33, 0.8);
+      transform: translateY(60%) scale(0);
+      transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    .exit-intent-popup.visible {
+      transform: translateY(0) scale(1);
+    }
+
+    .exit-intent-popup .newsletter {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Popup-specific styles */
+    .exit-intent-popup .newsletter {
+      background: #FFF;
+      padding: 26px;
+      border-radius: 9px;
+      max-width: 525px;
+      max-height: 230px;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .exit-intent-popup .title {
+      font-size: 25px;
+      color: #afafaf;
+      margin-bottom: 37px;
+    }
+
+    .exit-intent-popup .text {
+      font-size: 18px;
+    }
+
+    .exit-intent-popup a {
+      font-size: 19px;
+      color: #fc7201;
+    }
+  </style>
+
+  <div class="exit-intent-popup">
+    <div class="newsletter">
+      <span class="text">Зарегистрируйтесь и получите 200 бонусов!</span>
+      <a href="/register/">Регистрация</a>
+    </div>
+  </div>
+
+  {% comment %}
+  <script>
+  const exit = e => {
+      const shouldExit =
+        [...e.target.classList].includes('exit-intent-popup') || // user clicks on mask
+        e.target.className === 'close' || // user clicks on the close icon
+        e.keyCode === 27; // user hits escape
+
+      if (shouldExit) {
+        document.querySelector('.exit-intent-popup').classList.remove('visible');
+      }
+    };
+
+    const mouseEvent = e => {
+      const shouldShowExitIntent =
+        !e.toElement &&
+        !e.relatedTarget &&
+        e.clientY < 10;
+
+      if (shouldShowExitIntent) {
+        document.removeEventListener('mouseout', mouseEvent);
+        document.querySelector('.exit-intent-popup').classList.add('visible');
+
+        setCookie('exitIntentShown', true, 30);
+      }
+    };
+
+    if (!getCookie('exitIntentShown')) {
+      setTimeout(() => {
+        document.addEventListener('mouseout', mouseEvent);
+        document.addEventListener('keydown', exit);
+        document.querySelector('.exit-intent-popup').addEventListener('click', exit);
+      }, 0);
+    }
+  </script> {% endcomment %}
+
+  {% endif %}
+
+  <footer class="main-footer">
+    <div class="container main-footer__container">
+      <div class="column-one"> <a class="column-one__logo"
+          href="#">Тургородок</a>
+        <p class="column-one__slogan">Первый среди лучших</p>
+
+
+      </div>
+      <div class="column-second">
+        <div class="column-second__item">
+          <a href="/payment-methods/"
+            target="_blank"
+            class="column-second__title">Способы оплаты</a>
+        </div>
+        <div class="column-second__item">
+          <a href="/privacy-policy/"
+            target="_blank"
+            class="column-second__title">Политика хранения и обработки персональных данных</a>
+        </div>
+        <div class="column-second__item">
+          <a href="/contract-offer/"
+            target="_blank"
+            class="column-second__title">Договор оферта</a>
+        </div>
+        <p style="font-size: 14px; color: white; margin-top: 14px;">ИП Сычев Николай Григорьевич</p>
+        <p style="font-size: 14px; color: white;">ИНН 231709222803</p>
+        <p style="font-size: 14px; color: white;">ОГРНИП 322237500187504</p>
+        <p style="font-size: 14px; color: white;">Телефон/Факс <a href="tel:88001015369" style="color: white"><b>88001015369</b></a></p>
+        <p style="font-size: 14px; color: white;">Почта turgorodok@gmail.com</p>
+
+      </div>
+      <div class="column-three">
+        <ul>
+          <li> <a href="/">Поиск отелей </a></li>
+          <li> <a href="/">Поиск тура</a></li>
+          <li> <a href="{% url 'page_register_placement_object' %}">Зарегистрировать свой объект</a></li>
+          <li> <a href="/profile/ts/">Помощь</a></li>
+        </ul>
+      </div>
+      <div class="column-four">
+        <p class="column-four__title">Подпишитесь, чтобы получать лучшие предложения</p>
+        <div class="mailing-form mailing-form--footer"
+          action="#">
+          <div class="mailing-form__row mailing-form__row--footer">
+            <input class="mailing-form__input mailing-form__input--footer"
+              type="email"
+              name="email"
+              placeholder="Введите ваш e-mail">
+            <button class="mailing-form__button mailing-form__button--footer" type="submit">Подписаться</button>
+          </div>
+          <a href="/privacy-policy/"  class="privacy"
+            style="color: lightgrey">Нажимая на кнопку, вы соглашаетесь с Политикой конфиденциальности.</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+<script>
+  $(document).ready(function() {
+    $('.mailing-form button').click(function() {
+        input = $(this).parents(".mailing-form").find("input")
+        var email = $(input).val();
+        $(input).val()
+        $.ajax({
+            type: "POST",
+            url: "{% url 'ajax.mailing.add' %}",
+            beforeSend: function (request) {
+              request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            data: {
+                'email': email,
+            },
+            success: function() {
+                popup_create("Рассылка", "Вы успешно подписались на рассылку")
+            },
+            error: function() {
+                popup_create("Рассылка", "Ошибка, вы не смогли подписатся на рассылку", [], [], "error")
+            }
+        });
+    });
+});
+</script>
+
+<script defer>
+  function generateID() {
+    var charset = "1234567890";
+    var password = "";
+    for (var i = 0; i < 15; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
+  }
+
+  function fast_addStep(element, text, advanceOn = null) {
+    param = {
+      id: generateID(),
+      text: text,
+      attachTo: {
+        element: element,
+        on: 'left'
+      },
+      buttons: [
+      ]
+    };
+
+    if (advanceOn != null) {
+      param["advanceOn"] = advanceOn
+    }
+    else {
+      param["buttons"].push({
+        text: 'Далее',
+        action: tour.next
+      },)
+    }
+
+    param["buttons"].push({
+      text: 'Пропустить',
+      action() {
+        setCookie("tutorial_stage", "not");
+        tour.cancel();
+      }
+    })
+
+    tour.addStep(param)
+  }
+
+  function switchTutorialActive(status) {
+    localStorage.setItem("tutorial_active", status);
+  }
+
+  if (localStorage.getItem("tutorial_active") == null) {
+    localStorage.setItem("tutorial_active", false)
+  }
+
+  function saveTutorialProgress(status = true) {
+    const pageName = "tutorial_progress_" + window.location.pathname;
+    localStorage.setItem(pageName, status);
+  }
+
+  function getTutorialProgress() {
+    tutorial_active = localStorage.getItem("tutorial_active")
+    if (tutorial_active == "true") {
+      const pageName = "tutorial_progress_" + window.location.pathname;
+      const progress = localStorage.getItem(pageName);
+      return progress ? true : false;
+    }
+    else {
+      return true;
+    }
+  }
+
+  function deleteAllTutorialProgress() {
+    const keys = Object.keys(localStorage);
+    for (let i = 0; i < keys.length; i++) {
+      if (keys[i].startsWith("tutorial_progress_")) {
+        localStorage.removeItem(keys[i]);
+      }
+    }
+  }
+
+  function generateID() {
+    var charset = "1234567890";
+    var password = "";
+    for (var i = 0; i < 15; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
+  }
+
+  const tour = new Shepherd.Tour({
+    useModalOverlay: true,
+    defaultStepOptions: {
+      classes: 'shadow-md bg-purple-dark',
+      scrollTo: true
+    }
+  });
+
+
+  $(document).ready(function () {
+    if (document.cookie.includes("access_token")) {
+      const a = $('<a>').attr("id", "return_admin_account").attr('href', '/admin/ajax/auth/user/').css({
+        "text-decoration": "none",
+        "color": "rgb(0, 0, 0)",
+        "background": "#ff6262",
+        "color": "white",
+        "padding": "0",
+        "margin": "0",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "height": "39px",
+      }).text('Выйти из аккаунта пользователя');
+      $('body').prepend(a);
+    }
+  });
+</script>
+
+{% endblock base %}

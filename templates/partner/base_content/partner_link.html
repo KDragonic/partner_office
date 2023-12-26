@@ -1,0 +1,143 @@
+{% load static %}
+{% load form static %}
+
+
+<style>
+	input[readonly] {
+		background: #DDD;
+	}
+</style>
+
+<div class="row p-2">
+  <div class="col-12 col-xl-6 px-2 m-0">
+    <div class="kdjq-card" kdjq style="height: 100%;">
+      <div class="kdjq-card--header">
+        <div class="kdjq-card--header--title" style="display: flex; width: 100%; gap: 10px; align-items: center;">
+					<div class="icon" style="border-radius: 100%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #56708D;">
+						<span style="color: #fff; font-size: 18px; font-weight: 700;">1</span>
+					</div>
+					<span>Готовая ссылка</span>
+				</div>
+      </div>
+      <div class="kdjq-card--body pt-0">
+        <div class="row p-1">
+          <div class="col-12 col-md-6 p-1">
+            <label for="" class="form-label">Канал</label>
+            <select class="form-select" name="channel" id="input_channel">
+							{% for channel in channels.values %}
+								<option value="{{channel.id}}">{{channel.name}}</option>
+							{% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-6 p-1">
+            <label for="" class="form-label">SUB ID</label>
+            <input type="text" class="form-control" name="sub_id" id="input_sub_id" placeholder="Опционально" />
+          </div>
+					<div class="col-12 col-md-8 p-1">
+            <input type="text" class="form-control" name="url" id="input_url" readonly value="https://turgorodok.ru/s/4e" />
+          </div>
+					<div class="col col-md-4 p-1">
+						<button class="btn btn-primary w-100 d-flex" style="gap: 10px; align-items: center; justify-content: center; height: 38px;">
+							<svg style="height: 27px;" xmlns="http://www.w3.org/2000/svg" width="30" height="31" viewBox="0 0 30 31" fill="none">
+								<path fill-rule="evenodd" clip-rule="evenodd" d="M18.75 2.0625H13.68C11.3825 2.0625 9.5625 2.0625 8.13875 2.25375C6.67375 2.45125 5.4875 2.86625 4.55125 3.80125C3.61625 4.7375 3.20125 5.92375 3.00375 7.38875C2.8125 8.81375 2.8125 10.6325 2.8125 12.93V20.5C2.81253 21.6168 3.21117 22.6969 3.93667 23.5459C4.66217 24.3949 5.66689 24.9571 6.77 25.1313C6.94125 26.0863 7.2725 26.9013 7.935 27.565C8.6875 28.3175 9.635 28.64 10.76 28.7925C11.8438 28.9375 13.2225 28.9375 14.9312 28.9375H18.8188C20.5275 28.9375 21.9062 28.9375 22.99 28.7925C24.115 28.64 25.0625 28.3175 25.815 27.565C26.5675 26.8125 26.89 25.865 27.0425 24.74C27.1875 23.6562 27.1875 22.2775 27.1875 20.5688V14.1812C27.1875 12.4725 27.1875 11.0938 27.0425 10.01C26.89 8.885 26.5675 7.9375 25.815 7.185C25.1513 6.5225 24.3363 6.19125 23.3813 6.02C23.2071 4.91689 22.6449 3.91217 21.7959 3.18667C20.9469 2.46117 19.8668 2.06253 18.75 2.0625ZM21.4125 5.83875C21.2224 5.28375 20.8636 4.80207 20.3861 4.46116C19.9087 4.12024 19.3366 3.93714 18.75 3.9375H13.75C11.3663 3.9375 9.67375 3.94 8.3875 4.1125C7.13125 4.28125 6.40625 4.59875 5.8775 5.1275C5.34875 5.65625 5.03125 6.38125 4.8625 7.63875C4.69 8.92375 4.6875 10.6163 4.6875 13V20.5C4.68714 21.0866 4.87024 21.6587 5.21116 22.1361C5.55207 22.6136 6.03375 22.9724 6.58875 23.1625C6.5625 22.4 6.5625 21.5375 6.5625 20.5688V14.1812C6.5625 12.4725 6.5625 11.0938 6.70875 10.01C6.85875 8.885 7.18375 7.9375 7.935 7.185C8.6875 6.4325 9.635 6.11 10.76 5.95875C11.8438 5.8125 13.2225 5.8125 14.9312 5.8125H18.8188C19.7875 5.8125 20.65 5.8125 21.4125 5.83875ZM9.26 8.5125C9.60625 8.16625 10.0912 7.94125 11.01 7.8175C11.9525 7.69125 13.205 7.68875 14.9987 7.68875H18.7487C20.5425 7.68875 21.7938 7.69125 22.7388 7.8175C23.6562 7.94125 24.1413 8.1675 24.4875 8.5125C24.8337 8.85875 25.0588 9.34375 25.1825 10.2625C25.3088 11.205 25.3113 12.4575 25.3113 14.2513V20.5012C25.3113 22.295 25.3088 23.5463 25.1825 24.4913C25.0588 25.4088 24.8325 25.8937 24.4875 26.24C24.1413 26.5862 23.6562 26.8113 22.7375 26.935C21.7938 27.0613 20.5425 27.0637 18.7487 27.0637H14.9987C13.205 27.0637 11.9525 27.0613 11.0087 26.935C10.0912 26.8113 9.60625 26.585 9.26 26.24C8.91375 25.8937 8.68875 25.4087 8.565 24.49C8.43875 23.5462 8.43625 22.295 8.43625 20.5012V14.2513C8.43625 12.4575 8.43875 11.205 8.565 10.2612C8.68875 9.34375 8.915 8.85875 9.26 8.5125Z" fill="white"/>
+							</svg>
+							<span>Копировать</span>
+						</button>
+					</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-6 px-2 m-0">
+    <div class="kdjq-card" kdjq style="height: 100%;">
+      <div class="kdjq-card--header">
+				<div class="kdjq-card--header--title" style="display: flex; width: 100%; gap: 10px; align-items: center;">
+					<div class="icon" style="border-radius: 100%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #56708D;">
+						<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+							<path d="M15 12.5C14.6685 12.5 14.3505 12.6317 14.1161 12.8661C13.8817 13.1005 13.75 13.4185 13.75 13.75V21.25C13.75 21.5815 13.8817 21.8995 14.1161 22.1339C14.3505 22.3683 14.6685 22.5 15 22.5C15.3315 22.5 15.6495 22.3683 15.8839 22.1339C16.1183 21.8995 16.25 21.5815 16.25 21.25V13.75C16.25 13.4185 16.1183 13.1005 15.8839 12.8661C15.6495 12.6317 15.3315 12.5 15 12.5ZM15 7.5C14.691 7.5 14.3889 7.59164 14.1319 7.76333C13.875 7.93502 13.6747 8.17905 13.5564 8.46456C13.4382 8.75007 13.4072 9.06423 13.4675 9.36733C13.5278 9.67042 13.6766 9.94883 13.8951 10.1674C14.1137 10.3859 14.3921 10.5347 14.6952 10.595C14.9983 10.6553 15.3124 10.6243 15.5979 10.5061C15.8835 10.3878 16.1275 10.1875 16.2992 9.93058C16.4709 9.67363 16.5625 9.37153 16.5625 9.0625C16.5625 8.6481 16.3979 8.25067 16.1049 7.95765C15.8118 7.66462 15.4144 7.5 15 7.5Z" fill="white"/>
+						</svg>
+					</div>
+					<span>Как работают ссылки</span>
+				</div>
+      </div>
+      <div class="kdjq-card--body pt-0 d-flex flex-column" style="gap: 17px">
+        <span>Вы зарабатываете с комиссии сайта 40% за каждое оплаченное бронирование по вашим ссылкам. Отчисления от каждого бронирования начисляются вам в течение 1 года от даты первого оплаченного бронирования</span>
+        <section style="border-radius: 12px; background: #F6F8FF; padding: 8px 10px; display: flex; gap: 56px;">
+          <span style="color: #505050; font-size: 12px; font-weight: 700; line-height: normal;">1. Создайте партнёрскую или скопируйте готовую ссылку</span>
+          <span style="color: #505050; font-size: 12px; font-weight: 700; line-height: normal;">2. Выберите канал и добавьте SubID, чтобы отслеживать клики и бронирования по этой ссылке</span>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row p-2">
+  <div class="col-12 col-xl-7 px-2 m-0">
+    <div class="kdjq-card" kdjq style="height: 100%;">
+      <div class="kdjq-card--header">
+        <div class="kdjq-card--header--title" style="display: flex; width: 100%; gap: 10px; align-items: center;">
+					<div class="icon" style="border-radius: 100%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #56708D;">
+						<span style="color: #fff; font-size: 18px; font-weight: 700;">1</span>
+					</div>
+					<span>Готовая ссылка</span>
+				</div>
+      </div>
+      <div class="kdjq-card--body pt-0">
+        <div class="row p-1">
+					<div class="col-12 col-md-4 p-1">
+            <label for="" class="form-label">Адрес целевой страницы</label>
+            <input type="text" class="form-control" name="address_landing_page" id="штзге_address_landing_page" placeholder="https://turgorodok.ru/hotel/4/" />
+          </div>
+          <div class="col-12 col-md-4 p-1">
+            <label for="" class="form-label">Канал</label>
+            <select class="form-select" name="channel" id="input_channel">
+							{% for channel in channels.values %}
+								<option value="{{channel.id}}">{{channel.name}}</option>
+							{% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-4 p-1">
+            <label for="" class="form-label">SUB ID</label>
+            <input type="text" class="form-control" name="sub_id" id="input_sub_id" placeholder="Опционально" />
+          </div>
+					<div class="col-12 col-md-8 p-1">
+            <input type="text" class="form-control" name="url" id="input_url" readonly value="https://turgorodok.ru/s/4e" />
+          </div>
+					<div class="col col-md-4 p-1">
+						<button class="btn btn-primary w-100 d-flex" style="gap: 10px; align-items: center; justify-content: center; height: 38px;">
+							<svg style="height: 27px;" xmlns="http://www.w3.org/2000/svg" width="30" height="31" viewBox="0 0 30 31" fill="none">
+								<path fill-rule="evenodd" clip-rule="evenodd" d="M18.75 2.0625H13.68C11.3825 2.0625 9.5625 2.0625 8.13875 2.25375C6.67375 2.45125 5.4875 2.86625 4.55125 3.80125C3.61625 4.7375 3.20125 5.92375 3.00375 7.38875C2.8125 8.81375 2.8125 10.6325 2.8125 12.93V20.5C2.81253 21.6168 3.21117 22.6969 3.93667 23.5459C4.66217 24.3949 5.66689 24.9571 6.77 25.1313C6.94125 26.0863 7.2725 26.9013 7.935 27.565C8.6875 28.3175 9.635 28.64 10.76 28.7925C11.8438 28.9375 13.2225 28.9375 14.9312 28.9375H18.8188C20.5275 28.9375 21.9062 28.9375 22.99 28.7925C24.115 28.64 25.0625 28.3175 25.815 27.565C26.5675 26.8125 26.89 25.865 27.0425 24.74C27.1875 23.6562 27.1875 22.2775 27.1875 20.5688V14.1812C27.1875 12.4725 27.1875 11.0938 27.0425 10.01C26.89 8.885 26.5675 7.9375 25.815 7.185C25.1513 6.5225 24.3363 6.19125 23.3813 6.02C23.2071 4.91689 22.6449 3.91217 21.7959 3.18667C20.9469 2.46117 19.8668 2.06253 18.75 2.0625ZM21.4125 5.83875C21.2224 5.28375 20.8636 4.80207 20.3861 4.46116C19.9087 4.12024 19.3366 3.93714 18.75 3.9375H13.75C11.3663 3.9375 9.67375 3.94 8.3875 4.1125C7.13125 4.28125 6.40625 4.59875 5.8775 5.1275C5.34875 5.65625 5.03125 6.38125 4.8625 7.63875C4.69 8.92375 4.6875 10.6163 4.6875 13V20.5C4.68714 21.0866 4.87024 21.6587 5.21116 22.1361C5.55207 22.6136 6.03375 22.9724 6.58875 23.1625C6.5625 22.4 6.5625 21.5375 6.5625 20.5688V14.1812C6.5625 12.4725 6.5625 11.0938 6.70875 10.01C6.85875 8.885 7.18375 7.9375 7.935 7.185C8.6875 6.4325 9.635 6.11 10.76 5.95875C11.8438 5.8125 13.2225 5.8125 14.9312 5.8125H18.8188C19.7875 5.8125 20.65 5.8125 21.4125 5.83875ZM9.26 8.5125C9.60625 8.16625 10.0912 7.94125 11.01 7.8175C11.9525 7.69125 13.205 7.68875 14.9987 7.68875H18.7487C20.5425 7.68875 21.7938 7.69125 22.7388 7.8175C23.6562 7.94125 24.1413 8.1675 24.4875 8.5125C24.8337 8.85875 25.0588 9.34375 25.1825 10.2625C25.3088 11.205 25.3113 12.4575 25.3113 14.2513V20.5012C25.3113 22.295 25.3088 23.5463 25.1825 24.4913C25.0588 25.4088 24.8325 25.8937 24.4875 26.24C24.1413 26.5862 23.6562 26.8113 22.7375 26.935C21.7938 27.0613 20.5425 27.0637 18.7487 27.0637H14.9987C13.205 27.0637 11.9525 27.0613 11.0087 26.935C10.0912 26.8113 9.60625 26.585 9.26 26.24C8.91375 25.8937 8.68875 25.4087 8.565 24.49C8.43875 23.5462 8.43625 22.295 8.43625 20.5012V14.2513C8.43625 12.4575 8.43875 11.205 8.565 10.2612C8.68875 9.34375 8.915 8.85875 9.26 8.5125Z" fill="white"/>
+							</svg>
+							<span>Копировать</span>
+						</button>
+					</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-5 px-2 m-0">
+    <div class="kdjq-card" kdjq style="height: 100%;">
+      <div class="kdjq-card--header">
+				<div class="kdjq-card--header--title" style="display: flex; width: 100%; gap: 10px; align-items: center;">
+					<div class="icon" style="border-radius: 100%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #56708D;">
+						<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+							<path d="M15 12.5C14.6685 12.5 14.3505 12.6317 14.1161 12.8661C13.8817 13.1005 13.75 13.4185 13.75 13.75V21.25C13.75 21.5815 13.8817 21.8995 14.1161 22.1339C14.3505 22.3683 14.6685 22.5 15 22.5C15.3315 22.5 15.6495 22.3683 15.8839 22.1339C16.1183 21.8995 16.25 21.5815 16.25 21.25V13.75C16.25 13.4185 16.1183 13.1005 15.8839 12.8661C15.6495 12.6317 15.3315 12.5 15 12.5ZM15 7.5C14.691 7.5 14.3889 7.59164 14.1319 7.76333C13.875 7.93502 13.6747 8.17905 13.5564 8.46456C13.4382 8.75007 13.4072 9.06423 13.4675 9.36733C13.5278 9.67042 13.6766 9.94883 13.8951 10.1674C14.1137 10.3859 14.3921 10.5347 14.6952 10.595C14.9983 10.6553 15.3124 10.6243 15.5979 10.5061C15.8835 10.3878 16.1275 10.1875 16.2992 9.93058C16.4709 9.67363 16.5625 9.37153 16.5625 9.0625C16.5625 8.6481 16.3979 8.25067 16.1049 7.95765C15.8118 7.66462 15.4144 7.5 15 7.5Z" fill="white"/>
+						</svg>
+					</div>
+					<span>О клиентах</span>
+				</div>
+      </div>
+      <div class="kdjq-card--body pt-0 d-flex flex-column" style="gap: 17px">
+        <span>
+					При переходе по вашей партнерской ссылке, привлеченный клиент
+					помечается файлом в cookies на 30 дней.
+					Это значит, если вы привели клиента по партнерской ссылке, он покинул
+					сайт, но затем вернулся через несколько дней и забронировал • мы его
+					закрепим за вами.
+				</span>
+      </div>
+    </div>
+  </div>
+</div>

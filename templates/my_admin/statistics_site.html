@@ -1,0 +1,175 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form static %}
+{% block main_block %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  .info_card {
+    min-height: 100px;
+    min-width: 229px;
+    max-width: 278px;
+    padding: 20px;
+    background: white;
+    border: 3px solid #9a9a9a;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info_card .val {
+    font-size: 23px;
+  }
+
+  .grupe_info_card {
+    gap: 10px;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+</style>
+
+<div class="section">
+  <span class="title">Статистика сайта</span>
+  <div class="grupe_info_card">
+    <div class="info_card">
+      <div class="name">Количество броней</div>
+      <div class="val">{{len_booking}}</div>
+    </div>
+
+    <div class="info_card">
+      <div class="name">Заработано с брони</div>
+      <div class="val">{{total_spent}} ₽</div>
+    </div>
+
+    <div class="info_card">
+      <div class="name">Количество отелей</div>
+      <div class="val">{{len_hotel}}</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="title">Брони и их статусы</span>
+  <canvas id="myBar" style="max-width: 100%;"></canvas>
+  <br>
+  <span class="title">Брони по месяцам</span>
+  <canvas id="myBar_sum_booking" style="max-width: 100%;"></canvas>
+  <canvas id="myBar_count_booking" style="max-width: 100%;"></canvas>
+</div>
+
+<script>
+  booking_label = [
+    // {% for key in bookings.keys  %}
+    "{{key}}",
+    // {% endfor %}
+  ]
+
+  booking_val = [
+    // {% for val in bookings.values  %}
+    {{ val }},
+    // {% endfor %}
+  ]
+
+  var ctx = document.getElementById('myBar').getContext('2d');
+  var myBar = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: booking_label,
+      datasets: [{
+        label: 'Количество',
+        data: booking_val,
+        backgroundColor: [
+          "rgba(85, 211, 156, 0.2)",
+          "rgba(96, 192, 255, 0.2)",
+          "rgba(84, 211, 156, 0.2)",
+          "rgba(179, 186, 196, 0.2)",
+          "rgba(211, 65, 65, 0.2)",
+        ],
+        borderColor: [
+          "rgba(85, 211, 156, 1)",
+          "rgba(96, 192, 255, 1)",
+          "rgba(84, 211, 156, 1)",
+          "rgba(179, 186, 196, 1)",
+          "rgba(211, 65, 65, 1)",
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+
+    }
+  });
+</script>
+
+<script>
+  booking_label = [
+    // {% for key in bookings_and_price.keys  %}
+    "{{key}}",
+    // {% endfor %}
+  ]
+
+  booking_val_count = [
+    // {% for val in bookings_and_price.values  %}
+    {{ val.count }},
+    // {% endfor %}
+  ]
+
+
+  booking_val_sum = [
+    // {% for val in bookings_and_price.values  %}
+    {{ val.sum }},
+    // {% endfor %}
+  ]
+
+
+  var ctx = document.getElementById('myBar_sum_booking').getContext('2d');
+  var myBar_sum_booking = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: booking_label,
+      datasets: [{
+        label: 'Количество',
+        data: booking_val_count,
+        backgroundColor: [
+          "rgba(85, 211, 156, 0.2)",
+        ],
+        borderColor: [
+          "rgba(85, 211, 156, 1)",
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+
+    }
+  });
+
+
+  var ctx = document.getElementById('myBar_count_booking').getContext('2d');
+  var myBar_count_booking = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: booking_label,
+      datasets: [
+      {
+        label: 'Сумма',
+        data: booking_val_sum,
+        backgroundColor: [
+          "rgba(255, 192, 192, 0.2)",
+        ],
+        borderColor: [
+          "rgba(255, 192, 192, 1)",
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+
+    }
+  });
+</script>
+
+{% endblock main_block %}

@@ -1,0 +1,237 @@
+<div id="tabs">
+	<span class="username">
+		{{name}}
+	</span>
+
+	<a href="{% url 'profile_v2' %}"
+		class="edit_profil link">Профиль пользователя</a>
+
+	<div class="grupe_tabs">
+		{% if is_admin %}
+		<a href="{% url 'admin.page.list.user' %}" {% if view_name == 'admin.page.list.user' %}data-select="select"{% endif %} class="item">Список пользователей</a>
+		<a href="{% url 'admin.page.list.hotel' %}"  {% if view_name == 'admin.page.list.hotel' %}data-select="select"{% endif %} class="item">Объекты размещения</a>
+		<a href="{% url 'admin.page.list.moderation.hotel' %}"  {% if view_name == 'admin.page.list.moderation.hotel' %}data-select="select"{% endif %} class="item">Модерация объектов размещения</a>
+		<a href="{% url 'admin.page.list.booking' %}"  {% if view_name == 'admin.page.list.booking' %}data-select="select"{% endif %} class="item">Список броней</a>
+		<a href="{% url 'admin.page.list.place' %}"  {% if view_name == 'admin.page.list.place' %}data-select="select"{% endif %} class="item">Места</a>
+		<a href="{% url 'admin.page.list.services' %}"  {% if view_name == 'admin.page.list.services' %}data-select="select"{% endif %} class="item">Услуги</a>
+
+		<a href="{% url 'admin.page.ts.chat' %}"  {% if view_name == 'admin.page.ts.chat' %}data-select="select"{% endif %} class="item">Чат</a>
+		<a href="{% url 'admin.page_review_moderation' %}"  {% if view_name == 'admin.page_review_moderation' %}data-select="select"{% endif %} class="item">Отзывы</a>
+
+		<a href="{% url 'ajax.page.page_moderator_office' %}"  {% if view_name == 'ajax.page.page_moderator_office' %}data-select="select"{% endif %} class="item">Рабочий лист</a>
+
+		{% if supermoderator or user_type == "owner" %}
+		<a href="{% url 'admin.page.statistics' %}"  {% if view_name == 'admin.page.statistics' %}data-select="select"{% endif %} class="item">Статистика</a>
+		<a href="{% url 'admin.page.site_management' %}"  {% if view_name == 'admin.page.site_management' %}data-select="select"{% endif %} class="item">Управление сайтом</a>
+		{% endif %}
+
+		{% if user_type == "moder" or user_type == "owner" %}
+		<a href="{% url 'admin.page.list.moderator_reports' %}"  {% if view_name == 'admin.page.list.moderator_reports' %}data-select="select"{% endif %} class="item">Отчёты модераторов</a>
+		{% endif %}
+
+		{% if user_type == "owner" or supermoderator %}
+		<a href="{% url 'admin.page.list.actions_admin' %}"  {% if view_name == 'admin.page.list.actions_admin' %}data-select="select"{% endif %} class="item">Логи админов</a>
+		{% endif %}
+
+
+		{% else %}
+		{% if user_owner_hotel %}
+		<div class="item grupe">
+			<span class="name_grupe">Выбраный объект</span>
+			<div class="cont">
+				{% for hotel in hotels %}
+				<a href="/ajax/switch_hotel/?hotel={{hotel.id}}&next={{path}}" data-select="{% if hotel.select %}select{% endif %}" class="item">{{hotel.name}}</a>
+				{% endfor %}
+			</div>
+		</div>
+		<div class="item grupe">
+			<span class="name_grupe">Управление объектом размещения</span>
+			<div class="cont"
+				{% if path not in list_url_1 %} style="display: none;" {% endif %}>
+				<a href="/profile/hotel/"
+					data-select="{% if path == '/profile/hotel/' %}select{% endif %}"
+					class="item">Объект</a>
+				<a href="/profile/hotel/rcs/"
+					data-select="{% if path == '/profile/hotel/rcs/' %}select{% endif %}"
+					class="item">Управление категориями номеров</a>
+				<a href="/profile/hotel/rooms/"
+					data-select="{% if path == '/profile/hotel/rooms/' %}select{% endif %}"
+					class="item">Управление номерами</a>
+				<a href="/profile/hotel/price_calendar/"
+					data-select="{% if path == '/profile/hotel/price_calendar/' %}select{% endif %}"
+					class="item">Календарь цен</a>
+			</div>
+			<div class="item grupe">
+				<span class="name_grupe">Управление бронированием {% if count_new_booking > 0 %}({{count_new_booking}}+){% endif %}</span>
+				<div class="cont"
+					{% if path not in list_url_2 %} style="display: none;" {% endif %}>
+					<a href="/profile/hotel/booking/"
+						data-select="{% if path == '/profile/hotel/booking/' %}select{% endif %}"
+						class="item">Бронирования</a>
+					<a href="/profile/hotel/booking/chess/"
+						data-select="{% if path == '/profile/hotel/booking/chess/' %}select{% endif %}"
+						class="item">Шахматка бронирования</a>
+					<a href="/profile/hotel/chat/"
+						data-select="{% if path == '/profile/hotel/chat/' %}select{% endif %}"
+						class="item">Чат с клиентами</a>
+				</div>
+			</div>
+			<div class="item grupe">
+				<span class="name_grupe">Финансы отеля</span>
+				<div class="cont"
+					{% if path not in list_url_3 %} style="display: none;" {% endif %}>
+					<a href="/profile/hotel/balance/"
+						data-select="{% if path == '/profile/hotel/balance/' %}select{% endif %}"
+						class="item">Счета и история</a>
+					<a href="/profile/hotel/boost/"
+						data-select="{% if path == '/profile/hotel/boost/' %}select{% endif %}"
+						class="item">Повышения отеля</a>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		<a href="/profile/booking/"
+			data-select="{% if path == '/profile/booking/' %}select{% endif %}"
+			class="item">Мои бронирования</a>
+		<a href="/profile/chat/"
+			data-select="{% if path == '/profile/chat/' %}select{% endif %}"
+			class="item">Чат</a>
+		<a href="/profile/balance/"
+			data-select="{% if path == '/profile/balance/' %}select{% endif %}"
+			class="item">Счета и история</a>
+
+		<a href="/techsupport/chat/"
+			class="item">Техподдержка</a>
+
+		{% endif %}
+
+		<a href="/logout/"
+			class="item">Выход</a>
+	</div>
+</div>
+
+<script>
+	$(".item.grupe span").click(function () {
+		$(this).next(".cont").toggle("fast")
+		$(this).toggleClass("active")
+	})
+</script>
+
+<script defer>
+	$(document).ready(function () {
+		let width = $(window).width();
+		if (width < 768) {
+			$('#tabs').hide();
+		}
+	});
+
+	$("#tabs_mobile_toggle").click(function () {
+		$("#tabs").toggle();
+	});
+</script>
+
+<style>
+
+	#tabs {
+		background: #ffffff;
+		border-radius: 13px;
+		margin-left: 57px;
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		min-height: 535px;
+		width: 370px;
+	  }
+
+	  #tabs .username {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 700;
+		font-size: 18px;
+		line-height: 25px;
+		color: #000000;
+		margin-bottom: 10px;
+	  }
+
+	  #tabs .edit_profil {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 22px;
+		color: #024849;
+		margin-bottom: 45px;
+	  }
+
+	#tabs .grupe_tabs {
+		display: flex;
+		flex-direction: column;
+	}
+
+	#tabs .grupe_tabs .item {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 25px;
+
+		color: #787878;
+		cursor: pointer;
+	}
+
+	#tabs .grupe_tabs .item[data-select="select"] {
+		color: #5f8fff;
+	}
+
+	#tabs .grupe_tabs .cont {
+		margin-left: 20px;
+		margin-top: -5px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#tabs .grupe_tabs span.active::after {
+		content: "▼";
+		margin-left: 8px;
+	}
+
+	#tabs .grupe_tabs span::after {
+		content: "▲";
+		margin-left: 8px;
+	}
+
+	#tabs .name_grupe {
+		margin-bottom: 6px;
+		display: block;
+	}
+
+	#tabs .grupe_tabs,
+	#tabs .cont,
+	#tabs .grupe {
+		display: flex;
+		gap: 13px;
+		flex-direction: column;
+	}
+
+	#tabs_mobile_toggle {
+		display: none;
+		font-size: 31px;
+		position: relative;
+		margin-right: 13px;
+		top: -9px;
+	}
+
+	@media screen and (max-width: 768px) {
+		#tabs_mobile_toggle {
+			display: block !important;
+		}
+
+		#tabs {
+			margin-top: 20px;
+		}
+
+		/* #content .breadcrumb {
+			margin-left: 31px;
+		} */
+	}
+</style>

@@ -1,0 +1,96 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form static %}
+{% block main_block %}
+  <style>
+    #content #main_block {
+      min-height: 552px;
+    }
+
+    .services {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .service {
+      display: flex;
+      gap: 5px;
+    }
+
+    .service span {
+      padding: 5px;
+      border-radius: 5px;
+      color: white;
+      display: flex;
+      justify-content: center;
+    }
+
+    .service .type {
+      background: #ff7272;
+    }
+
+
+    .service .name {
+      color: black;
+      background: #dcdcdc;
+    }
+
+    .service .count {
+      background: #ff9292;
+    }
+
+    .service .count_2 {
+      background: #9cc088;
+    }
+
+    .tab {
+      padding: 5px;
+      border-radius: 0 5px 5px 0;
+      width: 15px;
+      color: white;
+      background: #858585;
+    }
+
+    .tab:nth-child(1) {
+      background: rgb(133 133 133 / 100%);
+    }
+    .tab:nth-child(2) {
+      background: rgb(133 133 133 / 80%);
+    }
+    .tab:nth-child(3) {
+      background: rgb(133 133 133 / 60%);
+    }
+    .tab:nth-child(4) {
+      background: rgb(133 133 133 / 40%);
+    }
+    .tab:nth-child(5) {
+      background: rgb(133 133 133 / 20%);
+    }
+
+  </style>
+
+  <section class="section">
+    <span class="title">Услуги номера</span>
+    <div class="services">
+      {% for service in services_rooms %}
+        <div class="service">
+          <span class="name">{{ service.name }}</span>
+          <span class="count">{{ service.count }} отеля</span>
+          <span class="count_2">{{ service.count_2 }} номера</span>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section" style=" margin-top: 24px; ">
+    <span class="title">Услуги отеля</span>
+    <div class="services">
+      {% for service in services_hotels %}
+        <div class="service">
+          <span class="name">{{ service.name }}</span>
+          <span class="count">{{ service.count }} отеля</span>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

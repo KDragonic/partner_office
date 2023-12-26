@@ -1,0 +1,422 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static sass_tags %}
+{% block main_block %}
+
+<link href="{% static 'css/scss/chat.css' %}"
+    rel="stylesheet"
+    type="text/css" />
+
+<style>
+    #main_block {
+        background: transparent !important;
+    }
+
+    .chat_list {
+        margin-top: 20px !important;
+        border: 1px solid #CFCFCF !important;
+        border-radius: 20px !important;
+        padding: 15px;
+        padding-top: 27px;
+        margin-bottom: 20px !important;
+        background: #ffffff !important;
+    }
+
+    .chat_item_ts {
+        background: white;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 9px;
+        padding-left: 72px;
+        position: relative;
+        border-radius: 10px;
+        min-height: 73px;
+        justify-content: center;
+        border: 1px solid #CFCFCF;
+    }
+
+    .chat_item_ts.select {
+        filter: drop-shadow(0px 0px 8px #B7B9FF);
+        border: 1px solid #FC7201;
+    }
+
+    .chat_item_ts img {
+        width: 56px;
+        position: absolute;
+        left: 6px;
+    }
+
+    .chat_item_ts .chat_user {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: 900;
+        font-size: 14px;
+        line-height: 16px;
+        color: #000000;
+    }
+
+    .chat_item_ts .chat_title {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 14px;
+        color: #A2A2A2;
+        margin-top: 8px;
+    }
+
+    .chat_item_ts .not_read_messages_count {
+        position: absolute;
+        top: 20px;
+        right: 14px;
+        font-size: 20px;
+        color: #ff6a6a;
+    }
+
+    .not_select_chat {
+        background: #ffffff !important;
+        margin-top: 20px !important;
+        border: 1px solid #CFCFCF !important;
+        border-radius: 20px !important;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        height: auto;
+        background: #ffffff;
+    }
+
+    #content .right #main_block .section {
+        gap: 17px;
+    }
+
+    #chat_max {
+        background: #ffffff !important;
+        margin-top: 20px !important;
+        border: 1px solid #CFCFCF !important;
+        border-radius: 20px !important;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        height: auto;
+        background: #ffffff;
+    }
+
+    #entering_message {
+        border-radius: 10px;
+        background: transparent !important;
+        border: 1px solid #185C5C;
+        height: 76px;
+        margin: 24px;
+        font-size: 15px;
+    }
+
+    #entering_message .send_messages {
+        position: absolute;
+        bottom: 15px;
+        right: 17px;
+        cursor: pointer;
+    }
+
+    #entering_message #entering_a_message_text {
+        flex-grow: 1;
+        resize: none;
+        font-size: 16px;
+        border: none;
+        margin-top: 2px;
+        padding: 0 !important;
+        height: 20px !important;
+    }
+
+    #messages {
+        height: 67vh;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        display: flex;
+        gap: 5px;
+        flex-direction: column;
+        overflow: auto;
+    }
+</style>
+
+<div class="section">
+    <div class="chat_list {% if full_chat %}hide{% endif %}">
+        {% for chat in chats %}
+        <a href="{{chat.url}}"
+            class="chat_item_ts {% if full_chat == chat.id %}select{% endif %}"
+            data-chat-id="{{chat.id}}">
+            <img src="{% static 'img/av_user_ts.png' %}"></img>
+            <span class="chat_user">Техподдержка</span>
+            <span class="chat_title">{{chat.title}}</span>
+            <!-- <div class="not_read_messages_count">{{chat.not_read_messages_count}}</div> -->
+        </a>
+        {% endfor %}
+        <a href="{% url 'techsupport.pattern' %}"
+            style=" height: 50px;background: #FC7201;color: white;display: flex;justify-content: center;align-items: center;font-size: 20px;border-radius: 5px;">Создать
+            новый чат</a>
+    </div>
+    {% if full_chat %}
+    <div id="chat_max">
+        <div id="messages">
+            <!-- Тут через js делается сообщения -->
+        </div>
+        <div id="entering_message">
+            <textarea name="text"
+                id="entering_a_message_text"
+                placeholder="Введите сообщение..."
+                required></textarea>
+            <img src="{% static 'img/chat_send_button.png' %}"
+                class="send_messages">
+            <label for="file_input"
+                style="cursor: pointer; position: absolute; right: 77px; bottom: 20px;">
+                <img src="{% static 'img/chat_send_a_file.png' %}"
+                    style="width: 14px;">
+                <input type="file"
+                    id="file_input"
+                    accept="image/*"
+                    style="display: none;">
+            </label>
+        </div>
+    </div>
+    {% else %}
+    <div class="not_select_chat">
+        Чат не выбран
+    </div>
+    {% endif %}
+</div>
+
+{% if full_chat != None %}
+<script defer>
+    chat = {
+        "isGetMessages": false,
+    }
+
+    get_chat()
+
+    function get_chat() {
+        data = {
+            "chat": "{{full_chat}}",
+        }
+
+        load_start()
+
+        $.ajax({
+            method: "POST",
+            data: data,
+            url: "{% url 'get_chat' %}",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (data) {
+
+                chat["id"] = data["chat"]["id"]
+                chat["date_start"] = data["chat"]["date_start"]
+                get_messages(false)
+                load_end()
+            }
+        });
+    }
+
+    function get_messages(isRestart) {
+        chat["isGetMessages"] = true
+        data_get = {
+            "chat": chat.id,
+            "isRestart": isRestart,
+        }
+        $.ajax({
+            method: "GET",
+            data: data_get,
+            url: "{% url 'chat_messages' %}",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (data) {
+                chat["isGetMessages"] = false
+                if (data.status && data.status == "not_now_messages") {
+                    console.log("Нету новых сообщений")
+                }
+                else {
+                    add_messages_to_html(data.messages)
+                }
+            }
+        });
+    }
+
+    setInterval(function () {
+        if (chat["isGetMessages"] == false) {
+            get_messages(true);
+        }
+    }, 5000);
+
+    count_mess = 0
+
+    load_messages = false
+
+    function add_messages_to_html(messages) {
+        if (count_mess >= messages.length) {
+            return
+        }
+
+        count_mess = messages.length
+
+        $("#messages > .media").remove()
+        $("#messages > .title-date-messages").remove()
+        savedDay = null
+
+        messages.forEach(message => {
+            // получаем дату сообщения
+            console.log(message.date)
+            let messageDate = new Date(message.date);
+            // получаем день сообщения
+            let messageDay = messageDate.getDate();
+
+            // сравниваем дни
+            if (messageDay != savedDay) {
+                // добавляем дату перед сообщением
+                let date = messageDate.toLocaleString('ru-RU', { day: 'numeric', month: 'numeric', year: 'numeric' });
+                $("#messages").append(`<p class="title-date-messages text-muted text-center">${date}</p>`)
+                // сохраняем текущий день
+                savedDay = messageDay;
+            }
+
+            if (message.belong == "user" || message.belong == "client" || message.belong == "hotel") {
+                html = $(`<div class="media media-his">
+                    <div class="media-left media-fix-width">
+                        <img class="media-object img-circle"
+                        src="{% static '/img/av_user.png' %}"
+                    style="max-width:75px;">
+                    </div>
+                    <div class="media-right media-fix-width">
+                    </div>
+                    <div class="media-body media-body-left">
+                    <div class="message-body">
+                        ${message.text}
+                    </div>
+                    </div>
+                    <div class="message-data-right text-muted">
+                    ${message.time}
+                    </div>
+                </div>`)
+            }
+            else if (message.belong == "info") {
+                html = $(message.text)
+            }
+            else if (message.belong == "admin") {
+                html = $(`
+                <div class="media media-my">
+                    <div class="media-left message-data-left text-muted">
+                        ${message.time}
+                    </div>
+                    <div class="media-right media-fix-width">
+                        <img class="media-object img-circle" src="{% static '/img/av_user_ts.png' %}" style="max-width:75px;">
+                    </div>
+                    <div class="media-body media-body-right">
+                        <div class="message-body">
+                            ${message.text}
+                        </div>
+                    </div>
+                </div>
+                `)
+            }
+
+            if (message.file_url) {
+                file = $(`<a class="file_message" href="${message.file_url}">`);
+                $(file).attr("target", "_blank");
+                $(file).text("Файл")
+                $(html).find(".message-body").prepend(file);
+            }
+
+            $("#messages").append(html)
+        });
+
+        if (!load_messages) {
+            load_messages = true;
+            adds_fast_addStep()
+        }
+    }
+
+    $(".send_messages").click(function () {
+        sendMessages()
+    });
+
+    setInterval(function () {
+        if (chat["isGetMessages"] == false) {
+            get_messages(true);
+        }
+    }, 5000);
+
+
+    $('textarea').keydown(function (event) {
+        if (event.keyCode === 13) {
+            sendMessages()
+        }
+    });
+
+    $('#file_input').on('change', function () {
+        if ($("#file_input").val()) {
+            // файл выбран
+            sendMessages();
+        }
+    });
+
+    function sendMessages() {
+        var text = $("#entering_a_message_text").val();
+        var file = $("#file_input").prop('files')[0];
+        if (text != "" || file) {
+            var data_post = new FormData();
+            data_post.append("text", text);
+            data_post.append("chat", chat.id);
+            if (file) {
+                var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.bmp)$/i;
+                if (!allowedExtensions.exec(file.name)) {
+                    alert('Допустимы только файлы с расширениями: .jpg, .jpeg, .png, .bmp.');
+                    return false;
+                }
+                data_post.append("file", file);
+            }
+
+            $.ajax({
+                method: "POST",
+                data: data_post,
+                url: "{% url 'chat_send' %}",
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                },
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    text = $("#entering_a_message_text").val("");
+                    $("#file_input").val("");
+                    get_messages(false);
+                }
+            });
+        }
+    }
+
+</script>
+
+<script defer>
+
+    function adds_fast_addStep() {
+        $('.media-body').each(function () {
+            text = $(this).text()
+            if (text.search("Добрый день, уважаемый партнер!") != -1) {
+                $(this).attr("id", "hello_hotel_mess")
+            }
+        });
+
+        if (!getTutorialProgress()) {
+            fast_addStep("#hello_hotel_mess",
+                `Для начала работы с размещением объекта ознакомьтесь с сообщением от техподдержки.`
+            )
+
+            fast_addStep(`#tabs`,
+                `Для начала размещения объекта на сайте выберете пункт - Управление объектом размещения - Объект`
+            )
+
+            tour.start();
+            saveTutorialProgress()
+        }
+    }
+</script>
+
+{% endif %}
+{% endblock main_block %}

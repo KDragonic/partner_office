@@ -1,0 +1,9 @@
+{% load form static %}
+<ul>
+    {% for place in places %}
+      <li>[{{ place.place.place_type }}] {{ place.place.name }}</li>
+      {% if place.children %}
+        {% include 'template/child_places.html' with places=place.children %}
+      {% endif %}
+    {% endfor %}
+</ul>

@@ -1,0 +1,164 @@
+{% extends 'template/base_profile.html' %}
+{% load menu form static cards %}
+{% block main_block %}
+  <style>
+    .block_card {
+      border: 1px solid #d3d3d3;
+      width: min-content;
+      min-height: 200px;
+      min-width: min-content;
+      max-width: 100%;
+      border-radius: 5px;
+    }
+
+    .block_card .title {
+      font-size: 20px;
+      padding: 10px;
+    }
+
+    .block_card .content {
+      padding: 10px;
+    }
+
+    .block_card .grupe_input {
+      margin-top: -5px;
+      height: 100%;
+      margin-left: 12px;
+      margin-bottom: 14px;
+      gap: 10px;
+      flex: 1 0 200px;
+      flex: 1 0 200px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(322px, 1fr));
+      grid-gap: 20px;
+    }
+
+    .block_card .grupe_input > label {
+      width: auto !important;
+    }
+
+    @media screen and (max-width: 607px) {
+      .block_card .grupe_input {
+        display: flex !important;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .block_card {
+        min-width: 100%;
+      }
+    }
+  </style>
+
+  <section class="grupe_button" style="display: flex; gap: 10px;">
+    {% if booking_data.chat_url %}
+      <a href="{{ booking_data.chat_url }}" class="button">Открыть чат</a>
+    {% endif %}
+    {% if booking_data.status == 'new' or booking_data.status == 'verified' %}
+      <a class="button" data-button="cancellation_booking">Отменить бронирование</a>
+    {% endif %}
+    {% if booking_data.paymant_url %}
+      <a href="{{booking_data.paymant_url}}" class="button">Оплатить с карты</a>
+    {% endif %}
+
+  </section>
+  <script defer>
+    $("[data-button='cancellation_booking']").click(function () {
+
+      if ("{{booking_data.status}}" != "new") {
+        popup_create('Отмена бронирования', `Для отмены бронирования свяжитесь с тех подершкой.`,
+        [
+          {
+            name: 'Связатся с техподдержкой',
+            type: 'link',
+            param: ["/techsupport/pattern/", 1]
+          }
+        ],
+        []
+        )
+      }
+      else {
+        popup_create('Отмена бронирования', `Вы уверены что хотите отменить это бронироване? <br>Бронь: {{booking_data.id}}<br>Номер: {{booking_data.room_name}}`, [
+          {
+            name: 'Да',
+            type: 'action',
+            fun: ajax_cancellation_booking,
+            param: ['{{booking_data.id}}']
+          },
+          {
+            name: 'Нет',
+            type: 'close'
+          }
+        ])
+      }
+    })
+
+    function ajax_cancellation_booking(id) {
+      data = {
+        id: id
+      }
+
+      load_start()
+      $.ajax({
+        method: 'POST',
+        data: data,
+        url: "{% url 'cancellation_booking' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function (request) {
+          load_end()
+          location.reload()
+        }
+      })
+    }
+  </script>
+
+  <div class="section">
+    <div class="block_card">
+      <div class="title">Информация о бронирование</div>
+      <div class="content">
+        <div class="grupe_input" style="height: 100%; margin-left: 12px; margin-bottom: 14px; gap: 10px;">
+          <label class="text">
+            <span class="name">Отель</span>
+            <a href="/hotel/{{ booking_data.hotel_id }}/?sid={{ booking_data.sid }}" style="cursor: pointer"><input type="text" style="cursor: pointer; color:#0917ef" value="{{ booking_data.hotel }}" readonly /></a>
+          </label>
+          <label class="text">
+            <span class="name">Код бронирования</span>
+            <input type="text" value="{{ booking_data.id }}" readonly />
+          </label>
+          <label class="text">
+            <span class="name">Название номера</span>
+            <input type="text" value="{{ booking_data.room_name }}" readonly />
+          </label>
+          <label class="text"><span class="name">Статус</span><input type="text" style="background: #ffe0be;" value="{{ booking_data.status_text }}" readonly /></label>
+          <label class="text"><span class="name">Дата и время заезда</span><input type="text" value="{{ booking_data.check_in }}" readonly /></label>
+          <label class="text"><span class="name">Дата и время отъезда</span><input type="text" value="{{ booking_data.check_out }}" readonly /></label>
+          <label class="text"><span class="name">Количество забронированных дней</span><input type="text" value="{{ booking_data.days_booked }}" readonly /></label>
+          <label class="text"><span class="name">Количество взрослых</span><input type="text" value="{{ booking_data.count_a }}" readonly /></label>
+          <label class="text"><span class="name">Количество детей</span><input type="text" value="{{ booking_data.count_c }}" readonly /></label>
+          <label class="text"><span class="name">Возраст детей</span><input type="text" value="{{ booking_data.children_ages }}" readonly /></label>
+
+          {% if booking_data.accommodation_cost > 0 %}
+            <label class="text"><span class="name">Стоимость проживания</span><input type="text" value="{{ booking_data.accommodation_cost }}" readonly /></label>
+          {% endif %}
+
+          <label class="text"><span class="name">Стоимость бронирования</span><input type="text" value="{{ booking_data.amount_paid }}" readonly /></label>
+          <label class="text"><span class="name">Доплата при заселении</span><input type="text" value="{{ booking_data.cost_difference }}" readonly /></label>
+
+          <label class="text"><span class="name">Оплачено бонусами</span><input type="text" value="{{ booking_data.prices.bonus.value }}" readonly /></label>
+          <label class="text"><span class="name">Оплачено со счета в ЛК</span><input type="text" value="{{ booking_data.prices.balanc.value }}" readonly /></label>
+          {% if booking_data.paymant_url %}
+            <label class="text"><span class="name">Оплата картой (Не оплачено)</span><input type="text" value="{{ booking_data.prices.card.value }}" readonly /></label>
+          {% else %}
+            <label class="text"><span class="name">Оплата картой</span><input type="text" value="{{ booking_data.prices.card.value }}" readonly /></label>
+          {% endif %}
+
+          {% if booking_data.prices.first_booking_discount > 0 %}
+          <label class="text"><span class="name">Скидка при первой брони</span><input type="text" value="{{ booking_data.prices.first_booking_discount }}" readonly /></label>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

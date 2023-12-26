@@ -1,0 +1,67 @@
+{% extends "main/base.html" %}
+{% load menu sass_tags form static %}
+{% block content %}
+
+<link href="/static/css/scss/profile.css"
+	rel="stylesheet"
+	type="text/css" />
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+
+<style>
+	.main-header .main-header__container .main-header__logo,
+	.main-header .main-header__container #register_hotel_button_header,
+	.main-header .main-header__container .header_nav_item.favourites_nav,
+	.main-header .main-header__container #FAB_button_header {
+		display: none !important;
+	}
+
+	.main-header__container #login_pa {
+		margin-left: auto !important;
+	}
+
+	a {
+		text-decoration: none !important;
+	}
+
+	#content {
+	display: flex;
+	min-height: 87vh;
+	flex-direction: column;
+	padding: 10px;
+	}
+
+</style>
+
+{% if request.user.is_authenticated %}
+	{% amenu_sidebar %}
+{% endif %}
+
+<div id="content">
+	{% block main_block %}
+	{% endblock main_block %}
+</div>
+
+<script defer>
+	function set_width_table_section() {
+		$(".greyGridTable").parent(".section").map(function () {
+			pos_x = $(this).offset().left
+			w_body = $("body").width()
+			$(this).width(w_body - pos_x - 10)
+			$(this).css("overflow", "auto")
+		});
+
+	}
+
+	set_width_table_section()
+
+	window.addEventListener('resize', function () {
+		set_width_table_section()
+	});
+</script>
+
+{% endblock content %}

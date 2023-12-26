@@ -1,0 +1,169 @@
+{% extends 'template/base_profile.html' %}
+{% load menu form static %}
+{% block main_block %}
+  <style>
+    .button_new_user,
+    .button_new_user:link {
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    input[type='file'] {
+      display: none;
+    }
+
+    .label_file {
+      border: 1px solid #d2d2d2;
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      width: 100%;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    form {
+      display: flex;
+      gap: 14px;
+    }
+  </style>
+
+  <div class="section" style="gap: 12px;">
+    <span class="title">Импорт данных отеля</span>
+
+    <form id="file-upload-form" method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label for="file" class="label_file">
+        <input type="file" name="files" multiple id="file" />
+        <span class="file_name_span">Файл не выбран</span>
+      </label>
+      <button class="button" type="submit">Загрузить</button>
+    </form>
+  </div>
+  <span id="user_data">
+
+  </span>
+
+  <script>
+    const MAX_FILES_PER_REQUEST = 10;
+    const MAX_SIMULTANEOUS_REQUESTS = 5;
+    let request_counter = 0;
+
+    function uploadFilesSequentially(groups) {
+      if (request_counter >= MAX_SIMULTANEOUS_REQUESTS || groups.length === 0) {
+        return;
+      }
+      request_counter++;
+      const group = groups.shift();
+      const formData = new FormData();
+      for (let j = 0; j < group.length; j++) {
+        const file = group[j];
+        formData.append('files', file);
+      }
+      $.ajax({
+        url: "{% url 'admin.ajax.hotel.add.multi' %}",
+        type: 'post',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function (request) {
+          request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+        },
+        success: function (response) {
+          console.log(response);
+        },
+        error: function (xhr, status, error) {
+          console.log(xhr.responseText);
+        },
+        complete: function () {
+          request_counter--;
+          uploadFilesSequentially(groups);
+        }
+      });
+    }
+
+    $('form').submit(function (event) {
+      event.preventDefault();
+      var form = $(this);
+      var formData = new FormData(form[0]);
+      $('#file-upload-form').show();
+      popup_load_create();
+      const files = formData.getAll('files');
+      const groups = [];
+
+      // Split files into groups of MAX_FILES_PER_REQUEST
+      for (let i = 0; i < files.length; i += MAX_FILES_PER_REQUEST) {
+        groups.push(Array.prototype.slice.call(files, i, i + MAX_FILES_PER_REQUEST));
+        console.log("Файл выбран", i, files.length)
+      }
+      console.log("Все файлы выбраны")
+
+      // Send requests sequentially, with a maximum of MAX_SIMULTANEOUS_REQUESTS requests at a time
+      while (groups.length > 0) {
+        uploadFilesSequentially(groups);
+      }
+    });
+
+    $('input[name="files"]').change(function (e) {
+      file_name_span_html = '';
+      const files = e.target.files;
+      const groups = [];
+
+      // Split files into groups of MAX_FILES_PER_REQUEST
+      for (let i = 0; i < files.length; i += MAX_FILES_PER_REQUEST) {
+        groups.push(Array.prototype.slice.call(files, i, i + MAX_FILES_PER_REQUEST));
+      }
+
+      // Send requests sequentially, with a maximum of MAX_SIMULTANEOUS_REQUESTS requests at a time
+      while (groups.length > 0) {
+        uploadFilesSequentially(groups);
+      }
+
+      $('.file_name_span').html(file_name_span_html);
+    });
+
+  </script>
+
+
+  {% comment %} <script defer>
+    $(document).ready(function () {
+      $('input[name="files"]').change(function (e) {
+        file_name_span_html = ''
+        for (let i = 0; i < e.target.files.length; i++) {
+          var file = e.target.files[i]
+          var filename = file.name
+          file_name_span_html += `<span>${filename}</span><br>`
+        }
+
+        $('.file_name_span').html(file_name_span_html)
+      })
+
+      $('#file-upload-form').submit(function (event) {
+        event.preventDefault()
+
+        var form = $(this)
+        var formData = new FormData(form[0])
+
+        $('#file-upload-form').show()
+        popup_load_create()
+
+        $.ajax({
+          url: "{% url 'admin.ajax.hotel.add.multi' %}",
+          type: 'post',
+          data: formData,
+          processData: false,
+          contentType: false,
+          beforeSend: function (request) {
+            request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+          },
+          success: function (response) {
+            console.log(response)
+          },
+          error: function (xhr, status, error) {
+            console.log(xhr.responseText)
+          }
+        })
+      })
+    })
+  </script> {% endcomment %}
+{% endblock %}

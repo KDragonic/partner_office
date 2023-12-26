@@ -1,0 +1,310 @@
+{% extends 'user/v2/base.html' %}
+{% load cards humanize %}
+{% block main_block %}
+  <div class="section_title" style="  margin-bottom: 28px; ">Информация о бронирование</div>
+
+  <section class="grupe_cards" style="margin-bottom: 25px;">
+
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Объект</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">Название: </span>
+            <a href="/hotel/{{hotel.id}}/" class="value link">{{ hotel.name }}</a>
+          </div>
+          <div class="item">
+            <span class="name">Адрес: </span>
+            <span class="value">{{ hotel.address }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Бронирование</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">Код:</span>
+            <span class="value">{{ booking.id }}</span>
+          </div>
+
+          <div class="item">
+            <span class="name">Номер:</span>
+            <span class="value">{{ rc.name }}</span>
+          </div>
+
+          <div class="item">
+            <span class="name">Статус:</span>
+            <span class="value">{{ booking.status_text }}</span>
+          </div>
+
+          {% if booking.food_rate %}
+          <div class="item">
+            <span class="name">Еда:</span>
+            <span class="value">{{ booking.food_rate }}</span>
+          </div>
+          {% endif %}
+
+          <div class="item">
+            <span class="name">Дата и время заезда:</span>
+            <span class="value">{{ booking.check_in }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Дата и время отъезда:</span>
+            <span class="value">{{ booking.check_out }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Количество забронированных дней:</span>
+            <span class="value">{{ booking.days_booked }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Количество гостей: </span>
+            <span class="value">{{ booking.adults_count }}</span>
+          </div>
+          {% if booking.children_count > 0 %}
+            <div class="item">
+              <span class="name">Количество детей: </span>
+              <span class="value">{{ booking.children_count }}</span>
+            </div>
+            {% if booking.children_ages %}
+            <div class="item">
+              <span class="name">Возраст детей: </span>
+              <span class="value">{{ booking.children_ages }}</span>
+            </div>
+            {% endif %}
+          {% endif %}
+          <div class="item">
+            <span class="name">Комментарий: </span>
+            {% if booking.comment %}
+            <span class="value">{{ booking.comment }}</span>
+            {% else %}
+            <span class="value">Нет</span>
+            {% endif %}
+            <div class="editor_icon" id="edit_comment_button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="16" viewBox="0 0 18 16" fill="none">
+                <path d="M16.7981 3.59283C17.151 3.24622 17.151 2.66852 16.7981 2.33967L14.6808 0.259964C14.346 -0.0866546 13.7578 -0.0866546 13.4049 0.259964L11.74 1.8864L15.1332 5.21927M0.773438 12.6671V16H4.16657L14.174 6.16137L10.7809 2.8285L0.773438 12.6671Z" fill="#BDBDCB" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Статус бронирования</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">Изменить статус:</span>
+            <span class="value">{{ booking.status_text }}</span>
+            <div class="editor_icon" id="edit_status_button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="16" viewBox="0 0 18 16" fill="none">
+                <path d="M16.7981 3.59283C17.151 3.24622 17.151 2.66852 16.7981 2.33967L14.6808 0.259964C14.346 -0.0866546 13.7578 -0.0866546 13.4049 0.259964L11.74 1.8864L15.1332 5.21927M0.773438 12.6671V16H4.16657L14.174 6.16137L10.7809 2.8285L0.773438 12.6671Z" fill="#BDBDCB" />
+              </svg>
+            </div>
+          </div>
+          <div class="discription">
+            После подтверждения вам станут доступны контактные данные клиента, а клиенту ваши контактные данные указанные в профиле пользователя.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {% if booking.status != "new" and booking.status != cancelled %}
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Клиент</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">ФИО:</span>
+            <span class="value">{{ user.fio }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Почта:</span>
+            <span class="value">{{ user.email }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Телефон:</span>
+            <span class="value">{{ user.phone }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Цены {% if payment_status == "not_paid" and booking.param.paymant_url %}(Не оплачено){% endif %}</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">Стоимость проживания:</span>
+            <span class="value">{{ booking.accommodation_cost }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Стоимость бронирования:</span>
+            <span class="value" {% if payment_status == "not_paid" and booking.param.paymant_url %}style=" color: #ff2929; font-weight: 700; "{% endif %}>{{ booking.amount_paid }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Доплата при заселении:</span>
+            <span class="value">{{ booking.hotel_price }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Оплачено бонусами:</span>
+            <span class="value">{{ booking.prices.bonus.value }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Оплачено со счета в ЛК:</span>
+            <span class="value">{{ booking.prices.balanc.value }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Оплата картой: </span>
+            <span class="value">{{ booking.prices.card.value }} ₽</span>
+          </div>
+          {% if booking.prices.first_booking_discount %}
+          <div class="item">
+            <span class="name">Скидка при первой брони: </span>
+            <span class="value">{{ booking.prices.first_booking_discount }} ₽</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads">
+      {% if booking.chat_id %}
+      <a href="{% url 'profile_v2_chats' %}?chat_type=hotel_booking&chat={{booking.chat_id}}" target="_blank" class="block_card text clickable">
+        <span class="title">Открыть чат</span>
+      </a>
+      {% endif %}
+    </section>
+
+    <section class="row_crads">
+      {% telegram_card %}
+    </section>
+  </section>
+
+
+<script>
+  $("#edit_status_button").click(function () {
+    popup_create('Изменить статус', `Вы уверены что хотите сменить статус?<br>`, [
+        {
+          name: 'Установить',
+          type: 'use-inputs',
+          fun: ajax_edit_status,
+          color: "green"
+        },
+        {
+          name: 'Нет',
+          type: 'close'
+        }
+      ],
+      [
+        [
+          {
+            type: "select",
+            label: "Новый статус",
+            name: "status",
+            val: [
+                ["verified", "Подтверждено"],
+                ["settled", "Заселен"],
+                ["left", "Выехал"],
+                ["cancelled", "Отменен"],
+            ],
+          }
+        ]
+      ])
+  })
+
+
+  function ajax_edit_status(param) {
+    date = {
+      "id": "{{booking.id}}",
+      "status": param["status"],
+    }
+
+    load_start()
+
+    $.ajax({
+      url: '{% url "ajax_booking_edit_status" %}',
+      type: 'POST',
+      data: date,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      success: function (response) {
+        location.reload()
+      },
+      error: function (response) {
+        location.reload()
+      },
+    });
+  }
+</script>
+
+<script>
+  $("#edit_comment_button").click(function () {
+
+    def_value_comment = "{{booking.comment}}"
+    if (def_value_comment == "None") {
+      def_value_comment = ""
+    }
+
+    popup_create('Изменить статус', `Вы уверены что хотите сменить статус?<br>`, [
+        {
+          name: 'Установить',
+          type: 'use-inputs',
+          fun: ajax_edit_comment,
+          color: "green"
+        },
+        {
+          name: 'Нет',
+          type: 'close'
+        }
+      ],
+      [
+        [
+          {
+            type: "textarea",
+            label: "Новый комментарий",
+            name: "comment",
+            val: def_value_comment,
+          }
+        ]
+      ])
+  })
+
+
+  function ajax_edit_comment(param) {
+    date = {
+      "id": "{{booking.id}}",
+      "comment": param["comment"],
+    }
+
+    if (param["comment"] == "") {
+      return
+    }
+
+    load_start()
+
+    $.ajax({
+      url: '{% url "ajax_booking_edit_comment" %}',
+      type: 'POST',
+      data: date,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      success: function (response) {
+        location.reload()
+      },
+      error: function (response) {
+        location.reload()
+      },
+    });
+  }
+</script>
+
+
+{% endblock %}

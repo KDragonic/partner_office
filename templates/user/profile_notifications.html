@@ -1,0 +1,8 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static %}
+{% block main_block %}
+<div class="section">
+  <span class="title">Уведомления</span>
+  {% table 'Список уведомлений' table.notifications %}
+</div>
+{% endblock main_block %}

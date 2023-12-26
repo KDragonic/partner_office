@@ -1,0 +1,31 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block content %}
+
+<script>
+  const hash = window.location.hash;
+  const origin = window.location.origin;
+  const pathname = window.location.pathname;
+  const parameters = hash.substring(1).split('&');
+
+  const obj = {};
+
+  for (let i = 0; i < parameters.length; i++) {
+    const keyValue = parameters[i].split('=');
+    obj[keyValue[0]] = keyValue[1];
+  }
+
+  console.log(obj)
+
+  if (obj["email"]) {
+    href = `${origin}${pathname}?user_id=${obj["user_id"]}&email=${obj["email"]}`
+  }
+  else {
+    href = `${origin}${pathname}?user_id=${obj["user_id"]}`
+  }
+
+
+  window.location.href = href
+</script>
+
+{% endblock %}

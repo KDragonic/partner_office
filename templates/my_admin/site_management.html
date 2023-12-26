@@ -1,0 +1,552 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form static %}
+{% block main_block %}
+  <style>
+    table {
+      border: none;
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
+    }
+    table th,
+    table td {
+      border: 1px solid #b3b3b3;
+      padding: 10px;
+    }
+
+    table tbody td {
+      font-size: 14px;
+    }
+
+    table thead {
+      background: #ffffff;
+      border-bottom: 2px solid #cdcdcd;
+    }
+
+    table thead th {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333333;
+      background: #f0f0f0;
+      border-bottom: 2px solid #cdcdcd;
+      text-align: left;
+    }
+
+    table td:nth-child(1) {
+      background: #f2f2f2;
+    }
+
+    table tr:nth-child(n+1) td:nth-child(n+2) {
+      cursor: pointer;
+      background-color: white;
+      transition: background-color 2s;
+    }
+
+    table tr:nth-child(n+1) td:nth-child(n+2):hover {
+      background-color: #f7ffa8;
+      transition: background-color 0.1s;
+    }
+
+
+    .cashback_table td .values {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cashback_table td .values [data-type='day_and_procent'] {
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 100%;
+    }
+
+    .cashback_table td .values [data-type='type'] {
+      font-weight: 400;
+      color: #adadad;
+      font-size: 12px;
+      line-height: 100%;
+    }
+
+    .cashback_table td .values [data-type='type'] [data-param="accommodation"] {
+      color: blue;
+    }
+
+    .cashback_table td .values [data-type='type'] [data-param="site_price"] {
+      color: #ff0000;
+    }
+
+  </style>
+
+  <table class="cashback_table">
+    <thead>
+      <th data-type="type">Тип объекта</th>
+      <th data-type="booking">Бонусы клиенту за бронирование (Кэшбек)</th>
+      <th data-type="review">Бонусы клиенту за отзыв (Кэшбек)</th>
+      <th data-type="to_hotel">Бонусы объекту за проживание клиента</th>
+    </thead>
+    <tbody>
+      {% for code, name in hotel_type %}
+        <tr data-hotel-type="{{ code }}">
+          <td data-type="type" data-code="{{ code }}">{{ name }}</td>
+          <td data-type="booking">---</td>
+          <td data-type="review">---</td>
+          <td data-type="to_hotel">---</td>
+        </tr>
+      {% endfor %}
+      <tr data-hotel-type="all">
+        <td data-type="type" data-code="all"></td>
+        <td data-type="booking">Изменить все</td>
+        <td data-type="review">Изменить все</td>
+        <td data-type="to_hotel">Изменить все</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <style>
+    .grupe_input {
+      margin-top: 6px;
+      row-gap: 7px;
+      column-gap: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      width: 696px;
+      flex-direction: column;
+    }
+    .grupe_input .input_with_text_label {
+      display: flex;
+      flex-direction: row;
+      width: max-content;
+      align-items: center;
+      gap: 7px;
+    }
+
+
+    .grupe_input .input_with_text {
+      flex-direction: row;
+      border: 1px solid #D2D2D2;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding: 5px 10px;
+      width: auto;
+      gap: 2px;
+    }
+    .grupe_input .input_with_text .input {
+      border: none;
+      min-width: 20px;
+      text-align: end;
+    }
+
+    .input_button_select {
+      flex-direction: row;
+      border: 1px solid #D2D2D2;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding: 5px 10px;
+      width: max-content;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      user-select: none;
+    }
+
+    .input_button_select[data-button-option-status="yes"] {
+      background: #2edb55;
+      color: white;
+    }
+
+    .input_button_select[data-button-option-status="no"] {
+      background: #ff5050;
+      color: white;
+    }
+
+  </style>
+
+  <section style="padding: 10px; display: flex; flex-direction: column;">
+    <h3 class="title">Бонусы за регистрацию</h3>
+    <div class="grupe_input">
+      <label for="" class="input_with_text_label">
+        <span>Дни сгорания</span>
+        <label class="input_with_text" for="">
+          <span contenteditable="true" class="input" id="registration_bonuses_lifetime_input" class=""></span>
+          <span style="color: #9d9d9d;">дней</span>
+        </label>
+      </label>
+      <label for="" class="input_with_text_label">
+        <span>Бонусы</span>
+        <label class="input_with_text" for="">
+          <span contenteditable="true" class="input" id="registration_bonuses_value_input" class=""></span>
+          <span style="color: #9d9d9d;">бонусов</span>
+        </label>
+      </label>
+    </div>
+  </section>
+
+  <section style="padding: 10px; display: flex; flex-direction: column;">
+    <h3 class="title">Комиссия сайта</h3>
+    <div class="grupe_input">
+      <div style="display: flex; gap: 5px">
+        <label for="" class="input_with_text_label">
+          <span>От</span>
+          <label class="input_with_text" for="">
+            <span contenteditable="true" class="input" id="site_commission_from_input" class=""></span>
+            <span style="color: #9d9d9d;">%</span>
+          </label>
+        </label>
+        <label for="" class="input_with_text_label">
+          <span>До</span>
+          <label class="input_with_text" for="">
+            <span contenteditable="true" class="input" id="site_commission_to_input" class=""></span>
+            <span style="color: #9d9d9d;">%</span>
+          </label>
+        </label>
+      </div>
+      <label for="" class="input_with_text_label">
+        <span>Без коммисии</span>
+        <div class="input_button_select" id="site_commission_not_commission_input" data-button-option="yes,no" data-button-option-status="yes" data-button-option-label-yes="Да" data-button-option-label-no="Нет"></div>
+      </label>
+    </div>
+  </section>
+
+  <section style="padding: 10px; display: flex; flex-direction: column;">
+    <h3 class="title">Заголовок и подзаголовок на главной сайта</h3>
+    <div class="grupe_input">
+      <label for="" class="input_with_text_label">
+        <span>Заголовок</span>
+        <label class="input_with_text" for="">
+          <span contenteditable="true" class="input" id="pages_main_heading_input" class=""></span>
+        </label>
+      </label>
+      <label for="" class="input_with_text_label">
+        <span>Подзаголовок</span>
+        <label class="input_with_text" for="">
+          <span contenteditable="true" class="input" id="pages_main_subtitle_input" class=""></span>
+        </label>
+      </label>
+    </div>
+  </section>
+
+  <section style="padding: 10px; display: flex; flex-direction: column;">
+    <h3 class="title">Кнопки управления</h3>
+    <div class="buttons" style=" display: flex; gap: 10px; ">
+      <button class="button" onclick="show_popup_save()" style="background: #29ad00;">Сохранить изменение</button>
+      <button class="button" onclick="location.reload()" style="background: #ff1d1d;">Сбросить изменение</button>
+    </div>
+  </section>
+
+
+  <script>
+    $(".input_button_select").each(function() {
+      let status = $(this).attr("data-button-option-status")
+      let label = $(this).attr(`data-button-option-label-${status}`)
+      $(this).text(label)
+    })
+
+    $('.input_button_select').on('click', function() {
+      var options = $(this).data('button-option').split(',');
+      var currentStatus = $(this).attr('data-button-option-status')
+      var currentIndex = options.indexOf(currentStatus);
+      var nextIndex = (currentIndex + 1) % options.length;
+      var nextStatus = options[nextIndex];
+      $(this).attr('data-button-option-status', nextStatus);
+
+      let label = $(this).attr(`data-button-option-label-${nextStatus}`)
+      $(this).text(label)
+    });
+
+  </script>
+
+
+  <style>
+    .popup_inputs {
+      position: fixed;
+      padding: 14px;
+      background: white;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px 3px #fc7201;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      display: flex;
+      flex-direction: column;
+      width: min-content;
+    }
+    .popup_inputs > .title {
+      font-weight: 900;
+      font-size: 17px;
+      flex-basis: 100%;
+      display: block;
+    }
+
+    .popup_inputs .grupe_input {
+      width: auto;
+    }
+
+    @media screen and (max-width: 997px) {
+      .popup_inputs .grupe_input > label {
+        width: min(100%, 328px) !important;
+      }
+    }
+
+    .popup_inputs .grupe_input .buttons {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .popup_inputs .grupe_input .buttons .button {
+      flex-grow: 1;
+      flex-basis: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <div class="popup_inputs" data-popup="booking">
+    <span class="title">Бонусы клиенту за бронирование (Кэшбек)</span>
+    <div class="inputs">
+      <div class="grupe_input row">
+        <label class="text col-sm-12 col-md-6" for="">
+          <span class="name">Дней жизни*</span>
+          <span style=" font-size: 13px; line-height: 100%; margin-top: -10px; "><span style="color: green">К уже начисленным бонусам не применяется.</span>Не сгорают у кого бонусы дольше на счету чем указанный срок.</span>
+          <input type="text" name="lifetime" value="" />
+        </label>
+      </div>
+      <div class="grupe_input row">
+        <label class="text col-sm-12 col-md-6" for="">
+          <span class="name">Процент %*</span>
+          <select name="type" required="">
+            <option value="accommodation">От стоимости проживания</option>
+            <option value="site_price">От стоимости бронирования</option>
+          </select>
+          <input type="text" name="value" value="" />
+        </label>
+      </div>
+      <div class="grupe_input row buttons">
+        <div class="button" data-button-event="apply">Применить</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup_inputs" data-popup="review">
+    <span class="title">Бонусы клиенту за отзыв (Кэшбек)</span>
+    <div class="inputs">
+      <div class="grupe_input row">
+        <label class="text col-sm-12 col-md-6" for="">
+          <span class="name">Дней жизни*</span>
+          <span style=" font-size: 13px; line-height: 100%; margin-top: -10px; "><span style="color: green">К уже начисленным бонусам не применяется.</span>Не сгорают у кого бонусы дольше на счету чем указанный срок.</span>
+          <input type="text" name="lifetime" value="" />
+        </label>
+      </div>
+      <div class="grupe_input row">
+        <label class="text col-sm-12 col-md-6" for="">
+          <span class="name">Процент %*</span>
+          <select name="type" required="">
+            <option value="accommodation">От стоимости проживания</option>
+            <option value="site_price">От стоимости бронирования</option>
+          </select>
+          <input type="text" name="value" value="" />
+        </label>
+      </div>
+      <div class="grupe_input row buttons">
+        <div class="button" data-button-event="apply">Применить</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup_inputs" data-popup="to_hotel">
+    <span class="title">Бонусы объекту за проживание клиента</span>
+    <div class="inputs">
+      <div class="grupe_input row">
+        <label class="text col-sm-12 col-md-6" for="">
+          <span class="name">Дней жизни*</span>
+          <span style=" font-size: 13px; line-height: 100%; margin-top: -10px; "><span style="color: green">К уже начисленным бонусам не применяется.</span>Не сгорают у кого бонусы дольше на счету чем указанный срок.</span>
+          <input type="text" name="lifetime" value="" />
+        </label>
+      </div>
+      <div class="grupe_input row">
+        <label class="text col-sm-12 col-md-6" for="">
+          <span class="name">Процент %*</span>
+          <select name="type" required="">
+            <option value="accommodation">От стоимости проживания</option>
+            <option value="site_price">От стоимости бронирования</option>
+          </select>
+          <input type="text" name="value" value="" />
+        </label>
+      </div>
+      <div class="grupe_input row buttons">
+        <div class="button" data-button-event="apply">Применить</div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    settings_options = {}
+
+    $(".popup_inputs").hide()
+
+    $(`.cashback_table tr td[data-type]`).not(`[data-type="type"]`).click(function () {
+      let hotel_type = $(this).parents("tr").attr("data-hotel-type")
+      let type_cashback = $(this).data("type")
+      $(".popup_inputs").hide()
+      $(`.popup_inputs[data-popup="${type_cashback}"]`).attr("data-param-hotel-type", hotel_type)
+      $(`.popup_inputs[data-popup="${type_cashback}"]`).show()
+    })
+
+    $(`.popup_inputs [data-button-event="apply"]`).click(function () {
+      let popup_inputs = $(this).parents(".popup_inputs")
+      let hotel_type = $(popup_inputs).attr("data-param-hotel-type")
+      let type_cashback = $(popup_inputs).data("popup")
+
+      let lifetime_input = $(popup_inputs).find(`[name='lifetime']`)
+      let type_input = $(popup_inputs).find(`[name='type']`)
+      let value_input = $(popup_inputs).find(`[name='value']`)
+
+      if (lifetime_input.val() == "" || value_input.val() == "") {
+        alert("Заполните пустое поле")
+      }
+
+      let lifetime = parseInt(lifetime_input.val())
+      let type = type_input.val()
+      let value = parseInt(value_input.val())
+
+      if (hotel_type == "all") {
+        for (key in settings_options.cashback_table) {
+          settings_options.cashback_table[key][type_cashback] = {
+            "lifetime": lifetime,
+            "type": type,
+            "value": value
+          }
+        }
+        reset_cashback_table()
+      }
+      else {
+        settings_options.cashback_table[hotel_type][type_cashback] = {
+          "lifetime": lifetime,
+          "type": type,
+          "value": value
+        }
+        reset_text_cell(hotel_type, type_cashback)
+      }
+
+      $(popup_inputs).hide()
+    })
+
+    $.ajax({
+      url: '/admin/site_management/settings_options/get/',
+      type: 'GET',
+      data: {},
+      success: function (response) {
+        settings_options = response.settings_options
+
+
+        $("#registration_bonuses_lifetime_input").text(settings_options["registration_bonuses"]["lifetime"])
+        $("#registration_bonuses_value_input").text(settings_options["registration_bonuses"]["value"])
+
+        $("#site_commission_from_input").text(settings_options["site_commission"]["from"])
+        $("#site_commission_to_input").text(settings_options["site_commission"]["to"])
+
+        if (settings_options["site_commission"]["not_commission"]) {
+          $("#site_commission_not_commission_input").attr("data-button-option-status", "yes")
+        }
+        else {
+          $("#site_commission_not_commission_input").attr("data-button-option-status", "no")
+        }
+
+        $("#pages_main_heading_input").text(settings_options["pages"]["main"]["heading"])
+        $("#pages_main_subtitle_input").text(settings_options["pages"]["main"]["subtitle"])
+
+
+        $(".input_button_select").each(function() {
+          let status = $(this).attr("data-button-option-status")
+          let label = $(this).attr(`data-button-option-label-${status}`)
+          $(this).text(label)
+        })
+
+        reset_cashback_table()
+      }
+    })
+
+    function show_popup_save() {
+      popup_create("Вы уверены что хотите сохранить изменения", "",
+      [
+        {
+          name: "Сохранить", fun: save_data, param: [], type: "action", color: "green", style: "full",
+        },
+        {
+          name: "Закрыть", type: "close", color: "gray", style: "full",
+        },
+      ]
+    )
+    }
+
+    function save_data() {
+      settings_options["registration_bonuses"] = {
+        "lifetime": $("#registration_bonuses_lifetime_input").text(),
+        "value": $("#registration_bonuses_value_input").text(),
+      }
+
+      settings_options["site_commission"] = {
+        "from": $("#site_commission_from_input").text(),
+        "to": $("#site_commission_to_input").text(),
+        "not_commission": "yes",
+      }
+      if ($("#site_commission_not_commission_input").attr("data-button-option-status") == "no") {
+        settings_options["site_commission"]["not_commission"] = false
+      }
+      else {
+        settings_options["site_commission"]["not_commission"] = true
+      }
+
+      settings_options["pages"] = {
+        "main": {
+          "heading": $("#pages_main_heading_input").text(),
+          "subtitle": $("#pages_main_subtitle_input").text(),
+        }
+      }
+
+      $.ajax({
+        url: '/admin/site_management/settings_options/save/',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify(settings_options),
+        headers: {
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        success: function (response) {
+          location.reload()
+        }
+      })
+    }
+
+    function reset_cashback_table() {
+      let cashback_table = settings_options.cashback_table
+      for (key in cashback_table) {
+        reset_text_cell(key, 'booking')
+        reset_text_cell(key, 'review')
+        reset_text_cell(key, 'to_hotel')
+      }
+    }
+
+    function reset_text_cell(hotel_type, type_cashback) {
+      let param = settings_options.cashback_table[hotel_type][type_cashback]
+      let td = $(`.cashback_table tr[data-hotel-type="${hotel_type}"] td[data-type="${type_cashback}"]`)
+      let type_str = ''
+      if (param['type'] == 'accommodation') {
+        type_str = 'от суммы проживания'
+      } else if (param['type'] == 'site_price') {
+        type_str = 'от суммы бронирования'
+      }
+
+      let html = `<div class="values"> <div class="value" data-type="day_and_procent"><span class="procent">---</span></div></div> `
+
+      if (param['value'] > 0) {
+        html = `<div class="values"> <div class="value" data-type="day_and_procent"><span class="day">${param['lifetime']} дней</span> <span class="arrow">→</span> <span class="procent">${param['value']}%</span> </div> <div class="value" data-type="type"> <span class="type" data-param="${param['type']}">${type_str}</span> </div> </div>`
+      }
+
+      td.html(html)
+    }
+  </script>
+{% endblock %}

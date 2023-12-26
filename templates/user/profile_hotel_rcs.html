@@ -1,0 +1,569 @@
+{% extends "template/base_profile.html" %}
+{% load form static menu %}
+{% block main_block %}
+
+{% hotel_shift_tab %}
+
+<div class="section" id="section_1">
+  <span class="title">Категории номеров</span>
+
+  <div class="divTable greyGridTable">
+    <div class="divTableHeading">
+      <div class="divTableRow">
+        <div class="divTableHead">Вкл</div>
+        <div class="divTableHead">Название</div>
+        <div class="divTableHead">Взрослые/Дети</div>
+        <div class="divTableHead">Цена за сутки</div>
+        <div class="divTableHead">Действие</div>
+      </div>
+    </div>
+    <div class="divTableBody">
+      {% for rc in rcs %}
+      <div class="divTableRow rc_item"
+        id="rc_{{rc.id}}">
+        <div class="divTableCell"
+          data-type="enable"
+          id="divTableCell_switch">
+          {% if rc.eneble %}
+          <div class="switch on"
+            id_room="{{rc.id}}">
+            <div class="part"></div>
+          </div>
+          {% else %}
+          <div class="switch off"
+            id_room="{{rc.id}}">
+            <div class="part"></div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="divTableCell"
+          data-type="name">{{rc.name}}</div>
+        <div class="divTableCell"
+          data-type="max_adults">{{rc.max_adults}}</div>
+        <div class="divTableCell"
+          data-type="price_base">{{rc.price_base}}</div>
+        <div class="divTableCell action">
+          <span class="edit c_point"
+            data-id="{{rc.id}}">Изменить</span>
+          <span class="del c_point"
+            data-id="{{rc.id}}">Удалить</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script defer>
+    $(".action .edit").click(function () {
+      id = $(this).data("id")
+      load_rc(id)
+    });
+  </script>
+
+  <script defer>
+    $(".action .del").click(function () {
+      id = $(this).data("id")
+      obj_text = $(this).parents(".rc_item").find("[data-type='name']").text()
+      popup_create("Удаление", obj_text, [
+        {
+          "name": "Закрыть",
+          "type": "close",
+        },
+        {
+          "name": "Удалить",
+          "fun": del_rc,
+          "param": [id],
+          "type": "remove",
+        }
+      ])
+    })
+  </script>
+
+  <style>
+    .switch {
+      background: #dedede;
+      width: 55px;
+      height: 22px;
+      border-radius: 5px;
+      position: relative;
+      top: 8px;
+    }
+
+    .part {
+      position: relative;
+      width: 28px;
+      height: 22px;
+      border-radius: 5px;
+      transition: left 0.5s;
+    }
+
+    .switch.on {}
+
+    .switch.off {}
+
+    .switch.on .part {
+      background: #FC7201;
+      left: 27px;
+    }
+
+    .switch.off .part {
+      background: #242424;
+    }
+
+    .divTableCell.action .del {
+      color: rgb(255, 74, 74)
+    }
+
+    .divTableCell.action .edit {
+      color: rgb(74, 110, 255)
+    }
+
+
+    div.greyGridTable {
+      border: 3px solid #FFFFFF;
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
+    }
+
+    .divTable.greyGridTable .divTableCell,
+    .divTable.greyGridTable .divTableHead {
+      border: 1px solid #FFFFFF;
+      padding: 10px;
+    }
+
+    .divTable.greyGridTable .divTableBody .divTableCell {
+      font-size: 14px;
+    }
+
+    .divTable.greyGridTable .divTableHeading {
+      background: #FFFFFF;
+      border-bottom: 2px solid #CDCDCD;
+    }
+
+    .divTable.greyGridTable .divTableHeading .divTableHead {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333333;
+      border-bottom: 2px solid #CDCDCD;
+      text-align: left;
+    }
+
+    .greyGridTable .tableFootStyle {
+      font-size: 14px;
+    }
+
+    /* DivTable.com */
+    .divTable {
+      display: table;
+    }
+
+    .divTableRow {
+      display: table-row;
+    }
+
+    .divTableHeading {
+      display: table-header-group;
+    }
+
+    .divTableCell,
+    .divTableHead {
+      display: table-cell;
+    }
+
+    .divTableHeading {
+      display: table-header-group;
+    }
+
+    .divTableFoot {
+      display: table-footer-group;
+    }
+
+    .divTableBody {
+      display: table-row-group;
+    }
+  </style>
+
+  <style>
+    #beds_label {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      width: 328px;
+    }
+
+    #beds_label .name {
+      margin-top: 2px;
+    }
+
+    #beds_label .input_span {
+      min-height: 45px;
+      width: 100%;
+      border: 1px solid #D2D2D2;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding-left: 14px;
+      justify-content: space-between;
+    }
+
+    #beds_label input {
+      border: none;
+      text-align: center;
+      height: 100%;
+      border-left: 1px solid #D2D2D2;
+      width: 42px;
+      background: transparent;
+    }
+  </style>
+
+
+
+  <button class="button add_button" id="id_add_button_rc"
+    style="margin-top: 15px;"
+    onclick="new_rc()">Добавить новую категорию</button>
+  <!-- <button class="button add_button" style="margin-top: 15px;" onclick="new_subrc()">Добавить вариант размещения в категории</button> -->
+</div>
+
+<div class="section"
+  style="display: none;"
+  id="edit_rc_section">
+  <span class="title">Редактирования записи</span>
+  <div class="grupe_input"
+    id="edit_rcategory">
+    {% input_text 'text' 'Название' 'name' '' 'Название категории номера' 1 %}
+    {% input_cr 'list' 'Тип' 'offer_type' choices.offer_type '' 1 %}
+
+    <div class="label text" id="beds_label">
+      <span class="name">Кровати*</span>
+      <div class="input_span" data-type-bed="bed_1">
+        <span>Односпальная</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+      <div class="input_span" data-type-bed="bed_2">
+        <span>Двухспальная</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+      <div class="input_span" data-type-bed="bed_1.5">
+        <span>Полутороспальная</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+
+      <div class="input_span" data-type-bed="sofa_1">
+        <span>Софа</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+      <div class="input_span" data-type-bed="two_tier">
+        <span>Двух-ярусная</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+
+      <div class="input_span" data-type-bed="sofa_2">
+        <span>Диван</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+
+      <div class="input_span" data-type-bed="armchair">
+        <span>Кресло</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+
+
+      <div class="input_span" data-type-bed="baby_bed">
+        <span>Детская кровать</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+
+      <div class="input_span" data-type-bed="baby_cradle">
+        <span>Детская люлька</span>
+        <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+      </div>
+
+      <div class="disctiption">
+        Детская кровать от 2 до 6 лет<br>
+        Детская люлька от 3 мес. до 2 лет.<br>
+        ? - дети до 2х лет не считаются за 1 гостя
+      </div>
+    </div>
+
+
+
+
+    {% input_text 'text' 'Площадь (м<sup>2</sup>)' 'square' '' 'Площадь номера' 1 %}
+    {% input_text 'text' 'Количество гостей' 'max_adults' '' 'Количество гостей' 1 %}
+    {% input_text 'text' 'Количество комнат' 'count_room' '' 'Количество комнат' 1 %}
+    {% input_text 'text' 'Количество спален' 'count_bedrooms' '' 'Количество спален' 1 %}
+    {% input_text 'long' 'Описание' 'description_of_the_room' '' 'Описание номера' 0 %}
+    {% input_text 'text' 'Базовая цена за сутки' 'price_base' '' 'Базовая цена за сутки' 1 %}
+    {% input_text 'text' 'Минимум дней' 'min_days' '' 'Минимум дней проживания' 1 %}
+    {% input_text 'int' 'Размер страхового депозита' 'the_amount_of_the_security_deposit' '' 'Размер страхового депозита' 1 %}
+    {% input_cr 'checkbox' 'Услуги' 'rservice' choices.rservice '' 0 %}
+    {% input_file 'many' 'Фото' 'photo_room' '' 2 20 %}
+
+  </div>
+  <div class="grupe_input"><button class="button save_an_entry"
+      onclick="save_rc()">Сохранить</button></div>
+</div>
+
+<div class="section"
+  style="display: none;"
+  id="edit_subrc_section">
+  <span class="title">Редактирования записи</span>
+  <div class="grupe_input"
+    id="edit_rcategory">
+    <label class="text">
+      <span class="name">Категория номера</span>
+      <select name="rc"
+        required>
+        {% for rc in rcs %}
+        <option value="{{rc.id}}">"{{rc.name}}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="grupe_input"><button class="button save_an_entry"
+      onclick="save_subrc()">Сохранить</button></div>
+</div>
+
+
+<script defer>
+  function new_rc() {
+    $("#edit_rc_section").show()
+    $(".save_an_entry").html("Создать")
+    $(".del_an_entry").hide()
+    id_element_rc = "new"
+    $(".add_button").hide()
+    $(".add_button").hide()
+  }
+
+  $(".rc_item .switch").click(function () {
+    $(this).toggleClass("off")
+    $(this).toggleClass("on")
+    id_room = $(this).attr("id_room")
+    toggle_eneble_rc(id_room)
+  })
+
+  id_element_rc = null
+
+  function toggle_eneble_rc(id) {
+    data = {
+      "id": id,
+    }
+
+    $.ajax({
+      method: "POST",
+      data: data,
+      url: "{% url 'form_toggle_eneble_rcategory' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+        value = request["value"]
+        if (value == true) {
+          $(`#id_${id} .switch`).removeClass("off")
+          $(`#id_${id} .switch`).addClass("on")
+        }
+        else {
+          $(`#id_${id} .switch`).removeClass("on")
+          $(`#id_${id} .switch`).addClass("off")
+        }
+      }
+    });
+  }
+
+  function load_rc(id) {
+    $(".save_an_entry").show()
+    $(".add_button").hide()
+
+    id_element_rc = id
+    data = {
+      "room_id": id,
+    }
+
+    load_start()
+
+    $.ajax({
+      method: "GET",
+      data: data,
+      url: "{% url 'get_hotel_rc' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+        $("*[name='name']").val(request.room.name)
+        $("*[name='offer_type']").val(request.room.offer_type)
+        $("*[name='square']").val(request.room.square)
+        $("*[name='description_of_the_room']").val(request.room.description_of_the_room)
+        $("*[name='hotel_rooms']").val(request.room.hotel_rooms)
+
+        $("*[name='price_base']").val(request.room.price_base)
+        $("*[name='min_days']").val(request.room.min_days)
+
+
+        $("*[name='max_adults']").val(request.room.max_adults)
+        $("*[name='count_room']").val(request.room.count_room)
+        $("*[name='count_bedrooms']").val(request.room.count_bedrooms)
+        $("*[name='the_amount_of_the_security_deposit']").val(request.room.the_amount_of_the_security_deposit)
+
+
+        for (let key in request.room.beds) {
+          val = request.room.beds[key];
+          elem = $(`#beds_label .input_span[data-type-bed="${key}"] input`)
+          $(elem).val(val)
+        }
+
+
+
+        request.room.rservice.forEach(item => {
+          input_buff = $(`*[name='rservice'][value='${item.id}']`)
+          $(input_buff).attr("checked", "checked")
+        });
+
+        $(`.label_input_file[input-file-name="photo_room"]`).multifile("reset")
+
+        files_jq = $(".label_input_file").find(".files")
+        request.room.imgs.forEach(item => {
+          item_a = $(`<div class="img_elem" data-id="${item.id}"><img src="${item.url}"><div class="remove">✖</div></div>`)
+
+          $(files_jq).find(".img_add").before(item_a)
+        });
+
+        $(`.label_input_file[input-file-name="photo_room"]`).multifile("check_the_pictures")
+
+        load_end()
+        $("#edit_rc_section").show()
+      }
+    });
+  }
+
+  function save_rc() {
+    if (!$(`.label_input_file[input-file-name="photo_room"]`).multifile("valid")) {
+      return false
+    }
+
+    required_fields_filled = true
+
+    $(':input[required]').each(function() {
+      if($(this).val() === '') {
+        $(this).css('border-color', 'red');
+        required_fields_filled = false
+      }
+    });
+
+    if (!required_fields_filled) {
+      return false
+    }
+
+    var beds = {};
+    $('.input_span').each(function(){
+      var type = $(this).data("type-bed");
+      var val = $(this).find('input').val();
+      if (val == "" || val == NaN || val == undefined) {
+        val = "0"
+      }
+      beds[type] = parseInt(val);
+    });
+
+    beds_string = Object.entries(beds).map(([key, value]) => `${key}=${value}`).join('&');
+
+    console.log(beds, beds_string)
+
+
+    if (window.FormData === undefined) {
+      alert('В вашем браузере FormData не поддерживается')
+    } else {
+      form_data = new FormData();
+
+      fileInput = $("input[name='photo_room[]']")[0];
+
+      if (!$(`.label_input_file[input-file-name="photo_room"]`).multifile("valid")) {
+        return false
+      }
+
+      form_data.append('photo_room[]', $(`.label_input_file[input-file-name="photo_room"]`).multifile("getlist"));
+
+      var selectedrservice = [];
+      $('input[name="rservice"]:checked').each(function () {
+        selectedrservice.push($(this).val());
+      });
+
+      form_data.append("rservice[]", selectedrservice)
+      form_data.append("id", id_element_rc)
+      form_data.append("name", $("*[name='name']").val())
+      form_data.append("offer_type", $("*[name='offer_type']").val())
+      form_data.append("square", $("*[name='square']").val())
+      form_data.append("beds", beds_string)
+      form_data.append("description_of_the_room", $("*[name='description_of_the_room']").val())
+      form_data.append("price_base", $("*[name='price_base']").val())
+      form_data.append("min_days", $("*[name='min_days']").val())
+      form_data.append("max_adults", $("*[name='max_adults']").val())
+      form_data.append("count_room", $("*[name='count_room']").val())
+      form_data.append("count_bedrooms", $("*[name='count_bedrooms']").val())
+      form_data.append("the_amount_of_the_security_deposit", $("*[name='the_amount_of_the_security_deposit']").val())
+      load_start()
+      $.ajax({
+        method: "POST",
+        data: form_data,
+        contentType: false,
+        processData: false,
+        url: "{% url 'form_save_rcategory' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        },
+        success: function (request) {
+          $("#edit_rc_section").hide()
+          $(".add_button").show()
+          location.reload()
+        }
+      });
+    }
+  }
+
+  function del_rc(id) {
+    data = {
+      id: id,
+    }
+    load_start()
+    $.ajax({
+      method: "POST",
+      data: data,
+      url: "{% url 'form_del_rcategory' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+        $("edit_rc_section").hide()
+        location.reload()
+
+      }
+    });
+  }
+</script>
+
+<script defer>
+  $(document).ready(function () {
+    fast_addStep("#section_1",
+      `Категории номеров – это условное разделение номеров по определенному признаку. Номера объединяют в одну категорию, если у них одинаковая конфигурация.<br>
+      Нажмите «Добавить новую категорию» и у вас появится форма для заполнения информации.`,
+      {selector: '#id_add_button_rc', event: 'click'}
+    )
+
+    fast_addStep("#edit_rcategory",
+      `Форма для добавления новых записей и изменения уже существующих одна и та же, поэтому вы сможете полностью изменить категорию номера.`
+    )
+
+    fast_addStep(`#tabs`,
+      `В разделе:<br>
+      «Управление объектом размещения > «Управление номерами» можете указать количество однотипных номеров для каждой категории.`
+    )
+
+    if (!getTutorialProgress()) {
+      tour.start();
+      saveTutorialProgress()
+    }
+  });
+
+</script>
+
+
+{% endblock main_block %}

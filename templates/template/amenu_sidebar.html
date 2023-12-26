@@ -1,0 +1,280 @@
+<style>
+
+
+	#tabs {
+		padding: 10px;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 100%;
+	}
+
+	#tabs .username {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 700;
+		font-size: 20px;
+		line-height: 25px;
+		color: #000000;
+		text-align: end;
+		margin-left: 50px;
+	}
+
+	#tabs .staff_post {
+		text-align: end;
+	}
+
+	#tabs .staff_post[data-type="owner"] {
+	color: #FF3131 !important;
+	}
+
+	#tabs .staff_post[data-type="admin"] {
+	color: #0038FF !important;
+	}
+
+	#tabs .staff_post[data-type="moder"] {
+	color: #1DD100 !important;
+	}
+
+	#tabs .grupe_tabs {
+		display: flex;
+		flex-direction: column;
+		margin-top: 27px;
+		overflow: auto;
+	}
+
+	#tabs .grupe_tabs .item {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 25px;
+
+		color: #787878;
+		cursor: pointer;
+	}
+
+	#tabs .grupe_tabs .item[data-select="select"] {
+		color: #5f8fff;
+	}
+
+	#tabs .grupe_tabs .cont {
+		margin-left: 20px;
+		margin-top: -5px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#tabs .grupe_tabs span.active::after {
+		content: "▼";
+		margin-left: 8px;
+	}
+
+	#tabs .grupe_tabs span::after {
+		content: "▲";
+		margin-left: 8px;
+	}
+
+	#tabs .name_grupe {
+		display: block;
+	}
+
+	#tabs .grupe_tabs,
+	#tabs .cont,
+	#tabs .grupe {
+		display: flex;
+		gap: 8px;
+		flex-direction: column;
+	}
+</style>
+
+<style>
+.amenu {
+	display: inline-block;
+	font-size: 31px;
+	color: white;
+	cursor: pointer;
+	padding: 0 10px;
+	transition: transform 0.1s;
+}
+
+.amenu_1 {
+	left: 13px;
+	position: absolute;
+}
+
+.amenu:hover {
+	transform-origin: 50%;
+	transform: scale(1.1);
+}
+
+.amenu .bar1,
+.amenu .bar2,
+.amenu .bar3 {
+	width: 35px;
+	height: 5px;
+	background-color: #fff;
+	margin: 6px 0;
+	transition: transform 0.4s, opacity 0.1s;
+}
+
+.amenu.active .bar1 {
+	-webkit-transform: rotate(-45deg) translate(-9px, 6px);
+	transform: rotate(-45deg) translate(-9px, 6px);
+}
+
+.amenu.active .bar2 {opacity: 0;}
+
+.amenu.active .bar3 {
+	-webkit-transform: rotate(45deg) translate(-8px, -8px);
+	transform: rotate(45deg) translate(-8px, -8px);
+}
+
+#amenu_sidebar {
+	height: 100vh;
+	position: fixed;
+	width: 100vw;
+	z-index: 999999;
+	top: 0;
+	left: 0;
+}
+
+#amenu_sidebar .darkening {
+	background: #0000006b;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+}
+
+#amenu_sidebar .amenu_sidebar_menu {
+	width: 100%;
+	max-width: 320px;
+	height: 100%;
+	background: white;
+	box-shadow: 0px 0px 18px 0px #D9D9D9;
+	position: absolute;
+	top: 0;
+	left: -100%;
+	transition: transform 2s;
+}
+
+#amenu_sidebar .amenu {
+	display: block;
+	font-size: 31px;
+	color: black;
+	cursor: pointer;
+	padding: 0 10px;
+	transition: transform 0.1s;
+	z-index: 9999;
+	position: absolute;
+    top: 11px;
+    left: 2px;
+}
+
+#amenu_sidebar .amenu .bar1,
+#amenu_sidebar .amenu .bar2,
+#amenu_sidebar .amenu .bar3 {
+	width: 35px;
+	height: 5px;
+	background-color: black;
+	margin: 6px 0;
+	transition: transform 0.4s, opacity 0.1s;
+}
+
+</style>
+
+<div id="amenu_sidebar" class="d-none">
+	<div class="darkening"></div>
+	<div class="amenu_sidebar_menu">
+		<div id="tabs">
+			<span class="username">
+				{{name}}
+			</span>
+
+			<span class="staff_post" data-type="{{staff_post.code}}">{{staff_post.label}}</span>
+
+			<div class="grupe_tabs">
+				<div class="item grupe">
+					<span class="name_grupe">Списки</span>
+					<div class="cont">
+						<a href="{% url 'admin.page.list.user' %}" {% if view_name == 'admin.page.list.user' %}data-select="select"{% endif %} class="item">Пользователи</a>
+						<a href="{% url 'admin.page.list.hotel' %}" {% if view_name == 'admin.page.list.hotel' %}data-select="select"{% endif %} class="item">Объекты размещения</a>
+						<a href="{% url 'admin.page.list.moderation.hotel' %}" {% if view_name == 'admin.page.list.moderation.hotel' %}data-select="select"{% endif %} class="item">Модерация объектов размещения</a>
+						<a href="{% url 'admin.page.list.booking' %}"  {% if view_name == 'admin.page.list.booking' %}data-select="select"{% endif %} class="item">Брони</a>
+						<a href="{% url 'admin.page.list.place' %}"  {% if view_name == 'admin.page.list.place' %}data-select="select"{% endif %} class="item">Места</a>
+						<a href="{% url 'admin.page.list.services' %}"  {% if view_name == 'admin.page.list.services' %}data-select="select"{% endif %} class="item">Услуги</a>
+						<a href="{% url 'admin.page_review_moderation' %}"  {% if view_name == 'admin.page_review_moderation' %}data-select="select"{% endif %} class="item">Отзывы</a>
+						{% if supermoderator or user_type == "owner" %}
+						<a href="{% url 'admin.page.list.actions_admin' %}"  {% if view_name == 'admin.page.list.actions_admin' %}data-select="select"{% endif %} class="item">Логи админов</a>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="item grupe">
+					<span class="name_grupe">Работа модератора</span>
+					<div class="cont">
+						<a href="{% url 'admin.page.ts.chat' %}"  {% if view_name == 'admin.page.ts.chat' %}data-select="select"{% endif %} class="item">Чат</a>
+						{% if user_type == "moder" or user_type == "admin" or user_type == "owner" %}
+							<a href="{% url 'ajax.page.page_moderator_office' %}"  {% if view_name == 'ajax.page.page_moderator_office' %}data-select="select"{% endif %} class="item">Мой рабочий лист</a>
+							<a href="{% url 'admin.moderwork' %}"  {% if view_name == 'admin.moderwork' %}data-select="select"{% endif %} class="item">Управление рабочими листами</a>
+						{% else %}
+							<a href="{% url 'ajax.page.page_moderator_office' %}"  {% if view_name == 'ajax.page.page_moderator_office' %}data-select="select"{% endif %} class="item">Рабочий лист</a>
+						{% endif %}
+
+						{% if user_type == "moder" or user_type == "owner" %}
+						<a href="{% url 'admin.page.list.moderator_reports' %}"  {% if view_name == 'admin.page.list.moderator_reports' %}data-select="select"{% endif %} class="item">Отчёты модераторов</a>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="item grupe">
+					<span class="name_grupe">Инструменты</span>
+					<div class="cont">
+						<a href="{% url 'admin.page.parser.hotel' %}"  {% if view_name == 'admin.page.parser.hotel' %}data-select="select"{% endif %} class="item">Парсер</a>
+						{% if supermoderator or user_type == "owner" %}
+						<a href="{% url 'admin.staff' %}"  {% if view_name == 'admin.staff' %}data-select="select"{% endif %} class="item">Управление персоналом</a>
+						<a href="{% url 'admin.page.statistics' %}"  {% if view_name == 'admin.page.statistics' %}data-select="select"{% endif %} class="item">Статистика</a>
+						<a href="{% url 'admin.page.site_management' %}"  {% if view_name == 'admin.page.site_management' %}data-select="select"{% endif %} class="item">Управление сайтом</a></a>
+						{% endif %}
+					</div>
+				</div>
+
+				<a href="{% url 'profile_v2' %}" class="item">Профиль пользователя</a>
+				<a href="/logout/" class="item">Выход</a>
+			</div>
+		</div>
+	</div>
+	<div class="amenu amenu_2 active d-none">
+		<div class="bar1"></div>
+		<div class="bar2"></div>
+		<div class="bar3"></div>
+	</div>
+</div>
+
+<script>
+	$(".item.grupe span").click(function () {
+		$(this).next(".cont").toggle("fast")
+		$(this).toggleClass("active")
+	})
+</script>
+
+<script>
+	$(".amenu_1").click(function() {
+		$("#amenu_sidebar").removeClass("d-none")
+		$("#amenu_sidebar .amenu_sidebar_menu").animate({"left": 0}, 500, function() {
+			$(".amenu_2").removeClass("d-none")
+		})
+		$(".amenu_1").addClass("d-none")
+	})
+
+	$(".amenu_2").click(function() {
+		$("#amenu_sidebar .amenu_sidebar_menu").removeClass("show")
+		$(".amenu_2").addClass("d-none")
+		$("#amenu_sidebar .amenu_sidebar_menu").animate({"left": "-100%"}, 500, function() {
+			$("#amenu_sidebar").addClass("d-none")
+			$(".amenu_1").removeClass("d-none")
+		})
+	})
+	</script>

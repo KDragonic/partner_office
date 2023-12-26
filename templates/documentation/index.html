@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+{% load static documentation_tags %}
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Документация - {{title}}</title>
+    {% if meta and meta.description %}
+      <meta name="description" content="{{ meta.description }}" />
+    {% endif %}
+    {% if meta and meta.keywords %}
+      <meta name="keywords" content="{{ meta.keywords }}" />
+    {% endif %}
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v2" />
+    <script src="{% static 'js/fun_cookie.js' %}"></script>
+
+    <link rel="shortcut icon" href="/static/img/favicon_2.ico" type="image/x-icon" />
+    <link rel="icon" href="/static/img/favicon_2.ico" type="image/x-icon" />
+
+    <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+    <script src="{% static 'jqu/jquery-ui.min.js' %}"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="{% static 'jqu/jquery-ui.structure.css' %}" />
+
+    <script src="/static/js/jquery.ui.touch-punch.js"></script>
+
+    <script src="{% static 'js/popup_create.js' %}?v4"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </head>
+
+  <style>
+    * {
+      font-family: Manrope;
+    }
+    a {
+      text-decoration: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: row;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .main-content {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .base-content {
+      height: 100%;
+      padding: 10px;
+    }
+  </style>
+
+  <style>
+    header {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px;
+      flex-wrap: wrap;
+    }
+
+    header .breadcrumbs {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 0px;
+    }
+
+    header .breadcrumbs .items {
+      display: flex;
+      color: #a0aec0;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    header .breadcrumbs .items .item:nth-child(n + 2)::before {
+      content: '/';
+      margin: 0 5px;
+    }
+
+    header .title {
+      color: #01b574;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    header .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    header .buttons .item {
+      cursor: pointer;
+    }
+
+    header .buttons .item a {
+      color: black;
+    }
+
+    header .buttons .item:hover a {
+      color: #01b574;
+    }
+
+    header .buttons .item:hover svg path {
+      fill: #01b574;
+    }
+  </style>
+
+  <body>
+    {% menu %}
+    <div class="main-content">
+      {% header %}
+      <main class="base-content">
+        <article>
+          {{documentation.content|safe}}
+        </article>
+      </main>
+    </div>
+  </body>
+  {% footer %}
+</html>

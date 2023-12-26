@@ -1,0 +1,347 @@
+#search_input_menu {
+  margin-right: -6px;
+}
+
+@media screen and (max-width: 1024px) {
+  #search_input_menu {
+    margin-left: 0;
+    margin-right: 0;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+  }
+
+  #search_input {
+    width: 100% !important;
+    min-width: 0px !important;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  #search_input_menu {
+    margin-right: -6px;
+    position: relative;
+
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: -17px;
+      right: 0;
+      height: 81px;
+      width: 1px;
+      background: rgba(118, 118, 118, 0.3);
+    }
+  }
+}
+
+#search_input_menu_items {
+  position: absolute;
+  background: white;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+
+  span {
+    padding: 10px;
+
+    &:hover {
+      background: rgb(192, 192, 192);
+    }
+  }
+}
+
+/* Поле поиска */
+
+#search_input {
+  box-sizing: border-box;
+  font-size: 16px;
+  padding: 10px;
+  padding-left: 23px;
+  min-width: 323px;
+  border: none;
+
+  /* border: 1px solid #D2D2D2; */
+  border-radius: 5px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+
+
+/* Поле поиска, когда он получает фокус/нажал на */
+
+/* Контейнер <div> - необходим для размещения выпадающего содержимого */
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Выпадающее содержимое (скрыто по умолчанию) */
+
+.dropdown-content {
+  /* position: absolute; */
+  background-color: #f6f6f6;
+  min-width: 230px;
+  border: none;
+  z-index: 1;
+
+  a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+
+    &:hover {
+      background-color: #f1f1f1;
+    }
+  }
+}
+
+/* Ссылки внутри выпадающего списка */
+
+/* Изменение цвета выпадающих ссылок при наведении курсора */
+
+/* Показать выпадающее меню (используйте JS, чтобы добавить этот класс в .dropdown-content содержимого, когда пользователь нажимает на кнопку выпадающего списка) */
+
+.show {
+  display: block;
+}
+
+.guests {
+  display: flex;
+
+  p {
+    display: inline;
+  }
+}
+
+.ui-menu-item .search_input_sity,
+.ui-menu-item .search_input_count {
+  color: #000000;
+  padding-left: 15px;
+}
+
+.ui-menu-item .additional_address {
+  color: #696969;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ui-menu-item:hover .search_input_sity {
+  color: #FC7201;
+}
+
+.ui-menu-item .ui-state-active {
+  border: none !important;
+}
+
+.ui-menu-item .search_input_sity.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-right: 1px none !important;
+  border-bottom: 1px none !important;
+  border-top: 1px none !important;
+}
+
+.ui-menu-item .search_input_count.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-left: 1px none !important;
+  border-bottom: 1px none !important;
+  border-top: 1px none !important;
+}
+
+.ui-menu-item:first-child .search_input_sity.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-right: 1px none !important;
+  border-bottom: 1px none !important;
+}
+
+.ui-menu-item:first-child .search_input_count.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-left: 1px none !important;
+  border-bottom: 1px none !important;
+}
+
+.ui-menu-item:last-child .search_input_sity.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-right: 1px none !important;
+  border-top: 1px none !important;
+}
+
+.ui-menu-item:last-child .search_input_count.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-left: 1px none !important;
+  border-top: 1px none !important;
+}
+
+.ui-menu-item:last-child:first-child .search_input_sity.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-right: 1px none !important;
+}
+
+.ui-menu-item:last-child:first-child .search_input_count.ui-state-active {
+  border: 1px solid #d2d2d2 !important;
+  border-left: 1px none !important;
+}
+
+
+
+#guests_popup {
+  position: absolute;
+  background: white;
+  padding: 30px;
+  width: 256px;
+  box-sizing: border-box;
+  gap: 15px;
+  display: none;
+  flex-direction: column;
+  left: 0;
+  z-index: 2;
+  border: 1px solid #d2d2d2;
+  border-top: none;
+
+  border-radius: 0 0 5px 5px;
+
+  .input {
+    display: flex;
+    align-items: center;
+
+    .label {
+      flex-grow: 1;
+      width: 100%;
+      font-family: 'Manrope';
+      font-style: normal;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 22px;
+
+      /* identical to box height */
+
+      color: #07151C;
+    }
+
+    :is(.plus, .minus) {
+      border: 1px solid #FC7201;
+      color: #FC7201;
+      border-radius: 50%;
+      display: block;
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      min-height: 30px;
+      text-align: center;
+      user-select: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      text-align: center;
+      width: 40px;
+    }
+  }
+}
+
+.form-search__label.form-search__label--persons:hover #guests_popup {
+  display: flex;
+}
+
+.children_age_group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: -8px;
+
+  input {
+    padding: 6px;
+    padding-left: 10px;
+    border-radius: 5px;
+  }
+}
+
+.ui-datepicker {
+  width: auto;
+}
+
+.ui-datepicker-calendar {
+  .ui-state-default {
+    background: none;
+    border: none;
+    color: #07151C;
+    font-family: 'Manrope';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    height: 32px;
+    line-height: 22px;
+    padding: 5px;
+    text-align: center;
+    width: 32px;
+  }
+
+  .ui-datepicker th {
+    padding: .7em 12px;
+  }
+}
+
+.ui-datepicker td {
+  padding: 5px;
+}
+
+.ui-datepicker-calendar {
+  .ui-state-hover {
+    background: #F0F0F0;
+  }
+
+  .ui-state-active {
+    background: #FC7201;
+    color: white;
+  }
+
+  .ui-datepicker-month {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+
+    /* identical to box height */
+    color: #000000;
+  }
+
+  thead .col {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: #4A4A4A;
+  }
+}
+
+.ui-icon-circle-triangle-e {
+  background-image: url('/static/img/ui-datepicker-calendar-arrow_r.png') !important;
+  background-position: 0 0;
+}
+
+.ui-icon-circle-triangle-w {
+  background-image: url('/static/img/ui-datepicker-calendar-arrow_l.png') !important;
+  background-position: 0 0;
+}
+
+.ui-datepicker-next.ui-state-hover {
+  background: none;
+  right: 2px;
+  border: none;
+}
+
+.ui-datepicker-prev.ui-state-hover {
+  background: none;
+  left: 2px;
+  border: none;
+}

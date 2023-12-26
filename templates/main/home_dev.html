@@ -1,0 +1,243 @@
+﻿{% extends "main/base.html" %}
+{% load static %}
+{% block content %}
+<style>
+	.main-nav__item a.active {
+		background: #fff;
+		color: #07151C;
+	}
+</style>
+<section class="s-main">
+	<section class="hero">
+		<div class="container hero__container">
+			<h1 class="hero__header">Забронируй жильё на 5% дешевле, чем напрямую у отеля</h1>
+			<ul class="main-nav">
+				<li class="main-nav__item"
+					data-partition="hotel">
+					<a href="#hotel">
+						<img src="{% static 'img/sprite/building.svg' %}"
+							alt=""
+							color="red">
+						Жилье
+					</a>
+					<!-- <li class="main-nav__item" data-partition="tour"> <a href="#tour"> <img src="{% static 'img/sprite/flight.svg' %}" alt=""> Туры </a> -->
+			</ul>
+			<div class="main-searchbox">
+				{% include "main/form_search_dev.html" %}
+			</div>
+		</div>
+	</section>
+</section>
+<main class="main">
+	<section class="offers">
+
+		<div class="container offers__container">
+			<div class="offers-item">
+				<img class="svg-icon icon-backpack"
+					src="{% static 'img/sprite/hotel.svg' %}"
+					alt="">
+				<p class="offers-item__text">Бронируй жилье в путешествиях по России</p>
+			</div>
+			<div class="offers-item">
+				<img class="svg-icon icon-backpack"
+					src="{% static 'img/sprite/credit-card.svg' %}"
+					alt="">
+				<p class="offers-item__text">Выбирай тип оплаты </p>
+			</div>
+			<div class="offers-item">
+				<img class="svg-icon icon-backpack"
+					src="{% static 'img/sprite/map.svg' %}"
+					alt="">
+				<p class="offers-item__text">Отправляйся в свое незабываемое путешествие </p>
+			</div>
+		</div>
+	</section>
+	<section class="direction">
+		<div class="container direction__container">
+			<div class="direction-content">
+				<h2 class="direction-content__header">Направления для отелей</h2>
+				<p class="direction-content__text">В этих популярных местах вы точно найдете что-то для себя</p>
+				<ul class="direction-card">
+					{% for card in data %}
+					<li class="direction-card__item"
+						onclick="go_list_city_card('{{card.slug}}')">
+						<div class="direction-card__img">
+							<picture>
+								<source type="image/webp"><img src="{{card.img}}" alt="">
+							</picture>
+						</div>
+						<div class="direction-card__info">
+							<div class="direction-card__name">{{card.name}}</div>
+							<div class="direction-card__count">{{card.count}} вариантов</div>
+						</div>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+
+			<style>
+				.direction-card__item {
+					cursor: pointer;
+				}
+			</style>
+
+
+			<script>
+				function go_list_city_card(slug) {
+					let currentDate = new Date();
+					let futureDate = new Date();
+					futureDate.setDate(currentDate.getDate() + 5);
+
+					data = {
+						"adults": 1,
+						"date_1": formatDate(currentDate),
+						"date_2": formatDate(futureDate),
+					}
+
+					query_string = getQueryString(data)
+					url = `https://turgorodok.ru/hotel/search/${slug}/?${query_string}`
+					console.log(url)
+					location.href = url
+				}
+			</script>
+
+
+
+			<!-- <div class="direction-content">
+				<h2 class="direction-content__header">Направления для туров</h2>
+				<p class="direction-content__text">В этих популярных местах вы точно найдете что-то для себя</p>
+				<ul class="direction-card">
+					<li class="direction-card__item">
+						<div class="direction-card__img">
+							<picture>
+								<source type="image/webp"><img src="{% static 'img/card.jpg' %}"
+									alt="">
+							</picture>
+						</div>
+						<div class="direction-card__info">
+							<div class="direction-card__name">Кавказ</div>
+							<div class="direction-card__count">0 вариантов</div>
+						</div>
+					</li>
+					<li class="direction-card__item">
+						<div class="direction-card__img">
+							<picture>
+								<source type="image/webp"><img src="{% static 'img/card.jpg' %}"
+									alt="">
+							</picture>
+						</div>
+						<div class="direction-card__info">
+							<div class="direction-card__name">Калерия</div>
+							<div class="direction-card__count">0 вариантов</div>
+						</div>
+					</li>
+					<li class="direction-card__item">
+						<div class="direction-card__img">
+							<picture>
+								<source type="image/webp"><img src="{% static 'img/card.jpg' %}"
+									alt="">
+							</picture>
+						</div>
+						<div class="direction-card__info">
+							<div class="direction-card__name">Алтай</div>
+							<div class="direction-card__count">0 вариантов</div>
+						</div>
+					</li>
+					<li class="direction-card__item">
+						<div class="direction-card__img">
+							<picture>
+								<source type="image/webp"><img src="{% static 'img/card.jpg' %}"
+									alt="">
+							</picture>
+						</div>
+						<div class="direction-card__info">
+							<div class="direction-card__name">Тыва</div>
+							<div class="direction-card__count">0 вариантов</div>
+						</div>
+					</li>
+				</ul>
+			</div> -->
+		</div>
+	</section>
+	<style>
+		.mailing-list {
+			background-image: url('{% static "/img/unsplash_-qrcOR33ErA.png" %}');
+		}
+	</style>
+	<section class="mailing-list">
+		<div class="container mailing-list__container">
+			<div class="mailing-list__top">
+				<img src="{% static '/img/sprite/mail.svg' %}"
+					class="svg-icon icon-mail">
+				<h2 class="mailing-list__title">Подпишитесь, чтобы получать лучшие предложения</h2>
+			</div>
+			<div class="mailing-form"
+				action="#">
+				<div class="mailing-form__row">
+					<input class="mailing-form__input"
+						type="email"
+						name="email"
+						placeholder="Введите ваш e-mail">
+					<button class="mailing-form__button"
+						type="submit">Подписаться</button>
+				</div>
+				<a href="/privacy-policy/" class="privacy">Нажимая на кнопку, вы соглашаетесь с Политикой конфиденциальности.</a>
+			</div>
+		</div>
+	</section>
+</main>
+<script defer>
+	setting = {
+		"partition": "hotel",
+	}
+
+	hotel = $(".main-nav *[data-partition='hotel'] a")
+	tour = $(".main-nav *[data-partition='tour'] a")
+
+	function set_partition_button() {
+		if (setting.partition == "hotel") {
+			$(hotel).addClass("active");
+			$(tour).removeClass("active");
+		}
+		if (setting.partition == "tour") {
+			$(hotel).removeClass("active");
+			$(tour).addClass("active");
+		}
+	}
+
+	$(hotel).click(function () {
+		setting.partition = "hotel"
+		set_partition_button()
+	});
+
+	$(tour).click(function () {
+		setting.partition = "tour"
+		set_partition_button()
+	});
+
+	set_partition_button()
+</script>
+
+<script defer>
+	$(document).ready(function() {
+  // Массив URL-адресов фотографий
+  const photos = [
+    '/static/img/a-pier-leads-out-to-the-lautersee-near-mittenwald-in-the-bavarian-alps.jpg',
+    // '/static/img/bg-main.jpg',
+    '/static/img/scenery-of-a-beautiful-river-between-the-mountains-and-small-houses-under-the-cloudy-sky.jpg',
+    '/static/img/picture-of-a-female-sitting-on-a-wooden-bridge-against-an-emerald-lake-with-a-breathtaking-nature.jpg',
+  ];
+
+  // Выбираем .s-main элемент
+  const sMain = $('.s-main');
+
+  // Генерируем случайный индекс для массива photos
+  const randomIndex = Math.floor(Math.random() * photos.length);
+  const randomPath = photos[randomIndex];
+
+  // Устанавливаем фоновое изображение для .s-main с случайной фотографией из массива photos
+  sMain.css('background-image', `url(${randomPath})`);
+});
+</script>
+
+{% endblock content %}

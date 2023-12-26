@@ -1,0 +1,1439 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form static %}
+{% block main_block %}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  table {
+    border: 2px solid #f0f0f0;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+  table th {
+    border: 1px solid #fff;
+    padding: 10px;
+  }
+  table td {
+    border: 1px solid #fff;
+    padding: 10px;
+    background: #fff !important;
+  }
+  table tbody td {
+    font-size: 14px;
+  }
+  table thead {
+    background: #fff;
+    border-bottom: 2px solid #cdcdcd;
+  }
+  table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    background: #f0f0f0;
+    border-bottom: 2px solid #cdcdcd;
+    text-align: left;
+  }
+  #search-form {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  #search-form #search-input {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .search-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .search-buttons .item {
+    background: #dfdfdf;
+    color: black;
+    padding: 10px;
+    color: black;
+    border-radius: 5px;
+    width: max-content;
+    cursor: pointer;
+  }
+  .search-buttons span {
+    margin-right: 8px;
+  }
+  .search-buttons .item:hover {
+    background: #b6b6b6;
+  }
+  .search-buttons .item.select {
+    background: #fc7201;
+    color: white;
+  }
+  .search-buttons .item.select:hover {
+    background: #ff8929;
+  }
+  .search-buttons[data-type="page"] {
+    justify-content: center;
+  }
+  .search-buttons[data-type="page"] .item {
+    padding: 0;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    max-width: 95px;
+  }
+  .click_user, .click_hotel {
+    color: #0039ff;
+    cursor: pointer;
+  }
+  .click_user:hover, .click_hotel:hover {
+    color: #567bff;
+  }
+  progress.percentage {
+    max-width: 78px;
+  }
+  .section_flex {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+  }
+  progress.percentage::-webkit-progress-value {
+    background-color: linear-gradient(to right, red, yellow, green) !important;
+  }
+  .stars {
+    color: #fc7201;
+  }
+  .accordion_header, .white_space_nowrap {
+    white-space: nowrap;
+  }
+  .accordion_body {
+    display: flex;
+    flex-direction: column;
+  }
+  #main_table tr[data-is_report="true"] {
+    background-color: #d7ffdc;
+  }
+  table td {
+    vertical-align: top;
+    border: 1px solid #aeaeae;
+  }
+  table td > .list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  table td > .list .item {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  table td > .list .item .name {
+    color: #adadad;
+  }
+  table td > .list .item .value {
+    color: #000;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  table td > .list .item .value.active {
+    color: #00d200;
+  }
+  table td > .list .item .value.notactive {
+    color: red;
+  }
+  table td > .list .item.notactive .value, table td > .list .item.notactive .name {
+    color: #ff9f9f;
+  }
+  table td > .list .item_add {
+    cursor: pointer;
+    margin-top: 18px;
+  }
+  table td > .list .item_add .name {
+    color: #fc7201;
+  }
+  table td > .list .item_add .text {
+    color: #bcbcbc;
+  }
+  table td[data-type-col="hotels"] > .list .item {
+    color: #000eff;
+  }
+  table td[data-type-col="hotels"] > .list .item .name {
+    color: #000eff;
+    cursor: pointer;
+  }
+  table td[data-type-col="status"] > .list .item .name {
+    color: #000;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Взял в работу"] .value {
+    color: #5383e1;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Связался"] .value {
+    color: #cfbb05;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Ожидание обратной связи"] .value {
+    color: #17a1a1;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Передан"] .value {
+    color: #f300da;
+  }
+  table td[data-type-col="status"] > .list .item[data-status="Завершен"] .value {
+    color: #1af34a;
+  }
+  #search-form {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  #search-form #search-input {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .search-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .search-buttons .item {
+    background: #dfdfdf;
+    color: black;
+    padding: 10px;
+    color: black;
+    border-radius: 5px;
+    width: max-content;
+    cursor: pointer;
+  }
+  .search-buttons span {
+    margin-right: 8px;
+  }
+  .search-buttons .item:hover {
+    background: #b6b6b6;
+  }
+  .search-buttons .item.select {
+    background: #fc7201;
+    color: white;
+  }
+  .search-buttons .item.select:hover {
+    background: #ff8929;
+  }
+  .search-buttons[data-type="page"] {
+    justify-content: center;
+  }
+  .search-buttons[data-type="page"] .item {
+    padding: 0;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    max-width: 95px;
+  }
+  .hotel_place_select_popup {
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0px 0px 18px 0px #d9d9d9;
+    padding: 28px 30px;
+    font-family: Manrope;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 300px;
+    min-width: 300px;
+    max-width: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+
+<div id="search-form">
+  <input type="text"
+    id="search-input"
+    name="search"
+    placeholder="Поиск..."
+    value="">
+</div>
+
+
+<h2 style="margin-bottom: 10px;">Фильтрация</h2>
+
+<section class="search-buttons" data-type="hotel_status" style="margin-bottom: 5px;">
+  <span>Статус отеля</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="active">Активен</div>
+  <div class="item" data-type="on_moderation">На модерации</div>
+  <div class="item" data-type="off">Выключен</div>
+  <div class="item" data-type="on">Включён</div>
+</section>
+
+<section class="search-buttons" data-type="hotel_type" style="margin-bottom: 5px;">
+  <span>Тип отеля</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="apart-hotel">Апарт-отель</div>
+  <div class="item" data-type="apartments">Апартамент</div>
+  <div class="item" data-type="flat">Квартира</div>
+  <div class="item" data-type="recreation center">База отдыха</div>
+  <div class="item" data-type="hotel_1">Гостиница</div>
+  <div class="item" data-type="bungalow">Бунгало</div>
+  <div class="item" data-type="boutique hotel">Бутик-отель</div>
+  <div class="item" data-type="villa">Вилла</div>
+  <div class="item" data-type="glamping">Глэмпинг</div>
+  <div class="item" data-type="guest house">Гостевой дом</div>
+  <div class="item" data-type="residential premises">Жилое помещение</div>
+  <div class="item" data-type="castle">Замок</div>
+  <div class="item" data-type="camping">Кемпинг</div>
+  <div class="item" data-type="resort hotel">Курортный отель</div>
+  <div class="item" data-type="furnished rooms">Меблированные комнаты</div>
+  <div class="item" data-type="mini-hotel">Мини-отель</div>
+  <div class="item" data-type="bed and breakfast (b&b)">Ночлег и завтрак (B&B)</div>
+  <div class="item" data-type="hotel">Отель</div>
+  <div class="item" data-type="sanatorium">Санаторий</div>
+  <div class="item" data-type="farm">Ферма</div>
+  <div class="item" data-type="hostel">Хостел</div>
+  <div class="item" data-type="private house">Частный дом</div>
+  <div class="item" data-type="chalet">Шале</div>
+</section>
+
+
+<section class="search-buttons" data-type="work_status" style="margin-bottom: 5px;">
+  <span>Аккаунт</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="transferred">Передан</div>
+  <div class="item" data-type="refused">Отказались</div>
+  <div class="item" data-type="at_work">В работе</div>
+  <div class="item" data-type="client_account">Аккаунт клиента</div>
+</section>
+
+<section class="search-buttons" data-type="user_status" style="margin-bottom: 5px;">
+  <span>Статус пользователя</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="confirmed">Подтверждён (почта или телефон)</div>
+</section>
+
+<section class="search-buttons" data-type="last_status_work" style="margin-bottom: 5px;">
+  <span>Статус работы</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="Взял в работу">Взял в работу</div>
+  <div class="item" data-type="Связался">Связался</div>
+  <div class="item" data-type="Ожидание обратной связи">Ожидание обратной связи</div>
+  <div class="item" data-type="Передан">Передан</div>
+  <div class="item" data-type="Завершен">Завершен</div>
+</section>
+
+
+<section class="search-buttons" data-type="hotel_place" style="margin-bottom: 5px;">
+  <span>Выбраное место</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="city" id="hotel_place_select">Выбрать город</div>
+</section>
+
+<script>
+function open_hotel_place_select_popup() {
+  hotel_place_select_id = null
+
+  hotel_place_select_popup = $(`
+    <div class="hotel_place_select_popup">
+      <span style="font-size: 21px;">Выбирете город</span>
+      <select style="width: 100%">
+        {% for place in places %}
+        <option value="{{place.id}}">{{place.title}}</option>
+        {% endfor %}
+
+      </select>
+      <button class="button hotel_place_select_popup_button" style="background: #5bd565">Выбрать</button>
+    </div>
+    `)
+
+    hotel_place_select_popup.find("select").select2({
+      width : '100%',
+    })
+    $("body").append(hotel_place_select_popup)
+
+    hotel_place_select_popup.find(".hotel_place_select_popup_button").click(function() {
+      let val = hotel_place_select_popup.find("select").val()
+      let name = hotel_place_select_popup.find(`select option[value=${val}]`).text()
+      $(`#hotel_place_select`).attr("data-type", val).text(name)
+      hotel_place_select_popup.remove()
+
+      hotel_place_select_id = name
+
+      filter_apply()
+    })
+
+    hotel_place_select
+
+}
+
+$(`#hotel_place_select`).click(function() {
+  open_hotel_place_select_popup()
+});
+</script>
+
+<table class="main_table">
+  <thead>
+    <tr>
+      <th scope="col" data-type-col="index">#</th>
+      <th scope="col" data-type-col="hotels">Объекты размещения</th>
+      <th scope="col" data-type-col="contacts">Контактные данные</th>
+      <th scope="col" data-type-col="notes">Комментарий</th>
+      <th scope="col" data-type-col="work_status">Аккаунт передан</th>
+      <th scope="col" data-type-col="profile"><span>Данные в аккаунте</span><br><span style="font-size: 12px">(профиль пользователя)</span></th>
+      <th scope="col" data-type-col="reminders">Календарь напоминаний</th>
+      <th scope="col" data-type-col="status">Статус работы</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+
+<script>
+
+
+  $(".search-buttons .item").not("#hotel_place_select").click(function() {
+    category = $(this).parent(".search-buttons").data("type")
+    type = $(this).data("type")
+
+    $(`.search-buttons[data-type="${category}"] .item`).removeClass("select")
+    $(`.search-buttons[data-type="${category}"] .item[data-type="${type}"]`).addClass("select")
+
+    filter_apply()
+  })
+
+  $(".search-buttons .item#hotel_place_select").click(function() {
+    category = $(this).parent(".search-buttons").data("type")
+    type = $(this).data("type")
+
+    $(`.search-buttons[data-type="${category}"] .item`).removeClass("select")
+    $(`.search-buttons[data-type="${category}"] .item#hotel_place_select`).addClass("select")
+
+    filter_apply()
+  })
+
+  $("#search-input").change(function (e) {
+    filter_apply()
+  });
+
+
+  function filter_apply() {
+
+    let list_filter_param = {}
+
+    $(".search-buttons .item.select").each(function () {
+      let category = $(this).parent(".search-buttons").data("type")
+      if (category=="hotel_place" && $("#hotel_place_select").hasClass("select")) {
+        list_filter_param[category] = hotel_place_select_id
+      }
+      else {
+        let val = $(this).data("type");
+        list_filter_param[category] = val
+      }
+    });
+    list_filter_param["search"] = $("#search-input").val()
+
+
+    console.log("Фильтер собран")
+    console.table(list_filter_param)
+
+    // Фильтрация
+    let keys = Object.keys(moder_works).reverse()
+
+    let hide_tr = []
+
+    keys.forEach((key, index) => {
+
+      let obj = moder_works[key]
+
+      let valid_count = 0
+
+      let valid = true
+
+      if (list_filter_param["hotel_status"] == "active") {
+        obj["hotels"].forEach((hotel) => {
+          if (hotel.status.code == "active") {
+            valid_count += 1
+          }
+        })
+      }
+
+      if (list_filter_param["hotel_status"] == "on_moderation") {
+        obj["hotels"].forEach((hotel) => {
+          if (hotel.status.code == "is_pending") {
+            valid_count += 1
+          }
+        })
+      }
+
+      if (list_filter_param["hotel_status"] == "off") {
+        obj["hotels"].forEach((hotel) => {
+          if (!hotel.enable) {
+            valid_count += 1
+          }
+        })
+      }
+
+      if (list_filter_param["hotel_status"] == "on") {
+        obj["hotels"].forEach((hotel) => {
+          if (hotel.enable) {
+            valid_count += 1
+          }
+        })
+      }
+
+      if (list_filter_param["hotel_status"] != "all") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      valid_count = 0
+
+      if (list_filter_param["hotel_type"] != "all") {
+        obj["hotels"].forEach((hotel) => {
+          let hotel_type = list_filter_param["hotel_type"]
+          if (hotel.type == hotel_type) {
+            valid_count += 1
+          }
+        })
+      }
+
+
+      let all_hotel_name_str = ""
+      let all_hotel_city_str = ""
+      obj["hotels"].forEach((hotel) => {
+        all_hotel_name_str += hotel.name + " "
+        all_hotel_city_str += hotel.city + " "
+      })
+
+      all_hotel_name_str = all_hotel_name_str.trim().toLowerCase()
+      all_hotel_city_str = all_hotel_city_str.trim().toLowerCase()
+
+
+
+      if (list_filter_param["hotel_type"] != "all") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      if (valid == true) {
+        $(`tr[data-id='${key}']`).show()
+      }
+      else {
+        $(`tr[data-id='${key}']`).hide()
+      }
+
+      valid_count = 0
+
+
+      if (list_filter_param["work_status"] != "all") {
+        if (list_filter_param["work_status"] == obj["param"]["status"]) {
+          valid_count = 1
+        }
+      }
+
+      if (list_filter_param["work_status"] != "all") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      if (valid == true) {
+        $(`tr[data-id='${key}']`).show()
+      }
+      else {
+        $(`tr[data-id='${key}']`).hide()
+      }
+
+      if (list_filter_param["work_status"] != "all") {
+        if (list_filter_param["work_status"] == obj["param"]["status"]) {
+          valid_count = 1
+        }
+      }
+
+      if (list_filter_param["work_status"] != "all") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      if (valid == true) {
+        $(`tr[data-id='${key}']`).show()
+      }
+      else {
+        $(`tr[data-id='${key}']`).hide()
+      }
+
+
+
+
+
+      if (list_filter_param["last_status_work"] != "all") {
+        last_index = obj["status"].length - 1
+        if (last_index >= 0 && list_filter_param["last_status_work"] == obj["status"][last_index]["value"]) {
+          valid_count = 1
+        }
+      }
+
+      if (list_filter_param["last_status_work"] != "all") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      if (valid == true) {
+        $(`tr[data-id='${key}']`).show()
+      }
+      else {
+        $(`tr[data-id='${key}']`).hide()
+      }
+
+
+
+
+      valid_count = 0
+
+      if (list_filter_param["user_status"] != "all") {
+        if (obj["user"]["email"]["status"]) {
+          valid_count = 1
+        }
+        if (obj["user"]["phone"]["status"]) {
+          valid_count = 1
+        }
+      }
+
+      if (list_filter_param["user_status"] != "all") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      if (valid == true) {
+        $(`tr[data-id='${key}']`).show()
+      }
+      else {
+        $(`tr[data-id='${key}']`).hide()
+      }
+
+      valid_count = 0
+
+      if (list_filter_param["hotel_place"] != "all") {
+        obj["hotels"].forEach((hotel) => {
+          if (list_filter_param["hotel_place"].indexOf(hotel.city) !== -1) {
+            valid_count += 1
+          }
+        });
+      }
+
+      if (list_filter_param["hotel_place"] != "all") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      if (valid == true) {
+        $(`tr[data-id='${key}']`).show()
+      }
+      else {
+        $(`tr[data-id='${key}']`).hide()
+      }
+
+
+      valid_count = 0
+
+      if (list_filter_param["search"] != "") {
+        let search = list_filter_param["search"].toLowerCase()
+
+        if (all_hotel_name_str.length != 0)
+          valid_count += all_hotel_name_str.indexOf(search.toLowerCase()) > -1 ? 1 : 0
+
+        if (all_hotel_city_str.length != 0)
+          valid_count += all_hotel_city_str.indexOf(search.toLowerCase()) > -1 ? 1 : 0
+
+        valid_count += obj["user"]["fio"]["full"].indexOf(search) > -1 ? 1 : 0
+        valid_count += obj["user"]["phone"]["value"].indexOf(search) > -1 ? 1 : 0
+        valid_count += obj["user"]["email"]["value"].indexOf(search) > -1 ? 1 : 0
+      }
+
+      if (list_filter_param["search"] != "") {
+        if (valid_count == 0) {
+          valid = false
+        }
+      }
+
+      if (valid == true) {
+        $(`tr[data-id='${key}']`).show()
+      }
+      else {
+        $(`tr[data-id='${key}']`).hide()
+      }
+
+
+    })
+
+
+
+  }
+
+
+
+  moder_works = {}
+
+
+  function get_moder_works(id=null) {
+    data = {}
+    if (id) {
+      data["id"] = id
+    }
+
+    $.ajax({
+      url: "/admin/ajax/moderator_office/get/",
+      type: "GET",
+      data: data,
+      success: function(response) {
+        for (key in response.moder_works) {
+          let id = response.moder_works[key]["id"]
+          moder_works[id] = response.moder_works[key]
+
+          removeAllReminder();
+
+          moder_works[id]["reminders"].forEach((item) => {
+            if (item.status == "active") {
+              addReminder(item.value, item.datetime * 1000);
+            }
+          });
+
+        }
+        reset_record_all()
+      }
+    });
+  }
+
+  get_moder_works()
+
+  function updateElementsFormatTimestamp() {
+    $('[data-format-time]').each(function() {
+      const timestamp = parseInt($(this).data('time'));
+      const date = new Date(timestamp * 1000);
+      const formattedDate = date.toLocaleString();
+      $(this).text(formattedDate);
+    });
+  }
+
+  updateElementsFormatTimestamp();
+
+    $('body').on("click", `[data-type-col="hotels"] .item`, function () {
+
+      let id = parseInt($(this).parents("tr").data("id"))
+      let obj = moder_works[id]
+
+      id_hotel = $(this).data("id")
+
+      let hotel = null
+      obj["hotels"].forEach((item) => {
+        if (item["id"] == id_hotel) {
+          hotel = item
+          return
+        }
+      })
+
+
+      id_user = obj["user"]["id"]
+      hotel_enable = hotel["enable"]
+
+      let enableOnButtonStyle = ["50%"];
+      if (hotel_enable) {
+        enableOnButtonStyle.push("disabled");
+      }
+
+      let enableOffButtonStyle = ["50%"];
+      if (!hotel_enable) {
+        enableOffButtonStyle.push("disabled");
+      }
+
+      popup_text = hotel["name"] + "<br>"
+      popup_text += hotel["address"]["short"] + "<br>"
+      popup_text += hotel["address"]["coordinates"] + "<br>"
+
+      if (obj["user"]["phone"]["value"])
+        popup_text += "Телефон: " + obj["user"]["phone"]["value"] + "<br>"
+
+
+      if (obj["user"]["login"])
+        popup_text += "Логин: " +  obj["user"]["login"] + "<br>"
+      if (obj["user"]["password"])
+        popup_text += "Пароль: " +  obj["user"]["password"] + "<br>"
+
+
+      popup_create("Действие", popup_text,
+        [
+          {
+            name: "Войти из под пользователя", fun: user_fun_action, param: ["login", id_user], type: "action", color: "purple", style: "full",
+          },
+          {
+            name: "Открыть чат", type: "action", color: "green", fun: user_fun_action, param: ["open_chat", id_user], style: "full",
+          },
+          {
+            name: "Детальная отеля", param: [`/hotel/${id_hotel}/`, 1], type: "link", color: "gray", style: "full",
+          },
+          {
+            name: "Включить", type: "action", color: "green", fun: hotel_fun_action, param: ["enable_on", id_hotel], style: enableOnButtonStyle,
+          },
+          {
+            name: "Выключить", type: "action", color: "red", fun: hotel_fun_action, param: ["enable_off", id_hotel], style: enableOffButtonStyle,
+          },
+          {
+            name: "Разрешить", type: "action", color: "green", fun: hotel_fun_action, param: ["allow_hotel", id_hotel], style: ["50%", "green"],
+          },
+          {
+            name: "Запретить", type: "action", color: "red", fun: hotel_fun_action, param: ["disallow_hotel", id_hotel], style: ["50%", "red"],
+          },
+          {
+            name: "Закрыть", type: "close", color: "gray", style: "full",
+          },
+        ]
+      )
+    })
+
+    function hotel_fun_action(type, id) {
+      if (type == "detal_hotel") {
+        location.href = `/hotel/${id}/`
+      }
+      if (type == "enable_on" || type == "enable_off") {
+        let type_enable = type
+
+        $.ajax({
+          method: "POST",
+          data: { "hotel_id": id, "type_enable": type_enable },
+          url: "{% url 'admin.ajax.hotel.set_enable' %}",
+          beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          },
+          success: function (request) {
+            location.reload()
+          }
+        });
+      }
+      if (type == "disallow_hotel") {
+        hotel_name = $(`[hotel-id=${id}]`).data("hotel_name")
+        popup_create(
+          'Запретить',
+          hotel_name,
+          [
+            {
+              name: 'Закрыть',
+              type: 'close'
+            },
+            {
+              name: 'Запретить',
+              fun: disallow_hotel,
+              type: 'use-inputs'
+            }
+          ],
+          [
+            [
+              { type: 'hidden', name: 'hotel_id', val: id },
+              { type: 'textarea', label: 'Комментарий (Причина отмены которую увидит пользователь)', name: 'comment' }
+            ]
+          ]
+        )
+      }
+      if (type == "allow_hotel") {
+        hotel_name = $(`[hotel-id=${id}]`).data("hotel_name")
+        popup_create(
+          'Разрешить',
+          `Вы должны проверить все поля отеля, адрес и кординаты <br>${hotel_name}`,
+          [
+            {
+              name: 'Закрыть',
+              type: 'close'
+            },
+            {
+              name: 'Разрешить',
+              fun: allow_hotel,
+              type: 'use-inputs'
+            }
+          ],
+          [
+            [
+              { type: 'hidden', name: 'hotel_id', val: id },
+              { type: 'textarea', label: 'Комментарий (Причина отмены которую увидит пользователь)', name: 'comment' }
+            ]
+          ],
+          "warning"
+        )
+      }
+    }
+
+    function disallow_hotel(param) {
+      $.ajax({
+        method: 'POST',
+        data: param,
+        url: "{% url 'admin.ajax.moderation.hotel.disallow' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function (request) {
+          popup_create('Запрещена модерация объекта', request.hotel_name, [
+            {
+              name: 'Закрыть',
+              type: 'reload'
+            }
+          ])
+        }
+      })
+    }
+
+    function allow_hotel(param) {
+      $.ajax({
+        method: 'POST',
+        data: param,
+        url: "{% url 'admin.ajax.moderation.hotel.allow' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function (request) {
+          popup_create('Объект прошёл модерацию', request.hotel_name, [
+            {
+              name: 'Закрыть',
+              type: 'reload'
+            }
+          ])
+        }
+      })
+    }
+
+    function user_fun_action(type, id) {
+      if (type == "login") {
+        location.href = `{% url 'admin.ajax.auth_user' %}?user_id=${id}`
+      }
+      if (type == "open_chat") {
+        location.href = `{% url 'admin.redirect.open_user_chat' %}?user_id=${id}`
+      }
+      if (type == "edit_user") {
+        location.href = `/django_admin/user/user/${id}/change/`
+      }
+      if (type == "user_financial_transactions") {
+        location.href = `{% url 'admin.page.user.financial_transactions' %}?user_id=${id}`
+      }
+    }
+
+
+  $("body").on("click", `[data-type-col="contacts"] .item_add`, function () {
+    popup_create("Добавить", "Новые контактные данные",
+    [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Добавить", fun: add_contacts_item }],
+    [[{ type: "hidden", name: "id", val: parseInt($(this).parents("tr").data("id")) }], [{ type: "text", "label": "Название", val: "", name: "name" }], [{ type: "text", "label": "Значение", val: "", name: "value" }]]
+  )
+  })
+
+  $("body").on("click", `[data-type-col="notes"] .item_add`, function () {
+    popup_create("Добавить", "Новый комментарий",
+      [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Добавить", fun: add_notes_item }],
+      [[{ type: "hidden", name: "id", val: parseInt($(this).parents("tr").data("id")) }], [{ type: "textarea", "label": "", val: "", name: "value" }]]
+    )
+  })
+
+  $("body").on("click", `[data-type-col="reminders"] .item_add`, function () {
+    popup_create("Добавить", "Новое напоминание",
+      [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Добавить", fun: add_reminders_item }],
+      [[{ type: "hidden", name: "id", val: parseInt($(this).parents("tr").data("id")) }], [{ type: "date", "label": "Дата", val: "", name: "date" }, { type: "time", "label": "Время", val: "", name: "time" }], [{ type: "text", "label": "Комментарий", val: "", name: "value" }]]
+    )
+  })
+
+
+  $("body").on("click", `[data-type-col="work_status"]`, function () {
+    popup_create("Изменить", "Аккаунт передан",
+      [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Добавить", fun: edit_work_status_item }],
+      [[{ type: "hidden", name: "id", val: parseInt($(this).parents("tr").data("id")) }], [{ type: "select", "label": "Значение", val: [["transferred", "Да"], ["at_work", "В работе"], ["refused", "Отказался"], ["client_account", "Аккаунт клиента"]], name: "status" }], [{ type: "text", "label": "Комментарий", val: "", name: "note" }]]
+    );
+  })
+
+
+  $("body").on("click", `[data-type-col="status"] .item_add`, function () {
+    popup_create("Добавить", "Новый статус",
+      [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Добавить", fun: add_status_item }],
+      [[{ type: "hidden", name: "id", val: parseInt($(this).parents("tr").data("id")) }], [{ type: "select", "label": "Значение", val: [["Взял в работу", "Взял в работу"], ["Связался", "Связался"], ["Ожидание обратной связи", "Ожидание обратной связи"], ["Передан", "Передан"], ["Завершен", "Завершен"]], name: "value" }]]
+    );
+  })
+
+
+
+
+  $("body").on("click", `[data-type-col="contacts"] .item`, function () {
+    let id = parseInt($(this).parents("tr").data("id"))
+    let el_list = $(`<div class="list" data-type="contacts" data-id="${id}" style="display: flex; gap: 8px; flex-direction: column; align-items: flex-start;">`)
+    let contents = moder_works[id]["contacts"]
+    contents.forEach((item, index) => {
+      let el = $(`<div class='item' style="display: flex; flex-direction: column; align-items: flex-start;" data-index="${index}"> <div class="item_header" style="color: #adadad;">${item.name}</div> <div class="item_body">${item.value}</div> <div class="item_footer remove_item" style="color:#fc7201; cursor: pointer">Удалить</div></div>`)
+      if (item.status == "notactive") {
+        $(el).find(".item_header, .item_body").css("color", "#FF9F9F")
+        $(el).find(".item_footer").remove()
+      }
+      el_list.append(el)
+    })
+    popup_create("Контактные данные", el_list.get(0).outerHTML, [], [], "max_left");
+    updateElementsFormatTimestamp()
+  })
+
+  $("body").on("click", `[data-type="contacts"] .remove_item`, function() {
+    let id = $(this).parents(".list").data("id")
+    moder_works[id]["contacts"][$(this).parents(".item").data("index")]["status"] = "notactive"
+    $(this).find(".item_header, .item_body").css("color", "#FF9F9F")
+    $(this).parent(".item").find(".item_footer").remove()
+    submit_change(id)
+  })
+
+
+
+  $("body").on("click", `[data-type-col="reminders"] .item`, function () {
+    let id = parseInt($(this).parents("tr").data("id"))
+    let el_list = $(`<div class="list" data-type="reminders" data-id="${id}" style="display: flex; gap: 8px; flex-direction: column; align-items: flex-start;">`)
+    let contents = moder_works[id]["reminders"]
+    contents.forEach((item, index) => {
+      let el = $(`<div class='item' style="display: flex; flex-direction: column; align-items: flex-start;" data-index="${index}"> <div class="item_header" data-time="${item.datetime}" data-format-time style="color: #adadad;">${item.datetime}</div> <div class="item_body">${item.value}</div> <div class="item_footer remove_item" style="color:#fc7201; cursor: pointer">Удалить</div></div>`)
+      if (item.status == "notactive") {
+        $(el).find(".item_header, .item_body").css("color", "#FF9F9F")
+        $(el).find(".item_footer").remove()
+      }
+      el_list.append(el)
+    })
+    popup_create("Календарь напоминаний", el_list.get(0).outerHTML, [], [], "max_left");
+    updateElementsFormatTimestamp()
+  })
+
+  $("body").on("click", `[data-type="reminders"] .remove_item`, function() {
+    let id = $(this).parents(".list").data("id")
+    moder_works[id]["reminders"][$(this).parents(".item").data("index")]["status"] = "notactive"
+    $(this).parents(".item").find(".item_header, .item_body").css("color", "#FF9F9F")
+    $(this).parent(".item").find(".item_footer").remove()
+    submit_change(id)
+  })
+
+
+
+
+  $("body").on("click", `[data-type-col="status"] .item`, function () {
+    let id = parseInt($(this).parents("tr").data("id"))
+    let el_list = $(`<div class="list" data-type="status" data-id="${id}" style="display: flex; gap: 8px; flex-direction: column; align-items: flex-start;">`)
+    let contents = moder_works[id]["status"]
+    contents.forEach((item, index) => {
+      let el = $(`<div class='item' style="display: flex; flex-direction: column; align-items: flex-start;" data-index="${index}"> <div class="item_header" data-time="${item.datetime}" data-format-time style="color: #adadad;">${item.datetime}</div> <div class="item_body">${item.value}</div></div>`)
+      if (item.status == "notactive") {
+        $(el).parents(".item").find(".item_header, .item_body").css("color", "#FF9F9F")
+        $(el).parents(".item").find(".item_footer").remove()
+      }
+      el_list.append(el)
+    })
+    popup_create("Статусы", el_list.get(0).outerHTML, [], [], "max_left");
+    updateElementsFormatTimestamp()
+  })
+
+  $("body").on("click", `[data-type="status"] .remove_item`, function() {
+    let id = $(this).parents(".list").data("id")
+    moder_works[id]["status"][$(this).parents(".item").data("index")]["status"] = "notactive"
+    $(this).parents(".item").find(".item_header, .item_body").css("color", "#FF9F9F")
+    $(this).parents(".item").find(".item_footer").remove()
+    submit_change(id)
+  })
+
+
+
+
+  $("body").on("click", `[data-type-col="notes"] .item`, function () {
+    let id = parseInt($(this).parents("tr").data("id"))
+    let el_list = $(`<div class="list" data-type="notes" data-id="${id}" style="display: flex; gap: 8px; flex-direction: column; align-items: flex-start;">`)
+    let contents = moder_works[id]["notes"]
+    contents.forEach((item, index) => {
+      let el = $(`<div class='item' style="display: flex; flex-direction: column; align-items: flex-start;" data-index="${index}"> <div class="item_header" data-time="${item.datetime}" data-format-time style="color: #adadad;">${item.datetime}</div> <div class="item_body" style="text-align: justify;">${item.value}</div> <div class="item_footer remove_item" style="color:#fc7201; cursor: pointer">Удалить</div></div>`)
+      if (item.status == "notactive") {
+        $(el).find(".item_header, .item_body").css("color", "#FF9F9F")
+        $(el).find(".item_footer").remove()
+      }
+      el_list.append(el)
+    })
+    popup_create("Статусы", el_list.get(0).outerHTML, [], [], "max_left");
+    updateElementsFormatTimestamp()
+  })
+
+  $("body").on("click", `[data-type="notes"] .remove_item`, function() {
+    let id = $(this).parents(".list").data("id")
+    moder_works[id]["notes"][$(this).parents(".item").data("index")]["status"] = "notactive"
+    $(this).parents(".item").find(".item_header, .item_body").css("color", "#FF9F9F")
+    $(this).parent(".item").find(".item_footer").remove()
+    submit_change(id)
+  })
+
+
+  // Изменения ФИО, телефона, почты
+
+  $("body").on("click", `[data-type-col="profile"] .item_add`, function () {
+    let id = parseInt($(this).parents("tr").data("id"))
+
+    let user = moder_works[id]["user"]
+
+    popup_create("Изменить", "Данные профилья",
+      [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: edit_user_item }],
+      [
+        [{ type: "hidden", name: "id", val: id }],
+        [{ type: "text", "label": "Имя", val: user["fio"]["username"], name: "username" }],
+        [{ type: "text", "label": "Фамилия", val: user["fio"]["lastname"], name: "lastname" }],
+        [{ type: "text", "label": "Отчество", val: user["fio"]["middlename"], name: "middlename" }],
+        [{ type: "text", "label": "Почта", val: user.email.value, name: "email" }],
+        [{ type: "text", "label": "Телефон", val: user.phone.value, name: "phone" }],
+      ]
+    );
+  })
+
+
+  function edit_user_item(params) {
+    let id = parseInt(params["id"])
+    delete params["id"]
+    if (id) { moder_works[id]["user"] = {
+        "username": params["username"],
+        "lastname": params["lastname"],
+        "middlename": params["middlename"],
+        "phone": params["phone"],
+        "email": params["email"]
+      }
+    }
+    submit_change(id)
+  }
+
+  function edit_work_status_item(params) {
+    let id = parseInt(params["id"])
+
+    if (id) {
+      moder_works[id]["param"]["status"] = params["status"]
+      moder_works[id]["param"]["note"] = params["note"]
+
+      if (params["status"] == "transferred") {
+        moder_works[id]["status"].push({
+          "value": "Передан",
+        })
+      }
+
+    }
+    submit_change(id)
+  }
+
+  function add_contacts_item(params) {
+    let id = parseInt(params["id"])
+    delete params["id"]
+    if (id) { moder_works[id]["contacts"].push(params)}
+    submit_change(id)
+  }
+
+  function add_notes_item(params) {
+    let id = parseInt(params["id"])
+    delete params["id"]
+    if (id) { moder_works[id]["notes"].push(params)}
+    submit_change(id)
+  }
+
+  function add_reminders_item(params) {
+    let id = parseInt(params["id"])
+    delete params["id"]
+    if (id) { moder_works[id]["reminders"].push(params)}
+    submit_change(id)
+  }
+
+  function add_status_item(params) {
+    let id = parseInt(params["id"])
+    delete params["id"]
+    if (id) { moder_works[id]["status"].push(params)}
+    submit_change(id)
+  }
+
+
+  function reset_record_all() {
+    let keys = Object.keys(moder_works).reverse()
+    keys.forEach((key, index) => {
+      initial_creation_record(index, key)
+      reset_record(key)
+    })
+  }
+
+  function initial_creation_record(index, id) {
+    let tr = $(`
+    <tr data-id="${id}">
+      <td scope="col" data-type-col="index">
+        ${index + 1}
+      </td>
+      <td scope="col" data-type-col="hotels">
+        <div class="list">
+        </div>
+      </td>
+      <td scope="col" data-type-col="contacts">
+        <div class="list">
+        </div>
+      </td>
+      <td scope="col" data-type-col="notes">
+        <div class="list">
+        </div>
+      </td>
+      <td scope="col"
+        data-type-col="work_status">
+
+        <div class="list">
+          <span class="value"></span>
+          <span class="text"></span>
+        </div>
+
+
+      </td>
+      <td scope="col" data-type-col="profile">
+        <div class="list">
+          <div class="item" data-cell="fio">
+            <span class="name">ФИО</span>
+            <span class="value"></span>
+          </div>
+          <div class="item" data-cell="email">
+            <span class="name">Почта</span>
+            <span class="value"></span>
+          </div>
+          <div class="item" data-cell="phone">
+            <span class="name">Телефон</span>
+            <span class="value"></span>
+          </div>
+          <div class="item_add">
+            <span class="name">Изменить</span>
+          </div>
+        </div>
+      </td>
+      <td scope="col" data-type-col="reminders">
+        <div class="list">
+        </div>
+      </td>
+      <td scope="col" data-type-col="status">
+        <div class="list">
+        </div>
+      </td>
+    </tr>
+    `)
+
+    $("tbody").append(tr)
+  }
+
+
+  function submit_change(id) {
+
+    param = moder_works[id]
+
+    $.ajax({
+      url: "/admin/ajax/moderator_office/save/",
+      type: "POST",
+      dataType: 'json',
+      contentType: 'application/json',
+      data: JSON.stringify(param),
+      headers: {
+        "X-CSRFToken": getCookie('csrftoken')
+      },
+      success: function(response) {
+
+        moder_works[response.obj.id] = response.obj
+
+
+        moder_works[response.obj.id]["reminders"].forEach((item) => {
+          if (item.status == "active") {
+            addReminder(item.value, item.datetime * 1000);
+          }
+        });
+
+        reset_record(response.obj.id)
+      }
+    });
+  }
+
+  function reset_record(id) {
+    let tr = $(`tr[data-id="${id}"]`)
+
+    obj = moder_works[id]
+
+    // ФИО, почта, Телефон
+
+    tr.find(`[data-cell="fio"] .value`).text(obj["user"]["fio"]["full"])
+    tr.find(`[data-cell="email"] .value`).text(obj["user"]["email"]["value"])
+    tr.find(`[data-cell="phone"] .value`).text(obj["user"]["phone"]["value"])
+
+    if (obj["user"]["email"]["status"])
+      tr.find(`[data-cell="email"] .value`).addClass("active")
+    else
+      tr.find(`[data-cell="email"] .value`).addClass("notactive")
+
+    if (obj["user"]["phone"]["status"])
+      tr.find(`[data-cell="phone"] .value`).addClass("active")
+    else
+      tr.find(`[data-cell="phone"] .value`).addClass("notactive")
+
+    // Отели
+
+    tr.find(`[data-type-col="hotels"] .list`).empty()
+
+    for (key in obj["hotels"]) {
+      let hotel = obj["hotels"][key]
+
+      let el = $(`
+        <div class="item" data-id="${hotel['id']}">
+          <span class="name">${hotel['name']}</span>
+          <span class="status" style="color: ${hotel['status']['color']}">${hotel['status']['text']}</span>
+        </div>
+      `)
+
+      tr.find(`[data-type-col="hotels"] .list`).append(el)
+    }
+
+
+    tr.find(`[data-type-col="hotels"] .list`).append(`
+      <a href="/admin/page/moving/hotel/?user=${obj['user']['id']}" target="_blank" class="item_add">
+        <span class="name">Добавить объекты</span>
+        <span class="text">(Перенести с других аккаунтов)</span>
+      </a>
+    `)
+
+
+    // Контактные данные
+    tr.find(`[data-type-col="contacts"] .list`).empty()
+
+    for (key in obj["contacts"]) {
+      let contact = obj["contacts"][key]
+
+      let el = $(`
+        <div class="item ${contact['status']}">
+          <span class="name">${contact['name']}</span>
+          <span class="value">${contact['value']}</span>
+        </div>
+      `)
+
+      tr.find(`[data-type-col="contacts"] .list`).append(el)
+    }
+
+    tr.find(`[data-type-col="contacts"] .list`).append(`
+      <div class="item_add">
+        <span class="name">Добавить данные</span>
+      </div>
+    `)
+
+
+    // Комментарий
+
+    tr.find(`[data-type-col="notes"] .list`).empty()
+
+    for (key in obj["notes"]) {
+      let note = obj["notes"][key]
+
+      let el = $(`
+        <div class="item ${note['status']}">
+          <span class="name" data-time="${note.datetime}" data-format-time>${note.datetime}</span>
+          <span class="value">${note['value']}</span>
+        </div>
+      `)
+
+      tr.find(`[data-type-col="notes"] .list`).append(el)
+    }
+
+    tr.find(`[data-type-col="notes"] .list`).append(`
+    <div class="item_add">
+      <span class="name">Добавить</span>
+    </div>
+    `)
+
+
+    // Аккаунт передан
+    if (obj.param.status == "transferred")
+      tr.find(`[data-type-col="work_status"] .list .value`).text("Да").css("color", "#00d200")
+
+    if (obj.param.status == "refused")
+      tr.find(`[data-type-col="work_status"] .list .value`).text("Отказался").css("color", "red")
+
+    if (obj.param.status == "at_work")
+      tr.find(`[data-type-col="work_status"] .list .value`).text("В работе").css("color", "#053aff")
+
+    if (obj.param.status == "client_account")
+      tr.find(`[data-type-col="work_status"] .list .value`).text("Аккаунт клиента").css("color", "#C59C16")
+
+
+    tr.find(`[data-type-col="work_status"] .list .text`).text(obj.param.note)
+
+
+
+
+
+
+    // Статусы
+
+    tr.find(`[data-type-col="status"] .list`).empty()
+
+    for (key in obj["status"]) {
+      let status = obj["status"][key]
+
+      let el = $(`
+        <div class="item" data-status="${status.value}">
+          <span class="name" data-time="${status.datetime}" data-format-time>${status.datetime}</span>
+          <span class="value">${status.value}</span>
+        </div>
+      `)
+
+      tr.find(`[data-type-col="status"] .list`).append(el)
+    }
+
+    tr.find(`[data-type-col="status"] .list`).append(`
+    <div class="item_add">
+      <span class="name">Добавить</span>
+    </div>
+    `)
+
+
+    // Календарь напоминаний
+
+    tr.find(`[data-type-col="reminders"] .list`).empty()
+
+    for (key in obj["reminders"]) {
+      let reminder = obj["reminders"][key]
+
+      let el = $(`
+        <div class="item ${reminder.status}">
+          <span class="name" data-time="${reminder.datetime}" data-format-time>${reminder.datetime}</span>
+          <span class="value">${reminder.value}</span>
+        </div>
+      `)
+
+      tr.find(`[data-type-col="reminders"] .list`).append(el)
+    }
+
+    tr.find(`[data-type-col="reminders"] .list`).append(`
+    <div class="item_add">
+      <span class="name">Добавить</span>
+    </div>
+    `)
+
+
+    updateElementsFormatTimestamp()
+  }
+
+
+
+</script>
+
+{% endblock main_block %}

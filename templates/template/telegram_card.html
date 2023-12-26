@@ -1,0 +1,54 @@
+{% if auth_telegram == True %}
+  <div class="block_card telegram icontext" >
+    <div class="body_block_card">
+      <div class="icon svg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="78" viewBox="0 0 80 78" fill="none">
+          <path d="M40.2471 0C18.3184 0 0.541992 17.4607 0.541992 39C0.541992 60.5393 18.3184 78 40.2471 78C62.1759 78 79.9523 60.5393 79.9523 39C79.9523 17.4607 62.1759 0 40.2471 0Z" fill="#40B3E0" />
+          <path d="M59.5667 22.4345L52.475 57.5549C52.475 57.5549 51.4833 59.9905 48.7557 58.8215L32.3904 46.4975L26.4396 43.6724L16.4221 40.3598C16.4221 40.3598 14.8848 39.8242 14.7359 38.6551C14.5873 37.486 16.4717 36.8529 16.4717 36.8529L56.2935 21.5088C56.2935 21.5088 59.5667 20.0963 59.5667 22.4345Z" fill="white" />
+          <path d="M31.1324 57.1599C31.1324 57.1599 30.6547 57.116 30.0594 55.2647C29.4645 53.4137 26.4395 43.6717 26.4395 43.6717L50.4912 28.6688C50.4912 28.6688 51.8799 27.8407 51.8303 28.6688C51.8303 28.6688 52.0781 28.8148 51.3343 29.4967C50.5904 30.1789 32.4399 46.2045 32.4399 46.2045" fill="#D2E5F1" />
+          <path d="M38.6656 51.2228L32.1924 57.0198C32.1924 57.0198 31.6865 57.397 31.1328 57.1605L32.3724 46.3926" fill="#B5CFE4" />
+        </svg>
+      </div>
+      <span class="title">Получайте уведомления в Telegram</span>
+    </div>
+    <div class="footer_block_card">
+      <span>Telegram: <span style="color: #FC7201; font-weight: 700;">{{ token_telegram }}</span></span>
+      <span style="color: #5383E1; font-weight: 700;">Активирован</span>
+      <span>Для смены аккаунта обратитесь в поддержку</span>
+    </div>
+  </div>
+{% else %}
+  <div class="block_card telegram icontext">
+    <div class="body_block_card">
+      <div class="icon svg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="78" viewBox="0 0 80 78" fill="none">
+          <path d="M40.2471 0C18.3184 0 0.541992 17.4607 0.541992 39C0.541992 60.5393 18.3184 78 40.2471 78C62.1759 78 79.9523 60.5393 79.9523 39C79.9523 17.4607 62.1759 0 40.2471 0Z" fill="#40B3E0" />
+          <path d="M59.5667 22.4345L52.475 57.5549C52.475 57.5549 51.4833 59.9905 48.7557 58.8215L32.3904 46.4975L26.4396 43.6724L16.4221 40.3598C16.4221 40.3598 14.8848 39.8242 14.7359 38.6551C14.5873 37.486 16.4717 36.8529 16.4717 36.8529L56.2935 21.5088C56.2935 21.5088 59.5667 20.0963 59.5667 22.4345Z" fill="white" />
+          <path d="M31.1324 57.1599C31.1324 57.1599 30.6547 57.116 30.0594 55.2647C29.4645 53.4137 26.4395 43.6717 26.4395 43.6717L50.4912 28.6688C50.4912 28.6688 51.8799 27.8407 51.8303 28.6688C51.8303 28.6688 52.0781 28.8148 51.3343 29.4967C50.5904 30.1789 32.4399 46.2045 32.4399 46.2045" fill="#D2E5F1" />
+          <path d="M38.6656 51.2228L32.1924 57.0198C32.1924 57.0198 31.6865 57.397 31.1328 57.1605L32.3724 46.3926" fill="#B5CFE4" />
+        </svg>
+      </div>
+      <span class="title">Получайте уведомления в Telegram</span>
+    </div>
+    <div class="footer_block_card">
+      <span>Для этого перейдите по: <a href="https://t.me/booking_notifications_bot" target="_blank" style="color: #216CFE;">ссылке на бота</a></span>
+      <span>В сообщении отправьте код для авторизации</span>
+      <span style="color: #5383E1; font-weight: 700;">Активирован</span>
+      <span style=" display: flex; gap: 5px; flex-direction: column; ">Код для авторизации в телеграмм боте: <span style="color: #FC7201; font-weight: 700;" class="textToCopy">{{ token_telegram }}</span></span>
+    </div>
+  </div>
+{% endif %}
+
+<script>
+  $(document).ready(function() {
+    $(".textToCopy").click(function() {
+      var textToCopy = $(this).text();
+      var tempInput = $("<input>");
+      $("body").append(tempInput);
+      tempInput.val(textToCopy).select();
+      document.execCommand("copy");
+      tempInput.remove();
+      alert("Текст скопирован в буфер обмена!");
+    });
+  });
+  </script>

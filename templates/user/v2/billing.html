@@ -1,0 +1,261 @@
+{% extends 'user/v2/base.html' %}
+{% load cards humanize %}
+{% block main_block %}
+  <style>
+    .price_green {
+      color: rgb(0 216 0);
+    }
+
+    .price_red {
+      color: rgb(255, 91, 91);
+    }
+
+    div.greyGridTable {
+      border: 3px solid #ffffff;
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
+    }
+
+    .divTable.greyGridTable .divTableCell,
+    .divTable.greyGridTable .divTableHead {
+      border: 1px solid #ffffff;
+      padding: 10px;
+    }
+
+    @media only screen and (max-width: 1066px) {
+      .divTable.greyGridTable .divTableHeading .divTableHead {
+        font-size: 12px !important;
+      }
+
+      .divTable.greyGridTable .divTableBody .divTableCell {
+        font-size: 12px !important;
+      }
+    }
+
+    .divTable.greyGridTable .divTableBody .divTableCell {
+      font-size: 14px;
+    }
+
+    .divTable.greyGridTable .divTableHeading {
+      background: #ffffff;
+      border-bottom: 2px solid #cdcdcd;
+    }
+
+    .divTable.greyGridTable .divTableHeading .divTableHead {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333333;
+      border-bottom: 2px solid #cdcdcd;
+      text-align: left;
+    }
+
+    .greyGridTable .tableFootStyle {
+      font-size: 14px;
+    }
+
+    /* DivTable.com */
+    .divTable {
+      display: table;
+    }
+
+    .divTableRow {
+      display: table-row;
+    }
+
+    .divTableHeading {
+      display: table-header-group;
+    }
+
+    .divTableCell,
+    .divTableHead {
+      display: table-cell;
+    }
+
+    .divTableHeading {
+      display: table-header-group;
+    }
+
+    .divTableFoot {
+      display: table-footer-group;
+    }
+
+    .divTableBody {
+      display: table-row-group;
+    }
+  </style>
+
+  <div class="section_title" style="  margin-bottom: 28px; ">Мой баланс</div>
+
+  <section class="grupe_cards" style="margin-bottom: 25px; gap: 0px;">
+    <section class="row p-2">
+      <div class="col-12 col-lg p-lg-2 p-1">
+        <a href="#table_FOs" class="block_card text clickable">
+          <span class="title">Мой счёт</span>
+          <span class="text">{{ real|intcomma }} ₽</span>
+        </a>
+      </div>
+
+      <div class="col-12 col-lg p-lg-2 p-1">
+        <a href="#table_bonuses_client" class="block_card text clickable">
+          <span class="title">Мои бонусы</span>
+          <span class="text">{{ bonus.client.sum|intcomma }} бонусов</span>
+        </a>
+      </div>
+
+      {% if bonus.hotel.sum %}
+        <div class="col-12 col-lg p-lg-2 p-1">
+          <a href="#table_bonuses_hotel" class="block_card text clickable">
+            <span class="title">Бонусы отеля</span>
+            <span class="text">{{ bonus.hotel.sum|intcomma }} бонусов</span>
+          </a>
+        </div>
+      {% endif %}
+
+      <div class="col-12 col-lg p-lg-2 p-1">
+        <div class="block_card text clickable" id="add_rubl_button" style="background: linear-gradient(90deg, #7BF8F8 1.08%, #F9CCA8 81.21%);">
+          <span class="title">Пополнение счёта</span>
+          <span class="text">Пополнение счёта личного кабинета, нужно выбрать сумму и оплатить картой.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads mb-2">
+      <div class="block_card card_max_length" id="table_FOs">
+        <span class="section_title">Список операций</span>
+        <span class="body_block_card">
+          <div class="divTable greyGridTable">
+            <div class="divTableHeading">
+              <div class="divTableRow">
+                <div class="divTableHead">Сумма</div>
+                <div class="divTableHead">Описание</div>
+                <div class="divTableHead">Дата</div>
+              </div>
+            </div>
+            <div class="divTableBody">
+              {% for fo in FOs %}
+                <div class="divTableRow">
+                  {% if fo.isBonus == True %}
+                    <div class="divTableCell {% if fo.price <= 0 %}
+
+                      {% endif %}">{{ fo.price|intcomma }}
+                      бонусов</div>
+                  {% else %}
+                    <div class="divTableCell {% if fo.price <= 0 %}
+
+                      {% endif %}">{{ fo.price|intcomma }}
+                      ₽</div>
+                  {% endif %}
+                  <div class="divTableCell">{{ fo.comments }}</div>
+                  <div class="divTableCell">{{ fo.datetime|date:'d.m.Y H:i' }}</div>
+                </div>
+                {% empty %}
+                <div class="divTableRow">У вас нет финансовых операций</div>
+              {% endfor %}
+            </div>
+          </div>
+        </span>
+      </div>
+    </section>
+
+    <section class="row_crads mb-2">
+      <div class="block_card card_max_length" id="table_bonuses_client">
+        <span class="section_title">Список бонусов{% if bonus.hotel.sum %}(Клиент){% endif %}</span>
+        <span class="body_block_card">
+          <div class="divTable greyGridTable">
+            <div class="divTableHeading">
+              <div class="divTableRow">
+                <div class="divTableHead">Сумма</div>
+                <div class="divTableHead">Дата получения</div>
+                <div class="divTableHead">Описание</div>
+                <div class="divTableHead">Осталось дней</div>
+              </div>
+            </div>
+            <div class="divTableBody">
+              {% for bonus in bonus.client.list %}
+                <div class="divTableRow">
+                  <div class="divTableCell">{{ bonus.value|intcomma }} бонусов</div>
+                  <div class="divTableCell">{{ bonus.date|date:'d.m.Y' }}</div>
+                  <div class="divTableCell">{{ bonus.text }}</div>
+                  <div class="divTableCell">{{ bonus.del_days|intcomma }}</div>
+                </div>
+                {% empty %}
+                <div class="divTableRow">У вас нет бонусов</div>
+              {% endfor %}
+            </div>
+          </div>
+        </span>
+      </div>
+    </section>
+
+    {% if bonus.hotel.sum %}
+      <section class="row_crads mb-2">
+        <div class="block_card card_max_length" id="table_bonuses_hotel">
+          <span class="section_title">Список бонусов (Объект размещения)</span>
+          <span class="body_block_card">
+            <div class="divTable greyGridTable">
+              <div class="divTableHeading">
+                <div class="divTableRow">
+                  <div class="divTableHead">Сумма</div>
+                  <div class="divTableHead">Дата получения</div>
+                  <div class="divTableHead">Объект</div>
+                  <div class="divTableHead">Описание</div>
+                  <div class="divTableHead">Осталось дней</div>
+                </div>
+              </div>
+              <div class="divTableBody">
+                {% for bonus in bonus.hotel.list %}
+                  <div class="divTableRow">
+                    <div class="divTableCell">{{ bonus.value|intcomma }} бонусов</div>
+                    <div class="divTableCell">{{ bonus.date|date:'d.m.Y' }}</div>
+                    <div class="divTableCell">{{ bonus.hotel }}</div>
+                    <div class="divTableCell">{{ bonus.text }}</div>
+                    <div class="divTableCell">{{ bonus.del_days|intcomma }}</div>
+                  </div>
+                  {% empty %}
+                  <div class="divTableRow">У вас нет бонусов</div>
+                {% endfor %}
+              </div>
+            </div>
+          </span>
+        </div>
+      </section>
+    {% endif %}
+
+    <section class="row_crads">
+      {% telegram_card %}
+    </section>
+  </section>
+
+  <script>
+    $('#add_rubl_button').click(function () {
+      popup_create(
+        'Пополнение счёта',
+        'Укажите сумму и оплатите картой',
+        [
+          { type: 'close', name: 'Закрыть' },
+          { type: 'send-inputs', name: 'Пополнить', fun: pay_add_rubl }
+        ],
+        [[{ type: 'number', label: 'Сумма', name: 'price', setting: { max: 20000, min: 1 } }]]
+      )
+    })
+
+    function pay_add_rubl(params) {
+      $.ajax({
+        method: 'POST',
+        data: params,
+        url: "{% url 'add_rubl_lk' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function (response) {
+          if (('url' in response) & (response.url != null)) {
+            location.href = response.url
+          } else {
+            popup_create('Не оплачено', `<p>Создание оплаты не удалось.</p>`, [], [], 'error')
+          }
+        }
+      })
+    }
+  </script>
+{% endblock %}

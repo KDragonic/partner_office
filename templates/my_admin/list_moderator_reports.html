@@ -1,0 +1,153 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form static %}
+{% block main_block %}
+
+<style>
+  table {
+    border: 3px solid #FFFFFF;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+  table th,
+  table td {
+    border: 1px solid #FFFFFF;
+    padding: 10px;
+  }
+
+  table tbody td {
+    font-size: 14px;
+  }
+
+  table thead {
+    background: #FFFFFF;
+    border-bottom: 2px solid #CDCDCD;
+  }
+
+  table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333333;
+    background: #f0f0f0;
+    border-bottom: 2px solid #CDCDCD;
+    text-align: left;
+  }
+
+  table td:nth-child(1) {
+    background: #f2f2f2;
+  }
+</style>
+
+<style>
+  .click_user, .click_hotel {
+    color: #0039ff;
+    cursor: pointer;
+  }
+  .click_user:hover, .click_hotel:hover {
+    color: #567bff;
+  }
+  progress.percentage {
+    max-width: 78px;
+  }
+
+  .section_flex {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  progress.percentage::-webkit-progress-value {
+    background-color: linear-gradient(to right, red, yellow, green) !important;
+  }
+
+  .stars {
+    color: #fc7201;
+  }
+
+  .accordion_header {
+    white-space: nowrap;
+  }
+
+  .white_space_nowrap {
+    white-space: nowrap;
+  }
+
+  .accordion_body {
+    display: flex;
+    flex-direction: column;
+  }
+
+</style>
+
+
+<div class="section">
+  <span class="title">{{text_category}}</span>
+  <table id="main_table" class="display">
+  </table>
+  </div>
+</div>
+
+<link href="https://cdn.datatables.net/v/dt/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/cr-1.6.2/fh-3.3.2/r-2.4.1/sp-2.1.2/sl-1.6.2/sr-1.2.2/datatables.min.css" rel="stylesheet"/>
+<script src="https://cdn.datatables.net/v/dt/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/cr-1.6.2/fh-3.3.2/r-2.4.1/sp-2.1.2/sl-1.6.2/sr-1.2.2/datatables.min.js"></script>
+
+<script defer>
+  $(document).ready(function () {
+    $('#main_table').DataTable({
+      "serverSide": true,
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/ru.json'
+      },
+      ajax: {
+        url: "{% url 'admin.ajax.list.moderator_reports' %}",
+        type: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        data: function (d) {
+          {% if moder_id %}
+          d["moder_id"] = "{{moder_id}}"
+          {% endif %}
+        },
+      },
+      columns: [
+        {
+          data: 'id', name: 'id', title: "ID", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'name', name: 'name', title: "Название", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'fio', name: 'fio', title: "ФИО", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'moderation_date', name: 'moderation_date', title: "Дата модерации", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'registration_date', name: 'registration_date', title: "Дата регестрации", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'transfer_date', name: 'transfer_date', title: "Дата передачи", orderable: false, render: function (data, type) {
+            return data;
+          },
+        }
+      ],
+      colReorder: true,
+      fixedHeader: true,
+      responsive: true,
+      "sDom": '<"top"i>rt<"bottom"lp><"clear">'
+    })
+
+  });
+</script>
+{% endblock main_block %}

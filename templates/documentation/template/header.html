@@ -1,0 +1,13 @@
+{% load static %}
+
+<header>
+  <div class="breadcrumbs">
+    <div class="items">
+      {% for obj in breadcrumbs %}
+        <div class="item">{{obj}}</div>
+      {% endfor %}
+    </div>
+    <div class="title">{{title}}</div>
+  </div>
+  <div class="buttons"></div>
+</header>

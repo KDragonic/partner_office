@@ -1,0 +1,263 @@
+<style>
+	input[type="file"] {
+		border: none !important;
+		padding-left: 0 !important;
+	}
+
+	.grupe_input .label_input_file {
+		display: flex;
+		width: 100%;
+		flex-direction: column;
+	}
+
+	.grupe_input .label_input_file input {
+		display: none;
+	}
+
+	.grupe_input .label_input_file .files .img_elem {
+		height: 100px;
+		width: auto;
+		position: relative;
+	}
+
+	.grupe_input .label_input_file .files .img_add {
+		height: 100px;
+		width: 100px;
+		background-color: #f1f1f1;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 54px;
+
+		cursor: pointer;
+	}
+
+
+	.grupe_input .label_input_file .files .img_elem img {
+		height: 100%;
+		width: auto;
+		object-fit: cover;
+	}
+
+	.grupe_input .label_input_file .files .img_elem .remove {
+		position: absolute;
+		top: 0;
+		right: 5px;
+		width: min-content;
+		height: min-content;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: red;
+		cursor: pointer;
+	}
+
+	.grupe_input .label_input_file .files {
+		display: flex;
+		height: auto;
+		gap: 10px;
+		flex-wrap: wrap;
+		border: 1px solid #D2D2D2;
+		padding: 5px;
+		border-radius: 5px;
+	}
+
+	{% if arrange_first %}
+		#label_input_file_{{name}} .files .img_elem:first-child {
+			border: 3px solid #17a1a1;
+		}
+	{% endif %}
+</style>
+
+<script>
+	var defaults = {
+		min: 2,
+		max: 10,
+		name: null,
+		list: [],
+	};
+
+	var methods = {
+		init: function(params) {
+			var options = $.extend({}, defaults, params);
+			var main_elem = this
+			var getting_a_photo = false
+			// инициализируем лишь единожды
+			if (!this.data('multifile')) {
+				// закинем настройки в реестр data
+				this.data('multifile', options);
+				if (options.min == options.max) {
+					var html_discription = `<div class="discription">Нужно выбрать ${options.min} фото</div>`
+					this.append(html_discription)
+				}
+				else {
+					var html_discription = `<div class="discription">Нужно выбрать ${options.min}-${options.max} фото</div>`
+					this.append(html_discription)
+				}
+				// Добавить фото в список если они уже изначалньо были там
+
+				$(main_elem).find(".files .img_elem").map(function(index, elem) {
+					options.list.push($(elem).data("id"))
+				})
+
+				main_elem.data('multifile', options);
+
+				$(this).on("click", ".remove", function(event) {
+					var img_elem = $(event.target).parents(".img_elem")
+					var id = $(img_elem).data("id")
+					options.list = options.list.filter(item => item !== id);
+					img_elem.remove()
+				})
+
+				// добавим событий
+				$(this).find("input").on('change.multifile', function(event) {
+					options = main_elem.data('multifile')
+					var files = event.target.files;
+					var formData = new FormData();
+					for (var i = 0; i < files.length; i++) {
+						formData.append('file[]', files[i]);
+					}
+					if (getting_a_photo) {
+						return
+					}
+					getting_a_photo = true
+					$.ajax({
+						url: '{% url "utils.add_not_linked_img" %}',
+						type: 'POST',
+						data: formData,
+						headers: {
+							"X-CSRFToken": getCookie('csrftoken'),
+						},
+						contentType: false,
+						processData: false,
+						success: function (data) {
+							data.id_list.forEach(img => {
+								var html = `<div class="img_elem" data-id="${img.id}"><img src="${img.url}"><div class="remove">✖</div></div>`
+								var elem = $(html)
+								$(main_elem).find(".files").find(".img_add").before(elem)
+								options.list.push(img.id)
+							});
+							getting_a_photo = false
+							main_elem.data('multifile', options);
+						},
+						error: function (jqXHR, textStatus, errorThrown) {
+							console.log('Error: ' + errorThrown);
+							getting_a_photo = false
+						}
+					});
+				});
+			}
+			return this;
+		},
+		len: function() {
+			var options = $(this).data('multifile');
+			return options.list.length
+		},
+		reset: function() {
+			var options = $(this).data('multifile');
+			$(this).find(".files .img_elem").remove()
+			options.list = []
+			$(this).data('multifile', options);
+			return true
+		},
+		getlist: function() {
+			var options = $(this).data('multifile');
+			return options.list
+		},
+		check_the_pictures: function() {
+			var options = $(this).data('multifile');
+			options.list = []
+			$(this).find(".files .img_elem").map(function(index, elem) {
+				options.list.push($(elem).data("id"))
+			})
+			$(this).data('multifile', options);
+			return this
+		},
+		valid: function() {
+			var options = $(this).data('multifile');
+			var isValid = true
+			$(`.error_input.input_file_error`).remove()
+
+			if (options.list.length < options.min) {
+				if ($(`.error_input.input_file_error[data-type="min"]`).length == 0) {
+				$(".label_input_file_{{name}}").append(`<span class="error_input input_file_error" data-type="min">Не менее ${options.min} фото</span>`)
+				}
+				isValid = false
+			}
+			if (options.list.length > options.max) {
+				if ($(`.error_input.input_file_error[data-type="max"]`).length == 0) {
+				$(".label_input_file_{{name}}").append(`<span class="error_input input_file_error" data-type="max">Не больше ${options.max} фото</span>`)
+				}
+				isValid = false
+			}
+			return isValid
+		}
+	}
+
+
+	$.fn.multifile = function(method) {
+		// немного магии
+		if ( methods[method] ) {
+			// если запрашиваемый метод существует, мы его вызываем
+			// все параметры, кроме имени метода прийдут в метод
+			// this так же перекочует в метод
+			return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+		} else if ( typeof method === 'object' || ! method ) {
+			// если первым параметром идет объект, либо совсем пусто
+			// выполняем метод init
+			return methods.init.apply( this, arguments );
+		} else {
+			// если ничего не получилось
+			$.error('Метод "' + method + '" в плагине не найден');
+		}
+	};
+</script>
+
+{% if type == "many" %}
+<div class="label_input_file" id="label_input_file_{{name}}" input-file-name="{{name}}">
+
+	{% if label %}
+	<span class="name">{{label}}{% if required == true %}*{% endif %}</span>
+	{% endif %}
+
+	<div class="files">
+		{% for img in imgs %}
+		<div class="img_elem"
+			data-id="{{img.id}}">
+			<img src="{{img.url}}">
+			<div class="remove">✖</div>
+		</div>
+		{% endfor %}
+		<label class="img_add">
+			<input type="file"
+				name="{{name}}[]"
+				accept=".png, .jpeg, .jpg, .heic"
+				multiple>
+			+
+		</label>
+	</div>
+
+	{% if help %}
+		<span class="discription">{{help}}</span>
+	{% endif %}
+</div>
+
+<script>
+	$(`.label_input_file[input-file-name="{{name}}"]`).multifile({
+		"min": {{range.0}},
+		"max": {{range.1}}
+	})
+
+	{% if sort %}
+		$('.label_input_file .files').sortable({
+			opacity: 0.6,
+			ghosting: true,
+			cancel: '.img_add',
+			stop: function( event, ui ) {
+				$(`.label_input_file[input-file-name="{{name}}"]`).multifile("check_the_pictures")
+			}
+		});
+	{% endif %}
+</script>
+{% endif %}

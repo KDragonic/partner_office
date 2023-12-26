@@ -1,0 +1,94 @@
+{% extends "main/base_base.html" %}
+{% load crispy_forms_tags static sass_tags %}
+{% block base %}
+
+<link href="{% static 'css/scss/logreg.css' %}" rel="stylesheet" type="text/css" />
+
+<link href="https://fonts.googleapis.com/css?family=Inter:100,200,300,regular,500,600,700,800,900" rel="stylesheet" />
+
+<style>
+    .red_input {
+        border-color: rgb(255 0 0) !important;
+        color: rgb(255 0 0) !important;
+    }
+</style>
+
+<script>
+
+$(".red_input").focus(function() {
+    $(this).removeClass("red_input")
+    $(this).val("")
+})
+
+</script>
+
+<body class="register">
+    <div class="left" style="position: relative;">
+        <form method="POST">
+            <a href="/" class="logo_turcity">Тургородок</a>
+            <span class="span_title_1">Регистрация</span>
+            <span class="span_title_2">Создание нового аккаунта</span>
+            <div class="grupe_input">
+                {% csrf_token %}
+                <div class="column">
+                    <label for="username"><span class="name">Имя</span><input type="text" value="{{past_values.username}}" name="username" id="id_username" required></label>
+                    <label for="lastname"><span class="name">Фамилия</span><input type="text" value="{{past_values.lastname}}" name="lastname" id="id_lastname" required></label>
+                    <label for="middlename"><span class="name">Отчество</span><input type="text" value="{{past_values.middlename}}" name="middlename" id="id_middlename" required></label>
+                </div>
+                <div class="column">
+                    <label for="email"><span class="name">Почта</span><input type="text" class="{% if email_is_busy %}red_input{% endif %}" value="{{past_values.email}}" name="email" id="id_email" required>
+                    </label>
+                    <label for="phone"><span class="name">Телефон</span><input type="text" class="{% if email_is_busy %}red_input{% endif %}" value="{{past_values.phone}}" name="phone" id="id_phone" required></label>
+                    <label for="password"><span class="name">Пароль</span><input type="text" value="{{past_values.password}}" name="password" id="id_password" required></label>
+                </div>
+            </div>
+            </label>
+            <label style="align-items: center;"
+                for="i_agree_to_the_terms_of_use">
+                <input type="checkbox"
+                    name="i_agree_to_the_terms_of_use"
+                    id="id_i_agree_to_the_terms_of_use"
+                    required>
+                <span id="i_agree_to_the_terms_of_use_span">Я согласен с условиями использования</span>
+            </label>
+            <button class="button">Регистрация</button>
+            <span class="span_no_account">У меня уже есть аккаунт. <a href="{% url 'login' %}">Войти</a></span>
+            <span class="through_a_social_network">или войдите через социальную сеть</span>
+            <div class="social-icons">
+                <a href="{{vk_auth_url}}"><img src="{% static 'img/vk-icon.png' %}"></a>
+                <a href="{{google_auth_url}}"><img src="{% static 'img/google-icon.png' %}"></a>
+            </div>
+            <div class="button_back_go" onclick="window.history.back();" style="font-size: 20px;cursor: pointer;margin: 10px;">Назад</div>
+            <style>
+                .social-icons {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .social-icons a {
+                    margin-right: 10px;
+                    position: relative;
+                }
+
+                .social-icons a img {
+                    width: 30px;
+                    height: 30px;
+                }
+
+                .social-icons a:hover:before {
+                    content: "";
+                    position: absolute;
+                    top: -10px;
+                    left: -10px;
+                    bottom: -10px;
+                    right: -10px;
+                    background-color: rgba(255, 255, 255, 0.5);
+                    border-radius: 50%;
+                    z-index: -1;
+                }
+            </style>
+        </form>
+    </div>
+    <div class="right"></div>
+</body>
+{% endblock base %}

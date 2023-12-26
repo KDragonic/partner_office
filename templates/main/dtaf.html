@@ -1,0 +1,16 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block content %}
+<main class="main" style=" display: flex; justify-content: center; align-items: center; ">
+
+	<div class="" style="display: none;">
+		{{restult}}
+	</div>
+
+	<div class="contener">
+		<div class="title" style=" font-size: min(40px, 5vw); ">Скачать приложение Тургородка</div>
+		<a href="/static/files/turgorodok.apk" download class="button" style=" padding: 13px; border-radius: 13px; color: white; font-size: 20px; max-width: 367px; margin: auto; margin-top: 20px; ">Скачать</a>
+	</div>
+
+</main>
+{% endblock content %}

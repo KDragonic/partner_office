@@ -1,0 +1,416 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static %}
+{% block main_block %}
+
+<link href="{% static 'css/scss/form_search.css' %}" rel="stylesheet" type="text/css" />
+
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<link rel="stylesheet"
+  href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+<script src="https://cdn.jsdelivr.net/jquery.slick/1.5.0/slick.min.js"></script>
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/jquery.slick/1.5.0/slick.css">
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/jquery.slick/1.5.0/slick-theme.css">
+
+<style>
+  @media screen and (max-width: 1494px) {
+    .filter-result {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px 10px;
+      background: #fff;
+      border-radius: 13px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .filter-result__gallery {
+      gap: 10px !important;
+      justify-content: flex-start !important;
+    }
+
+    .filter-result__price {
+      margin-left: 0 !important;
+    }
+
+    .price--right {
+      text-align: start !important;
+    }
+
+    .input-date {
+      width: auto;
+    }
+  }
+  @media screen and (max-width: 1023px) {
+    .form_search {
+      border: none !important;
+      margin-right: 20px !important;
+    }
+
+    .form-search__label--date {
+      width: 100% !important;
+    }
+
+    .input-date {
+      width: 0 !important;
+    }
+  }
+
+
+
+  .form_search {
+    border: 1px solid #cccccc;
+  }
+
+  .favorite_icon {
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 16px;
+    padding: 5px;
+    right: 40px;
+  }
+
+  .favorite_icon path {
+    fill: #979797;
+    transition: fill 0.4s;
+  }
+
+  .favorite_icon.active path {
+    fill: #ff4b4b;
+  }
+
+  .ui-widget.ui-widget-content {
+    border: 1px solid #ffffff;
+  }
+
+  .ui-slider-horizontal .ui-slider-range-min {
+    background: #fc7201;
+  }
+
+  .ui-slider .ui-slider-handle {
+    height: 30px;
+    position: relative;
+    top: -9px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fc7201;
+    color: white;
+    border: none;
+    border-radius: 50%;
+  }
+</style>
+
+<style>
+  .popup_room_info_services_catalog {
+    overflow: auto;
+    column-gap: 98px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 19px;
+    flex-grow: 1;
+    height: 100%;
+  }
+
+  .popup_room_info_services_catalog_item {
+    font-size: 14px;
+    height: min-content;
+  }
+
+  .popup_room .close {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    font-size: 30px;
+  }
+
+  .carousel {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .slick-next:before,
+  .slick-prev:before {
+    font-size: 40px;
+  }
+
+  .slick-next {
+    right: 40px;
+  }
+
+  .slick-prev {
+    left: 20px;
+  }
+
+  .slick-dots li.slick-active button:before {
+    font-size: 15px;
+  }
+
+  .slick-dots li button:before {
+    font-size: 10px;
+    transition: all, .3s;
+  }
+
+  .carousel .item .overlay p.bold {
+    font-weight: bold;
+  }
+
+  .carousel .item .overlay p a {
+    color: #34ace8;
+    text-decoration: none;
+  }
+
+  .carousel .item h3 {
+    font-family: 'roboto slab';
+  }
+
+  .carousel .item {
+    position: relative;
+  }
+
+  .carousel .item .imageContainer {
+    display: block;
+    height: 761px;
+    position: relative;
+    object-fit: contain;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #626262;
+  }
+
+  .carousel .item .imageContainer:before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 66;
+    width: 100%;
+    height: 100%;
+  }
+
+  .carousel .item img {
+    object-fit: cover;
+  }
+
+  .carousel .item .overlay {
+    z-index: 999;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    color: #fff;
+    padding: 30px 0px 70px 0px;
+
+  }
+
+  .carousel .item .overlay h3 {
+    text-align: center;
+    font-size: 40px;
+    font-weight: 300;
+    padding-bottom: 20px;
+    width: 70%;
+    margin: 0 auto;
+  }
+
+  .carousel .item .overlay p {
+    text-align: center;
+    width: 60%;
+    margin: 0 auto;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 29px;
+    color: #fff;
+  }
+
+
+  .carousel .slick-dots {
+    position: absolute;
+    bottom: 10px;
+    z-index: 999;
+  }
+
+  .slick-dots li button:before {
+    color: #fff;
+  }
+
+  .slick-dots li.slick-active button:before {
+    color: #fff;
+  }
+
+  .popup_room {
+    background: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+  }
+
+  .popup_room_main {
+    width: 100%;
+    height: 761px;
+    display: flex;
+    position: relative;
+    background: white;
+  }
+
+  .popup_room_info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 463px;
+    height: 100%;
+  }
+
+  .popup_room_info_name {
+    font-size: 22px;
+    margin-left: 19px;
+  }
+
+  .popup_room_info_beds {
+    font-size: 15px;
+    margin-left: 19px;
+  }
+
+  .popup_room_info_square {
+    font-size: 20px;
+    margin-left: 19px;
+  }
+
+  .popup_room_room {
+    font-size: 20px;
+  }
+
+  .popup_room_info_price {
+    background: #eaf6df;
+    padding: 10px;
+    width: 100%;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 42px;
+  }
+
+  .valueadds {
+    padding-top: 20px;
+    padding-left: 25px;
+    font-size: 16px;
+    border-top: 3.2px solid #cecece;
+  }
+
+
+  img[alt="Загрузка изображения"]::after {
+    content: ".";
+    animation: dots 1s steps(3) infinite;
+  }
+
+  @keyframes dots {
+
+    0%,
+    40% {
+      content: ".";
+    }
+
+    50%,
+    90% {
+      content: "..";
+    }
+
+    100% {
+      content: "...";
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .popup_room .popup_room_info {
+      display: none;
+    }
+  }
+</style>
+
+<div class="section">
+  <span class="title">Избраное</span>
+  {% comment %} {% include "main/form_search_detal_hotel.html" %} {% endcomment %}
+  <div class="gpupe_rc">
+    {% for room in rooms %}
+    {{room.html}}
+    {% endfor %}
+  </div>
+</div>
+
+
+
+<script defer>
+  $(".filter-result").find(".favorite_icon").click(function () {
+    id = $(this).parents(".filter-result").data("rc")
+    $.ajax({
+      method: "POST",
+      data: { "rc": id },
+      url: "{% url 'ajax_toggle_favorite_hotel' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+      }
+    });
+    $(this).toggleClass("active")
+  })
+
+  function go_list() {
+    data = {
+      "adults": $("#guests_popup .adults input").val(),
+      "сhildren": $("#guests_popup .сhildren input").val(),
+      "date_1": formatDate(datepicker_1.datepicker("getDate")),
+      "date_2": formatDate(datepicker_2.datepicker("getDate")),
+      "age_c[]": Array.from($("*[name='age_c[]']"), item => $(item).val()),
+      "sid": localStorage.getItem('sid'),
+    }
+		load_start()
+    $.ajax({
+      method: "POST",
+      data: data,
+      url: "{% url 'form_fillter_rc_search' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+        location.href = `/profile/favourites/}`
+      }
+    });
+  }
+</script>
+
+<script defer>
+  function open_popup(id) {
+    $(`#room_${id}`).show();
+  }
+</script>
+
+<script defer>
+  $('.carousel').slick({
+    dots: true,
+    slidesToScroll: 1,
+    slidesToShow: 1,
+  });
+</script>
+{% endblock main_block %}

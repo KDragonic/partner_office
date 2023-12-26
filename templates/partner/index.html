@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+{% load static partner_tags %}
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Кабинет партнера</title>
+    {% if meta and meta.description %}
+      <meta name="description" content="{{ meta.description }}" />
+    {% endif %}
+    {% if meta and meta.keywords %}
+      <meta name="keywords" content="{{ meta.keywords }}" />
+    {% endif %}
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v2" />
+    <script src="{% static 'js/fun_cookie.js' %}"></script>
+
+    <link rel="shortcut icon" href="/static/img/favicon_2.ico" type="image/x-icon" />
+    <link rel="icon" href="/static/img/favicon_2.ico" type="image/x-icon" />
+
+    <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+    <script src="{% static 'jqu/jquery-ui.min.js' %}"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="{% static 'jqu/jquery-ui.structure.css' %}" />
+
+    <script src="/static/js/jquery.ui.touch-punch.js"></script>
+
+    <script src="{% static 'js/popup_create.js' %}?v4"></script>
+    <script src="/static/js/kdjq.js"></script>
+    <script src="/static/js/partner_page.js"></script>
+    <script src="/static/js/notice.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </head>
+
+  <style>
+    * {
+      font-family: Manrope;
+    }
+
+    *::selection {
+      background-color: #17a1a157; /* здесь можно указать цвет выделения */
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: row;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      --bs-btn-color: #fff;
+      --bs-btn-bg: #ff7600;
+      --bs-btn-border-color: #ff7600;
+      --bs-btn-hover-color: #fff;
+      --bs-btn-hover-bg: #ffa14f;
+      --bs-btn-hover-border-color: #ffa14f;
+      --bs-btn-focus-shadow-rgb: 255, 118, 0;
+      --bs-btn-active-color: #fff;
+      --bs-btn-active-bg: #ffb16e;
+      --bs-btn-active-border-color: #ffb16e;
+      --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+      --bs-btn-disabled-color: #fff;
+      --bs-btn-disabled-bg: #787878;
+      --bs-btn-disabled-border-color: #787878;
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 0 0.25rem rgba(255, 118, 0,.25);
+      border-color: #ff7600;
+    }
+
+    .form-select:focus {
+      box-shadow: 0 0 0 0.25rem rgba(255, 118, 0,.25);
+      border-color: #ff7600;
+    }
+
+
+    .btn {
+      border: none;
+    }
+
+    .main-content {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .base-content {
+      height: 100%;
+      padding: 10px;
+    }
+
+    .page-loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      background-color: #fff;
+      z-index: 9999;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      border: 5px solid #ff7600;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      position: absolute;
+    }
+
+    .loader_anim_1 {
+      animation: spin 1s linear infinite;
+    }
+    .loader_anim_2 {
+      animation: rspin 0.8s linear infinite;
+    }
+    .loader_anim_3 {
+      animation: spin 0.6s linear infinite;
+    }
+
+    .loader_size_1 {
+      width: 60px;
+      height: 60px;
+    }
+    .loader_size_2 {
+      width: 80px;
+      height: 80px;
+    }
+    .loader_size_3 {
+      width: 100px;
+      height: 100px;
+    }
+    .loader_size_4 {
+      width: 150px;
+      height: 150px;
+    }
+    .loader_size_5 {
+      width: 170px;
+      height: 170px;
+    }
+    .loader_size_6 {
+      width: 190px;
+      height: 190px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes rspin {
+      to {
+        transform: rotate(-360deg);
+      }
+    }
+  </style>
+
+  <style>
+    header {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px;
+      flex-wrap: wrap;
+    }
+
+    header .breadcrumbs {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 0px;
+    }
+
+    header .breadcrumbs .items {
+      display: flex;
+      color: #a0aec0;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    header .breadcrumbs .items .item:nth-child(n + 2)::before {
+      content: '/';
+      margin: 0 5px;
+    }
+
+    header .title {
+      color: #01b574;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    header .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    header .buttons .item {
+      cursor: pointer;
+    }
+
+    header .buttons .item a {
+      color: black;
+    }
+
+    header .buttons .item:hover a {
+      color: #01b574;
+    }
+
+    header .buttons .item:hover svg path {
+      fill: #01b574;
+    }
+  </style>
+
+  <style>
+    .kdjq-card {
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 0 18px 0px #D9D9D9;
+    }
+    .kdjq-card--header {
+      padding: 10px 15px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kdjq-card.hide .kdjq-card--header {
+      border-radius: 10px;
+    }
+
+    .kdjq-card--header--title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0em;
+      text-align: left;
+    }
+    .kdjq-card--header--buttons {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .kdjq-card--header--buttons--item {
+      font-size: 20px;
+      cursor: pointer;
+      user-select: none;
+      color: #4c4c4c;
+      padding: 2px 6px;
+      border-radius: 5px;
+      transition: background-color 0.2s;
+    }
+    .kdjq-card--header--buttons--item:hover {
+      background: #4545454f;
+    }
+    .kdjq-card.hide .kdjq-card--header--buttons--item[button-event='hide'] {
+      transform: rotate(180deg);
+    }
+    .kdjq-card--body {
+      padding: 10px 15px;
+    }
+    .kdjq-card.hide .kdjq-card--body {
+      display: none !important;
+    }
+    .kdjq-card--footer {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      padding: 10px 15px;
+    }
+    .kdjq-card.hide .kdjq-card--footer {
+      display: none !important;
+    }
+    .kdjq-card--footer--stats {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      gap: 12px;
+      width: 100%;
+    }
+    .kdjq-card--footer--stats--item {
+      display: flex;
+      align-items: flex-start;
+      gap: 3px;
+      font-size: 12px;
+    }
+    .kdjq-card--footer--stats--item--name {
+      font-weight: 600;
+    }
+    .kdjq-card--footer--stats--item--name::after {
+      content: ':';
+      font-weight: 600;
+    }
+  </style>
+
+  <style>
+    #notificationsContainer {
+      background-color: #fafafa;
+      margin: 3px;
+      position: absolute;
+      z-index: 999;
+      right: 19px;
+      bottom: 4px;
+      box-shadow: 4px 4px 16px 0px rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      height: calc(100vh - 13px);
+      overflow-y: auto;
+    }
+
+    #notificationsContainer .list {
+      padding: 5px;
+    }
+
+    #notificationsContainer.hide {
+      display: none;
+    }
+
+    #notificationsContainer::-webkit-scrollbar {
+      width: 10px; /* задайте ширину скроллбара */
+      background-color: #f0f0f0; /* цвет ползунка скроллбара при наведении */
+    }
+
+    #notificationsContainer::-webkit-scrollbar-thumb {
+      background-color: #a7a7a7; /* цвет ползунка скроллбара */
+      border-radius: 5px;
+    }
+
+    #notificationsContainer::-webkit-scrollbar-thumb:hover {
+      background-color: #555; /* цвет ползунка скроллбара при наведении */
+    }
+
+    #notificationsContainerHeader {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 5px;
+    }
+
+    #notificationsContainerClose {
+      color: #ff8080;
+      padding: 3px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    #notificationsContainerClose:hover {
+      background-color: #ff8080;
+      color: white;
+    }
+
+    .notification {
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 5px;
+    }
+
+    .notification:hover {
+      background-color: #eaeaea;
+    }
+
+    .notification .title {
+      font-weight: 500;
+      margin-bottom: 3px;
+      color: black;
+      text-transform: none;
+    }
+
+    .notification .text {
+      font-size: 14px;
+      line-height: 120%;
+    }
+
+    .notification .createdAt {
+      font-size: 12px;
+      color: gray;
+      margin: 0px;
+    }
+  </style>
+
+  <body>
+    {% menu %}
+    <div class="main-content">
+      <div class="page-loader">
+        <div class="loader loader_size_1 loader_anim_1"></div>
+        <div class="loader loader_size_2 loader_anim_2"></div>
+        <div class="loader loader_size_3 loader_anim_3"></div>
+        <div class="loader loader_size_4 loader_anim_1" style="animation-delay: 0.1s"></div>
+        <div class="loader loader_size_5 loader_anim_2" style="animation-delay: 0.1s"></div>
+        <div class="loader loader_size_6 loader_anim_3" style="animation-delay: 0.1s"></div>
+      </div>
+
+      {% header %}
+      <section class="base-content"></section>
+    </div>
+  </body>
+  {% footer %}
+</html>

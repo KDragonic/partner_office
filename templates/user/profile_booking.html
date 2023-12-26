@@ -1,0 +1,13 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static cards %}
+{% block main_block %}
+<div class="section">
+  <span class="title">Мои бронирования</span>
+
+  {% get_card "profile_booking" 'my' %}
+
+  <a href="/profile/#edit_user_profile_title" class="discription" id="edit_user_profile_title" style="text-decoration: underline; color: #5555f7; font-size: 20px;">Получать уведомления в Telegram</a>
+
+</div>
+
+{% endblock main_block %}

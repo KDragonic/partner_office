@@ -1,0 +1,95 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static %}
+{% block main_block %}
+
+<style>
+  .button_new_user,
+  .button_new_user:link {
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .label_file {
+    border: 1px solid #D2D2D2;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    width: 100%;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  form {
+    display: flex;
+    gap: 14px;
+  }
+</style>
+
+<div class="section"
+  style="gap: 12px;">
+  <span class="title">Импорт данных отеля</span>
+
+  <form id="file-upload-form"
+    method="post"
+    action=""
+    enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="file"
+      class="label_file">
+      <input type="file"
+        name="file"
+        id="file">
+      <span class="file_name_span">Файл не выбран</span>
+    </label>
+    <button class="button"
+      type="submit">Загрузить</button>
+  </form>
+</div>
+
+<script defer>
+  $(document).ready(function () {
+    $('input[type="file"]').change(function (e) {
+      var filename = e.target.files[0].name;
+      $('.file_name_span').text(filename);
+    });
+
+    $('#file-upload-form').submit(function (event) {
+      event.preventDefault();
+
+      var form = $(this);
+      var formData = new FormData(form[0]);
+
+      $('#file-upload-form').show()
+      popup_load_create()
+
+      $.ajax({
+        url: "{% url 'admin.ajax.hotel.add' %}",
+        type: "post",
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        },
+        success: function (response) {
+          if (response.reload) {
+            location.reload()
+          }
+          else {
+            all_popup_close()
+            $("#file-upload-form").remove()
+            popup_create("Успех", `Вы успешно создали отель.<br>${response.text}`)
+          }
+        },
+        error: function (xhr, status, error) {
+          console.log(xhr.responseText);
+        }
+      });
+    });
+  });
+</script>
+{% endblock main_block %}

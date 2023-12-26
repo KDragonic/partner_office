@@ -1,0 +1,305 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static %}
+{% block main_block %}
+<style>
+  .unverified_phone {
+    color: red;
+  }
+
+  .unverified_phone_button {
+    color: #7070f3;
+    cursor: pointer;
+  }
+
+  .unverified_phone_button:hover {
+    text-decoration: underline;
+  }
+</style>
+<div class="section">
+  <span class="title" id="edit_user_profile_title">Мои данные</span>
+  <form action="{% url 'form_edit_profile' %}" method="post" id="edit_user_profile" class="grupe_input">
+    {% csrf_token %}
+
+    {% if user.username != "" and user.lastname != "" %}
+
+    {% input_text 'readonly_text' 'Имя' 'name' user.username 'Имя' 1 'given-name' %}
+
+    {% input_text 'readonly_text' 'Фамилия' 'lastname' user.lastname 'Фамилия' 1 'family-name' %}
+
+    {% input_text 'readonly_text' 'Отчество' 'middlename' user.middlename 'Очество' 1 'additional-name' %}
+
+    {% else %}
+
+    {% input_text 'text' 'Имя' 'name' user.username 'Имя' 1 'given-name' %}
+
+    {% input_text 'text' 'Фамилия' 'lastname' user.lastname 'Фамилия' 1 'family-name' %}
+
+    {% input_text 'text' 'Отчество' 'middlename' user.middlename 'Очество' 1 'additional-name' %}
+
+    {% endif %}
+
+    {% input_text 'email' 'Почта' 'email' user.email 'Почта' 1 'email' %}
+
+    {% input_text 'tel' 'Телефон' 'phone' user.phone 'Ваш основной телефон' 1 'home tel' %}
+
+    {% input_text 'tel' 'Доп. телефон' 'phone_2' user.phone_2 'Доп. телефон' 0 'work tel' %}
+
+    {% input_cr 'radio' 'Пол' 'gender' choices.gender checkeds.gender 1 %}
+
+    <input class="button"
+      value="Изменить"
+      id="edit_user_profile_button"
+      style="margin-top: 20px;">
+
+    <input class="button"
+      value="Сохранить"
+      type="submit"
+      id="edit_user_profile_submit"
+      style="margin-top: 20px; display: none;">
+  </form>
+
+  {% if user.not_verification_phone_1 %}
+  <span class="unverified_phone">
+    Номер телефона не подтвержден,
+    <span class="unverified_phone_button"
+      data-type="phone_1">подтвердить?</span>
+  </span>
+  {% endif %}
+
+  {% if user.not_verification_email %}
+  <span class="unverified_phone">
+    Почта не подтверждена.
+  </span>
+  {% endif %}
+</div>
+
+<script>
+  $(".unverified_phone_button").click(function () {
+    type = $(this).data("type")
+    popup_create(
+      "Подверждение номера телефона",
+      "Для подтверждения вашего телефона, вам позвонят с указанного номера телефона, и вам потребуется ввести последние четыре цифры этого номера. Пожалуйста, не отвечайте на звонок, просто введите последние четыре цифры номера.",
+      [
+        { type: "close", name: "Отмена" },
+        { type: "add", name: "Позвонить", fun: сreating_a_verification_number, param: [type] }
+      ],
+    )
+  })
+
+  function сreating_a_verification_number(phone_type) {
+    $.ajax({
+      url: "{% url 'phone_verification_create' %}",
+      type: 'POST',
+      headers: {
+        'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+      },
+      data: {
+        phone_type: phone_type
+      },
+      success: function (response) {
+        if (!response.error) {
+          popup_create(
+            "Подверждение номера телефона",
+            "Введите последние 4 цифры телефона, с которого вам позвонят",
+            [
+              { type: "close", name: "Отмена" },
+              { type: "send-inputs", name: "Проверить", fun: check_a_verification_number }
+            ],
+            [
+              [
+                { type: "hidden", name: "phone_type", val: phone_type },
+                { type: "text", "label": "Код", name: "entered_code", val: "" }
+              ]
+            ]
+          )
+        } else {
+          switch (response.error) {
+            case 'call_was_not_created':
+              // обработка ошибки "Неудачно создан звонок"
+              popup_create(
+                "Ошибка",
+                "Неудачно создан звонок для проверки",
+                [
+                  { type: "close", name: "Закрыть" },
+                ]
+              )
+              break;
+            case 'invalid_phone_number_type':
+              popup_create(
+                "Ошибка",
+                "Неверный тип телефона",
+                [
+                  { type: "close", name: "Закрыть" },
+                ]
+              )
+              break;
+          }
+        }
+      }
+    });
+  }
+
+
+  function reset_page(param) {
+    location.reload()
+  }
+
+  function check_a_verification_number(param) {
+    data = {
+      phone_type: param["phone_type"],
+      entered_code: param["entered_code"],
+    }
+
+    console.log(data)
+
+    $.ajax({
+      url: "{% url 'phone_verification_check' %}",
+      type: 'POST',
+      headers: {
+        'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+      },
+      data: data,
+      success: function (response) {
+        if (!response.error) {
+          popup_create(
+            "Подтвержден!",
+            "Вы подтвердили номер телефона, если вы смените номер телефона в профиле нужно будет подвердить его ещё раз",
+            [
+              { type: "reset", name: "Закрыть", fun: reset_page, param: [] },
+            ]
+          )
+
+          $(`.unverified_phone[data-type="${param['phone_type']}"]`).remove()
+
+        } else {
+          switch (response.error) {
+            case 'invalid_phone_number_type':
+              popup_create(
+                "Ошибка",
+                "Неверный тип телефона",
+                [
+                  { type: "close", name: "Закрыть" },
+                ]
+              )
+              break;
+            case 'mismatch':
+              popup_create(
+                "Ошибка",
+                "Неверный код",
+                [
+                  { type: "close", name: "Закрыть" },
+                ]
+              )
+              break;
+            case 'already_active':
+              popup_create(
+                "Ошибка",
+                "Номер телефона уже активен",
+                [
+                  { type: "close", name: "Закрыть" },
+                ]
+              )
+              break;
+          }
+        }
+      }
+    });
+  }
+
+
+</script>
+<script defer>
+  $("#edit_user_profile label").addClass("flat")
+  $("#edit_user_profile label input").attr("readonly", "readonly")
+  $("#edit_user_profile_button").click(function () {
+    $("#edit_user_profile_button").hide()
+    $("#edit_user_profile_title").text("Изменение моих данных")
+    $("#edit_user_profile_submit").show()
+    $("#edit_user_profile label").removeClass("flat")
+    $("#edit_user_profile label").not(".readonly_text").find("input").removeAttr("readonly")
+
+    $('html, body').animate({
+      scrollTop: $('#edit_user_profile').offset().top
+    }, 100);
+
+  })
+</script>
+
+<style>
+  .grupe_card .card.add:hover {
+    transform: scale(1.1);
+    background: #07151c2e;
+  }
+
+  .grupe_card .card.add {
+    cursor: pointer;
+  }
+</style>
+
+<div class="br"></div>
+<div class="section">
+  <span class="title"
+    id="edit_user_profile_title">Получайте уведомления в Telegram</span>
+  {% if user.telegram_active == True %}
+  <span class="discription"
+    style=" font-size: 17px; display: flex; gap: 3px; flex-direction: column;">
+    <a href="https://t.me/booking_notifications_bot" target="_blank">Ссылка на бота</a>
+    <p>Telegram ID: {{user.token_telegram}}</p>
+    <p>Активирован</p>
+    <p>Для смены аккаунта Telegram обратитесь в поддержку.</p>
+  </span>
+  {% else %}
+  <span class="discription"
+    style=" font-size: 17px; display: flex; gap: 3px; flex-direction: column; ">
+    <p>Для этого перейдите по <a
+        href="https://t.me/booking_notifications_bot" target="_blank">ссылке на бота</a></p>
+    <p>В сообщении отправьте код для авторизации</p>
+
+    <p>Код для авторизации в телеграмм боте: {{user.token_telegram}}</p>
+  </span>
+  {% endif %}
+</div>
+
+<div class="br"></div>
+<div class="section"
+  style="width: 348px;">
+  <span class="title">Смена пароля</span>
+  <form action="{% url 'form_reset_password' %}"
+    method="post"
+    class="grupe_input">
+
+    {% csrf_token %}
+
+    <label class="text"
+      for="">
+      <span class="name">Текущий пароль*</span>
+      <input type="text"
+        placeholder="********"
+        name="current_password"
+        autocomplete="current-password">
+    </label>
+
+    <label class="text"
+      for="">
+      <span class="name">Новый пароль*</span>
+      <input type="text"
+        placeholder="********"
+        name="new_password"
+        autocomplete="new-password">
+    </label>
+
+    <label class="text"
+      for="">
+      <span class="name">Повторить новый пароль*</span>
+      <input type="text"
+        placeholder="********"
+        name="repeat_password"
+        autocomplete="new-password">
+    </label>
+
+    <input class="button"
+      type="submit"
+      value="Изменить">
+  </form>
+</div>
+{% endblock main_block %}

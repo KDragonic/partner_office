@@ -1,0 +1,711 @@
+{% extends 'template/base_profile_clean.html' %}
+{% load form static %}
+{% block main_block %}
+
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU&apikey=e964d90a-5747-4eb6-ac44-28cbfcca4dab" type="text/javascript"></script>
+
+  <style>
+    #content {
+      justify-content: center;
+      align-items: center;
+    }
+
+    #main_block {
+      max-width: 910px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .button_grupe {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      position: relative;
+      margin-top: 37px;
+    }
+
+    .grupe_input.max label {
+      width: 100%;
+    }
+
+    .title_center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Manrope';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 22px;
+      line-height: 30px;
+      color: #000000;
+    }
+  </style>
+
+  <style>
+    .br_tran {
+      margin-bottom: 20px;
+    }
+
+    .discription {
+      width: 100%;
+    }
+
+    .title_2 {
+      width: 100%;
+      font-size: 20px;
+      font-weight: 400;
+    }
+  </style>
+
+  <style>
+    #beds_label {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    #beds_label .name {
+      margin-top: 2px;
+    }
+
+    #beds_label .input_span {
+      min-height: 45px;
+      width: 100%;
+      border: 1px solid #d2d2d2;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding-left: 14px;
+      justify-content: space-between;
+    }
+
+    #beds_label input {
+      border: none;
+      text-align: center;
+      height: 100%;
+      border-left: 1px solid #d2d2d2;
+      width: 42px;
+      background: transparent;
+    }
+
+    .error_input {
+      border-color: red !important;
+    }
+  </style>
+
+  <script>
+
+
+    ym(94864675,'reachGoal', `obj_reg_start`)
+
+    function animateMainBlock_switching(dir) {
+      $('#main_block').animate(
+        {
+          left: `-=${100 * dir}vh`
+        },
+        80,
+        function () {
+          $(this).animate({ left: `+=${200 * dir}vh` }, 0, function () {
+            $(this).animate({ left: `-=${100 * dir}vh` }, 80)
+          })
+        }
+      )
+    }
+
+    function checkInputs(form_elem) {
+      var emptyInputs = []
+      $(form_elem)
+        .find('input, select, textarea')
+        .each(function () {
+          if ($(this).attr('required')) {
+            if (!$(this).val()) {
+              emptyInputs.push($(this))
+            }
+            else {
+              $(this).removeClass("error_input")
+            }
+          }
+        })
+
+      label_input_file = $(form_elem).find(".label_input_file")
+
+      if (label_input_file.length != 0) {
+        $(label_input_file).find(".files").removeClass("error_input")
+
+        if (!$(label_input_file).multifile("valid")) {
+          $(label_input_file).find(".files").addClass("error_input")
+          emptyInputs.push(label_input_file)
+        }
+      }
+
+      return emptyInputs
+    }
+
+    function highlightEmptyInputs(emptyInputs) {
+      emptyInputs.forEach(function (emptyInput) {
+        $(emptyInput).addClass('error_input')
+      })
+    }
+
+    $('#beds_label .input_span input').blur(function(){
+      var val = $(this).val()
+      if (val == "" || val == NaN || val == undefined) {
+        $(this).val(0)
+      }
+    });
+
+    function create_hotel() {
+      is_valid_input_file = true
+      $(`.label_input_file`).map(function() {
+        if (!$(this).multifile("valid")) {
+            alert("Вы не правильно заполнили одно поле для фото")
+            is_valid_input_file = false
+        }
+      })
+
+      if (!is_valid_input_file) {
+        return
+      }
+
+      data = {
+        photo_hotel: ($(`.label_input_file[input-file-name="images_hotel"]`).multifile("getlist")).join(','),
+        photo_room: ($(`.label_input_file[input-file-name="photo_room"]`).multifile("getlist")).join(',')
+      }
+
+      var selectedrservice = [];
+      $('input[name="rservice"]:checked').each(function () {
+        selectedrservice.push($(this).val());
+      });
+      data["rservice"] = selectedrservice.join(",")
+
+      var names = [
+        "minimum_days_before_arrival",
+        "name",
+        "type_hotel",
+        "percentage",
+        "date_when_you_start_receiving_guests",
+        "offer_type",
+        "allowed_party",
+        "allowed_smoking",
+        "allowed_child",
+        "allowed_animal",
+        "number_similar_numbers",
+        "the_amount_of_the_security_deposit",
+        "description_of_the_room",
+        "price_base",
+        "city",
+        "house",
+        "apartment",
+        "max_adults",
+        "count_room",
+        "count_bedrooms",
+        "coordinates",
+        "body",
+        "minimum_days_of_stay",
+        "for_long_term_stays_minimum_days_of_stay",
+        "min_days",
+        "home_name",
+        "rc_name",
+        "representative_phone",
+        "cleaning_fee",
+        "square",
+        "for_long_term_stays",
+        "region",
+        "street",
+        "representative_fio",
+        "channel_manager",
+        "floor",
+      ]; // здесь перечислены имена, которые нужно найти
+
+      $.each(names, function (i, name) {
+        var element = $(`:input[name='${name}']`); // находим элемент с именем name
+        data[name] = element.val(); // выводим результат в консоль
+      });
+
+      var beds = {};
+      $('#beds_label .input_span').each(function(){
+        var type = $(this).data("type-bed");
+        var val = $(this).find('input').val();
+        if (val == "" || val == NaN || val == undefined) {
+          val = "0"
+        }
+        beds[type] = parseInt(val);
+      });
+
+      beds_string = Object.entries(beds).map(([key, value]) => `${key}=${value}`).join('&');
+      data["beds"] = beds_string
+
+      console.log(data)
+
+      $.ajax({
+        method: "POST",
+        data: data,
+        url: "{% url 'ajax_register_placement_object' %}",
+        beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        },
+        success: function (request) {
+            load_end()
+            $("*[name]").css("border-color", "green")
+            $("#type_of_addition").css("border-color", "green")
+            $(".error_input").remove()
+            if (request.redirect_url) {
+                ym(94864675,'reachGoal', `obj_reg_end`)
+                location.href = request.redirect_url
+            }
+            else if (request.result == "error") {
+                errors = request.errors
+                errors_keys = Object.keys(errors);
+                errors_keys.forEach(key => {
+                    console.log(key, errors[key])
+                    $(`*[name='${key}']`).css("border-color", "red")
+                    $(`*[name='${key}']`).after(`<span class='error_input'>${errors[key]}</span>`)
+                });
+                popup_create("Ошибка", "Вы не заполнили обязательные поля", [], [], "error")
+            }
+            else if (request.result == "the_name_is_occupied") {
+              popup_create("Ошибка", "Название объекта размещения уже занято", [], [], "error")
+            }
+            else if (request.result == "the_name_is_occupied_by_me") {
+              popup_create("Ошибка", "Название объекта размещение уже занято, у вас в уже есть он", [], [], "error")
+            }
+        }
+    });
+    }
+
+    $(document).ready(function () {
+      var currentSection = 1
+      $(`[element-type='form-section']`).hide()
+      $(`[element-type='form-section'][data-section='${currentSection}']`).show()
+      $('.next-button').click(function () {
+        form = $(`[element-type='form-section'][data-section='${currentSection}']`)
+        emptyInputs = checkInputs(form)
+
+        if (emptyInputs.length > 0) {
+          highlightEmptyInputs(emptyInputs)
+          console.log('Ошибка')
+        } else {
+          console.log('Переключение >')
+          animateMainBlock_switching(1)
+          $(`[element-type='form-section'][data-section='${currentSection}']`).hide()
+          currentSection++
+          $(`[element-type='form-section'][data-section='${currentSection}']`).show()
+          ym(94864675,'reachGoal', `obj_reg_step_${currentSection}`)
+        }
+      })
+      $('.prev-button').click(function () {
+        console.log('Переключение <')
+        animateMainBlock_switching(-1)
+        $(`[element-type='form-section'][data-section='${currentSection}']`).hide()
+        currentSection--
+        $(`[element-type='form-section'][data-section='${currentSection}']`).show()
+      })
+      $('.create-hotel').click(function () {
+        create_hotel()
+      })
+    })
+  </script>
+
+  <div class="section" element-type="form-section" data-section="1">
+    <span class="title_center">Шаг 1: Информация об отеле</span>
+    <div class="grupe_input max">
+      <div class="section">
+        <span class="title">Основная информация</span>
+        <div class="grupe_input">
+          <label class="text">
+            <span class="name">Что сдаёте?</span>
+            <select class="text" name="type_hotel">
+              {% for type_hotel in types_hotel %}
+                <option value="{{ type_hotel.code }}">{{ type_hotel.name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          {% input_text 'text' 'Название' 'name' '' '' 1 'off' 60 %}
+        </div>
+      </div>
+      {% input_file 'many' 'Фото объекта' 'images_hotel' hotel.images 3 40 True True "Перетаскивайте изображения, чтобы изменить порядок" %}
+      <div class="section">
+        <span class="title">Адрес</span>
+        <div class="grupe_input">
+          <label class="text" for="" style="width: 100%;">
+            <span class="name">Поиск координат по адресу</span>
+            <input type="text" placeholder="Москва, проспект Мира 125" name="gs_address" value="" autocomplete="off">
+          </label>
+          <div class="discription" style=" margin-top: -17px; font-size: 15px; color: gray; ">Город/населённый пункт и через запятую улицу. Или найдите дом на карте и поставьте метку.</div>
+
+          <div id="map_coordinate"></div>
+          <div id="gs_address_list"></div>
+
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Город* (населенный пункт)</span>
+            <input type="text" placeholder="" name="city" value="" required="" autocomplete="off">
+          </label>
+
+          {% input_text 'text' 'Район' 'region' '' '' 0 %}
+          {% input_text 'text' 'Улица' 'street' '' '' 1 %}
+          {% input_text 'text' 'Корпус' 'body' '' '' 0 %}
+          {% input_text 'text' 'Дом' 'house' '' '' 1 %}
+          {% input_text 'text' 'Этаж' 'floor' '' '' 0 %}
+          {% input_text 'text' 'Квартира' 'apartment' '' '' 0 %}
+          {% input_text 'text' 'Координаты' 'coordinates' '' '' 1 %}
+
+        </div>
+      </div>
+      <div class="section">
+        <span class="title">Разрешения</span>
+        <div class="grupe_input">
+          {% input_cr 'text' 'Можно с детьми' 'allowed_child' 'yes_no' '' 1 %}
+          {% input_cr 'text' 'Можно с животными' 'allowed_animal' 'yes_no' '' 1 %}
+          {% input_cr 'text' 'Курение разрешено' 'allowed_smoking' 'yes_no' '' 1 %}
+          {% input_cr 'text' 'Вечеринки разрешены' 'allowed_party' 'yes_no' '' 1 %}
+        </div>
+      </div>
+    </div>
+    <div class="button_grupe">
+      <button type="button" class="button next-button">Далее</button>
+    </div>
+  </div>
+
+  <div class="section" element-type="form-section" data-section="2">
+    <span class="title_center">Шаг 2: Доп информация</span>
+    <div class="grupe_input max">
+      <span class="title">Бронирование</span>
+      <div class="grupe_input">
+        <label class="text">
+          <span class="name">Процент сайта</span>
+          <select name="percentage" required>
+            <option value="0">Без комиссии</option>
+            <option value="14" selected>14%</option>
+            <option value="15">15%</option>
+            <option value="16">16%</option>
+            <option value="17">17%</option>
+            <option value="18">18%</option>
+            <option value="19">19%</option>
+            <option value="20">20%</option>
+            <option value="21">21%</option>
+            <option value="22">22%</option>
+            <option value="23">23%</option>
+            <option value="24">24%</option>
+            <option value="25">25%</option>
+            <option value="26">26%</option>
+            <option value="27">27%</option>
+            <option value="28">28%</option>
+            <option value="29">29%</option>
+            <option value="30">30%</option>
+          </select>
+        </label>
+        <div class="discription">Выберите процент, который вы готовы заплатить сайту. Чем выше процент, тем выше будет показано ваше объявление. Диапазон процентов от 14% до 30%.</div>
+        <div class="discription">Указывать в днях</div>
+        <label class="text">
+          <!-- # TODO: Измен изменить -->
+          <span class="name">Минимум времени до заселения*</span>
+          <select name="minimum_days_before_arrival" required>
+            <option value="0.25">6 часов</option>
+            <option value="0.5">12 часов</option>
+            <option value="1">24 часа</option>
+            <option value="2">2 дня</option>
+            <option value="3">3 дня</option>
+            <option value="4">4 дня</option>
+            <option value="5">5 дней</option>
+            <option value="6">6 дней</option>
+            <option value="7">7 дней</option>
+            <option value="8">8 дней</option>
+            <option value="9">9 дней</option>
+            <option value="10">10 дней</option>
+            <option value="11">11 дней</option>
+            <option value="12">12 дней</option>
+          </select>
+        </label>
+        {% input_text 'text' 'Минимум дней пребывания' 'minimum_days_of_stay' '1' '' 1 %}
+        {% input_text 'date' 'Дата когда начинаете принимать гостей' 'date_when_you_start_receiving_guests' '' '01.01.2023' 1 %}
+
+        <script>
+          var today = new Date()
+          var month = today.getMonth() + 1
+          var day = today.getDate()
+          if (month < 10) {
+            month = '0' + month
+          }
+          if (day < 10) {
+            day = '0' + day
+          }
+          var todayFormatted = today.getFullYear() + '-' + month + '-' + day
+          $('[name="date_when_you_start_receiving_guests"]').val(todayFormatted)
+        </script>
+      </div>
+      <span class="title">Скидки и акции</span>
+      <div class="grupe_input">
+        {% input_text 'text' 'При длительном проживании скидка (₽)' 'for_long_term_stays' '0' '' 1 %}
+        {% input_text 'text' 'Минимум дней' 'for_long_term_stays_minimum_days_of_stay' '0' '' 1 %}
+        <div class="discription">Предложите гостям скидку при длительном проживании или на новый объект, чтобы повысить занятость жилья.</div>
+
+        {% input_text 'text' 'Плата за уборку (₽)' 'cleaning_fee' '0' '' 1 %}
+        <div class="discription">Плата за уборку: Включена в стоимость или одельно.</div>
+      </div>
+    </div>
+    <div class="button_grupe">
+      <button type="button" class="button prev-button">Назад</button>
+      <button type="button" class="button next-button">Далее</button>
+    </div>
+  </div>
+
+  <div class="section" element-type="form-section" data-section="3">
+    <span class="title_center">Шаг 3: Владелец / представитель</span>
+    <div class="grupe_input max">
+      {% input_text 'text' 'ФИО (Не обязательно)' 'representative_fio' '' '' 0 %}
+      {% input_text 'text' 'Номер телефона (Не обязательно)' 'representative_phone' '' '' 0 %}
+      {% input_text 'text' 'Ченел менедеж (Не обязательно)' 'channel_manager' '' '' 0 %}
+    </div>
+    <div class="button_grupe">
+      <button type="button" class="button prev-button">Назад</button>
+      <button type="button" class="button next-button">Далее</button>
+    </div>
+  </div>
+
+  <div class="section" element-type="form-section" data-section="4">
+    <span class="title_center">Шаг 4: Добавление номера</span>
+    <div class="grupe_input max">
+      <div class="grupe_input" id="edit_rcategory">
+        {% input_text 'text' 'Название' 'rc_name' '' 'Название категории номера' 1 %}
+        <div class="discription">Если у вас квартира / апартаменты и нет номеров, продублируете сюда название объекта</div>
+        {% input_cr 'list' 'Тип' 'offer_type' choices.offer_type '' 1 %}
+
+        <div class="label text" id="beds_label">
+          <span class="name">Кровати*</span>
+          <div class="input_span" data-type-bed="bed_1">
+            <span>Односпальная</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+          <div class="input_span" data-type-bed="bed_2">
+            <span>Двухспальная</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+          <div class="input_span" data-type-bed="bed_1.5">
+            <span>Полутороспальная</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+
+          <div class="input_span" data-type-bed="sofa_1">
+            <span>Софа</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+          <div class="input_span" data-type-bed="two_tier">
+            <span>Двух-ярусная</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+
+          <div class="input_span" data-type-bed="sofa_2">
+            <span>Диван</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+
+          <div class="input_span" data-type-bed="armchair">
+            <span>Кресло</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+
+          <div class="input_span" data-type-bed="baby_bed">
+            <span>Детская кровать</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+
+          <div class="input_span" data-type-bed="baby_cradle">
+            <span>Детская люлька</span>
+            <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required />
+          </div>
+        </div>
+
+        <div class="disctiption">
+          Детская кровать от 2 до 6 лет<br>
+          Детская люлька от 3 мес. до 2 лет.<br>
+          ? - дети до 2х лет не считаются за 1 гостя
+        </div>
+
+        {% input_text 'text' 'Площадь (м<sup>2</sup>)' 'square' '' 'Площадь номера' 1 %}
+        {% input_text 'text' 'Количество гостей' 'max_adults' '' 'Количество гостей' 1 %}
+        {% input_text 'text' 'Количество комнат' 'count_room' '' 'Количество комнат' 1 %}
+        {% input_text 'text' 'Количество спален' 'count_bedrooms' '' 'Количество спален' 1 %}
+        {% input_text 'long' 'Описание' 'description_of_the_room' '' 'Описание номера' 0 %}
+        {% input_text 'text' 'Базовая цена за сутки' 'price_base' '' 'Базовая цена за сутки' 1 %}
+        {% input_text 'text' 'Минимум дней' 'min_days' '1' 'Минимум дней проживания' 1 %}
+        {% input_text 'int' 'Размер страхового депозита' 'the_amount_of_the_security_deposit' '0' 'Размер страхового депозита' 0 %}
+        {% input_cr 'checkbox' 'Услуги' 'rservice' choices.rservice '' 0 %}
+        {% input_file 'many' 'Фото' 'photo_room' '' 2 20 %}
+
+        {% input_text 'int' 'Количество однотипных номеров' 'number_similar_numbers' '1' 'Количество однотипных номеров' 1 %}
+      </div>
+    </div>
+    <div class="button_grupe">
+      <button type="button" class="button prev-button">Назад</button>
+      <button type="button" class="button next-button">Далее</button>
+    </div>
+  </div>
+  <div class="section" element-type="form-section" data-section="5">
+    <span class="title_center">Шаг 5: Финал</span>
+    <span class="full_size">
+      Остальные номера и их количество можно добавить и указать в Лк.
+    </span>
+    <div class="button_grupe">
+      <button type="button" class="button prev-button">Назад</button>
+      <button type="button" class="button create-hotel">Создать отель</button>
+    </div>
+  </div>
+<style>
+
+  #map_coordinate {
+    height: 521px;
+    width: 100%;
+  }
+
+  #gs_address_list {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  #gs_address_list .item {
+    background: #ffffff;
+    padding: 7px;
+    border-radius: 10px;
+    border: 1px solid gray;
+    cursor: pointer;
+  }
+
+  #gs_address_list .item:hover {
+    border-color: #fc7201;
+    background-color: #fc7201;
+    color:white;
+  }
+</style>
+
+<script defer>
+  map = null
+
+  ymaps.ready(function () {
+    map = new ymaps.Map('map_coordinate', {
+      center: [60.00000, 105.0000],
+      zoom: 1,
+      behaviors: ['default', 'scrollZoom']
+    }, {
+      suppressMapOpenBlock: true,
+    });
+
+    map.controls.remove('trafficControl')
+    map.controls.remove('geolocationControl')
+    map.controls.remove('searchControl')
+
+    let ajax_gs_address_timer = null
+
+    $(`*[name='gs_address']`).change(function () {
+      if (ajax_gs_address_timer) {
+        clearTimeout(ajax_gs_address_timer)
+      }
+
+      ajax_gs_address_timer = setTimeout(() => {
+        ajax_gs_address()
+      }, 200)
+    })
+  });
+
+
+  list_place = {}
+
+  select_id = null
+
+  function ajax_gs_address() {
+    let val = $(`*[name='gs_address']`).val()
+    var myGeocoder = ymaps.geocode(val);
+    myGeocoder.then(function(res) {
+
+      $("#gs_address_list").empty()
+
+      list_place = {}
+
+      map.geoObjects.removeAll()
+
+      res.geoObjects.each(function (el, i) {
+        let name = el.properties.get("text")
+        let coordinates_el = el.geometry._coordinates
+
+        let latlng = `${coordinates_el[0]}, ${coordinates_el[1]}`
+
+        let placemark = new ymaps.Placemark(coordinates_el, {}, { preset: 'islands#blackDotIcon' })
+
+        let metaDataProperty = el.properties.get('metaDataProperty')
+
+        list_place[i] = {
+          "name": name,
+          "latlng": latlng,
+          "coord": coordinates_el,
+          "placemark": placemark,
+          "address": metaDataProperty["GeocoderMetaData"]["Address"]["Components"],
+        }
+
+        placemark.events.add('click', function() { select_place(i) })
+
+
+        let item = $(`<div class="item" data-id="${i}" data-coord-lat="${coordinates_el[0]}" data-coord-lng="${coordinates_el[1]}">${name} (${latlng})</div>`)
+        $("#gs_address_list").append(item)
+
+        map.geoObjects.add(placemark)
+      })
+    });
+  }
+
+  $("#gs_address_list").on("click", '.item', function() {
+    let id = parseFloat($(this).data("id"))
+
+    select_place(id)
+  })
+
+  function select_place(id) {
+    if (select_id != null) {
+      list_place[select_id].placemark.options.set('preset', 'islands#blackDotIcon');
+    }
+    list_place[id].placemark.options.set('preset', 'islands#redDotIcon');
+    select_id = id
+
+
+    $(`[name="city"]`).val("")
+    $(`[name="region"]`).val("")
+    $(`[name="street"]`).val("")
+    $(`[name="house"]`).val("")
+    $(`[name="apartment"]`).val("")
+    $(`[name="floor"]`).val("")
+
+
+    list_place[id]["address"].forEach(function(item) {
+      if (item["kind"] == "locality") {
+        $(`[name="city"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "area") {
+        $(`[name="region"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "street") {
+        $(`[name="street"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "house") {
+        $(`[name="house"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "other") {
+        if (item["name"].startsWith('этаж')) {
+          let name = item["name"].replace("этаж", '').trim();
+          $(`[name="floor"]`).val(name)
+        }
+        if (item["name"].startsWith('кв.')) {
+          let name = item["name"].replace(new RegExp("кв.", 'gi'), '').trim();
+          $(`[name="apartment"]`).val(name)
+        }
+      }
+    })
+
+    $("*[name='coordinates']").val(list_place[id]["latlng"])
+  }
+
+</script>
+{% endblock %}

@@ -1,0 +1,678 @@
+{% extends "main/base.html" %}
+{% load static menu form %}
+{% block content %}
+<style>
+	#card_section {
+		width: 100%;
+	}
+
+	.ui-slider .ui-slider-handle {
+		background: white;
+		border: 1px solid #FC7201;
+		border-radius: 50%;
+		width: 21px;
+		height: 21px;
+	}
+
+	.ui-slider-horizontal {
+		height: 6px !important;
+	}
+
+	.ui-slider-horizontal .ui-slider-range {
+		background: #FC7201;
+	}
+
+	.ui-slider-horizontal .ui-slider-handle {
+		top: -8px;
+	}
+
+	#balanc_section {
+		max-width: 317px;
+		margin-top: 18px;
+		display: flex;
+		flex-direction: column;
+		gap: 9px;
+	}
+
+	.versatile_text {
+		display: flex;
+		justify-content: space-between;
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 24px;
+		color: #BBBBBB;
+	}
+
+	#balanc_label .versatile_text_value {
+		color: black;
+	}
+
+	@media screen and (max-width: 1024px) {
+		.mini_width_flex {
+			width: auto !important;
+			flex-direction: column !important;
+		}
+
+		.grupe_input.mini_width_flex label {
+			width: auto !important;
+		}
+
+		.inner-content__sidebar {
+			width: auto;
+			margin-top: 12px;
+		}
+
+		.inner-content__sidebar .sidebar-content {
+			width: auto;
+			-webkit-box-flex: 0;
+			-ms-flex: 0 0 370px;
+			flex: 0 0 370px;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-orient: vertical;
+			-webkit-box-direction: normal;
+			-ms-flex-direction: column;
+			flex-direction: column;
+			gap: 30px;
+			padding: 20px;
+			background: #FFFFFF;
+			border-radius: 13px;
+		}
+	}
+
+	.section .mini_text {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 16px;
+
+		color: #000000;
+	}
+
+	.section>.title {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 500;
+		font-size: 22px;
+		line-height: 30px;
+
+		color: #000000;
+	}
+
+	.section>.discription {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 22px;
+		width: 100%;
+
+		color: #000000;
+		margin-top: 20px;
+	}
+
+	.grupe_input {
+		margin-top: 20px;
+		row-gap: 20px;
+		column-gap: 40px;
+		display: flex;
+		flex-wrap: wrap;
+		width: 696px;
+	}
+
+
+	.grupe_input>label {
+		display: flex;
+		gap: 10px;
+		flex-direction: column;
+		width: 328px;
+	}
+
+
+	.grupe_input>label>.name {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 22px;
+
+		color: #000000;
+	}
+
+	.grupe_input>label.text input,
+	.grupe_input>label.text select,
+	.grupe_input>label.date input {
+		height: 45px;
+		width: 100%;
+		border: 1px solid #D2D2D2;
+		border-radius: 5px;
+		display: flex;
+		align-items: center;
+		padding-left: 14px;
+		padding-right: 14px;
+	}
+
+	.grupe_input>label.text textarea {
+		width: 100%;
+		border: 1px solid #D2D2D2;
+		border-radius: 5px;
+		display: flex;
+		align-items: center;
+		padding-left: 14px;
+		resize: horizontal;
+	}
+
+	.grupe_input>label.text input::placeholder {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 22px;
+		color: #818181;
+	}
+
+	.grupe_input .date_3 section {
+		display: flex;
+		gap: 10px;
+	}
+
+	.grupe_input .date_3 section .d {
+		flex: 1 2 100%;
+		min-width: 75px;
+	}
+
+	.grupe_input .date_3 section .m {
+		flex: 2 1 100%;
+	}
+
+	.grupe_input .date_3 section .y {
+		flex: 1 2 100%;
+		min-width: 75px;
+	}
+
+	.grupe_input .checkradion section>label {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 22px;
+
+		color: #000000;
+		display: flex;
+		gap: 10px;
+		flex-direction: row;
+	}
+
+	.grupe_input input[type="checkbox"]:checked::before {
+		background: #FC7201;
+	}
+
+	.grupe_input .checkradion input {
+		width: 18px;
+	}
+
+	.button {
+		background: #FC7201;
+		height: 50px;
+		color: white;
+		border-radius: 5px;
+		padding: 14px 32px;
+		width: max-content;
+	}
+
+	.grupe_card {
+		display: flex;
+		margin-top: 20px;
+		gap: 20px;
+		cursor: pointer;
+	}
+
+	.grupe_card .card {
+		border-radius: 8px;
+		width: 174px;
+		height: 224.32px;
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		gap: 5px;
+	}
+
+	.grupe_card .card.active {
+		background: rgba(238, 238, 238, 0.5);
+	}
+
+	.grupe_card .card.add {
+		border: 0.8px solid #07151C;
+	}
+
+	.grupe_card .card .close {
+		cursor: pointer;
+		position: absolute;
+		top: 15px;
+		right: 25px;
+	}
+
+	.grupe_card .card .close:before,
+	.grupe_card .card .close:after {
+		content: "";
+		position: absolute;
+		width: 16px;
+		height: 1.5px;
+		background: #747474;
+	}
+
+	.grupe_card .card .close:before {
+		transform: rotate(45deg);
+	}
+
+	.grupe_card .card .close:after {
+		transform: rotate(-45deg);
+	}
+
+	.grupe_card .card .name {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 15px;
+		line-height: 130%;
+		/* identical to box height, or 19px */
+
+		text-align: center;
+		letter-spacing: 0.1px;
+		color: #000000;
+	}
+
+	.grupe_card .card.add .plus {
+		position: relative;
+		left: -15px;
+		margin-bottom: 15px;
+	}
+
+	.grupe_card .card.add .plus:before,
+	.grupe_card .card.add .plus:after {
+		content: "";
+		position: absolute;
+		width: 30px;
+		height: 3px;
+		background: #024849;
+		border-radius: 10px;
+	}
+
+	.grupe_card .card.add .plus:before {
+		transform: rotate(0deg);
+	}
+
+	.grupe_card .card.add .plus:after {
+		transform: rotate(90deg);
+	}
+
+	.grupe_card .card.add .name {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 130%;
+		/* or 16px */
+
+		text-align: center;
+		letter-spacing: 0.1px;
+
+		color: #024849;
+	}
+
+	.breadcrumb {
+		margin-left: -10px !important;
+	}
+
+	.booking_popup {
+		gap: 20px;
+		display: flex;
+		flex-direction: column;
+		border: 1px solid #7a7a7a;
+		width: 476px;
+		height: 399px;
+		max-height: 100vh;
+		margin-left: auto;
+		padding: 20px;
+		background-color: #fff;
+		border-radius: 13px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 9999;
+		background-color: #fff;
+		padding: 20px;
+		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+		align-items: center;
+		justify-content: center;
+	}
+
+	.overlay_popup {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		background-color: hwb(0 0% 100% / 0.53);
+		z-index: 9998;
+	}
+
+	.grupe_card .card.select {
+		background: rgb(167 215 147 / 50%);
+	}
+
+	#info_price {
+		width: 100%;
+		display: block;
+		text-align: center;
+		font-size: 20px;
+		margin-top: 21px;
+	}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.5/jquery.inputmask.min.js"></script>
+
+<main class="main">
+	<section class="inner">
+		<div class="container inner__container">
+			{% bread_crumb %}
+			<div class="inner-content js-sticky">
+				<div class="inner-content__main">
+					{% for data in list %}
+					<div class="booking-card">
+						<img class="booking-card__img"
+							src="{{data.room.img}}" onerror="this.onerror=null;this.src='/static/img/placeholder-image.png';"
+							style="width: 100%; height: 200px;"></img>
+						<div class="booking-card__body">
+							<div class="booking-info" style="display: flex;flex-direction: column;height: 100%;justify-content: space-around; margin-top: 0;">
+								<div class="booking-info__name">{{data.room.name}}</div>
+								<div class="booking-info__text">{{data.room.text}}</div>
+								<div class="booking-info__name" style="margin-top: 27px; text-align: center; ">Количество: {{data.room.count}}</div>
+							</div>
+						</div>
+						<div class="booking-times"
+							style="padding-right: 20px; width: auto;">
+							<div class="booking-times__item"
+								id="datatime_in">
+								<p class="booking-times__label">Заезд с {{data.hotel.time.in}}</p>
+								<p class="booking-times__date"
+									style="white-space: nowrap;">{{data.date_1|date:"d F Y"}}</p>
+							</div>
+							<div class="booking-times__item"
+								id="datatime_out">
+								<p class="booking-times__label">Выезд до {{data.hotel.time.out}}</p>
+								<p class="booking-times__date"
+									style="white-space: nowrap;">{{data.date_2|date:"d F Y"}}</p>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+					<div class="guest-contacts"
+						style="padding: 30px;">
+						{% csrf_token %}
+						<div class="section">
+							<span class="title">Контактные данные</span>
+							<div class="grupe_input mini_width_flex">
+								<label class="text">
+									<span class="name">Имя*</span>
+									<input type="text"
+										placeholder="Введите Ваше имя"
+										name="name"
+										value="{{user_data.user.username}}"
+										required>
+								</label>
+
+								<label class="text">
+									<span class="name">Фамилия*</span>
+									<input type="text"
+										placeholder="Введите Вашу фамилию"
+										name="lastname"
+										value="{{user_data.user.lastname}}"
+										required>
+								</label>
+
+								<label class="text">
+									<span class="name">Отчество</span>
+									<input type="text"
+										placeholder="Введите Ваше отчество"
+										name="middlename"
+										value="{{user_data.user.middlename}}">
+								</label>
+
+								<label class="text">
+									<span class="name">Почта*</span>
+									<input type="email"
+										placeholder="example@mail.ru"
+										name="email"
+										value="{{user_data.user.email}}"
+										required>
+								</label>
+
+								<label class="text">
+									<span class="name">Телефон для связи*</span>
+									<input type="tel"
+										placeholder="+7 (___) ___-__-__"
+										name="phone"
+										value="{{user_data.user.phone}}"
+										required>
+								</label>
+								<script>
+									$(document).ready(function () {
+										$(`input[type='tel']`).inputmask({"mask": "+7 (999) 999-99-99"});
+									});
+								</script>
+							</div>
+						</div>
+						<div class="br"></div>
+						<div class="guest-bottom"
+							style="padding: 0; margin-top: 15px;">
+							<div class="booking-button button"
+								onclick="post_booking()">Забронировать</div>
+							<div class="privacy">Нажимая «Забронировать», Вы принимаете Правила бронирования.</div>
+						</div>
+					</div>
+				</div>
+				<aside class="inner-content__sidebar">
+					<div class="sidebar-content js-sticky__item">
+						<div class="cost-item">
+							<div class="cost-item__middle">
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Стоимость проживания</div>
+									<div class="cost-total__price"
+										style="font-size: 15px;">{{other_data.prices.room_full}} ₽</div>
+								</div>
+								{% if other_data.prices.hotel > 0 %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Доплата отелю</div>
+									<div class="cost-total__price"
+										style="font-size: 15px;">{{other_data.prices.hotel}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.first_booking_discount %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Скидка первой брони (5%)</div>
+									<div class="cost-total__price"
+										id="prices_site"
+										style="font-size: 15px;">{{other_data.prices.first_booking_discount}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.cleaning %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Цена за уборку (Не включена в стоимость)</div>
+									<div class="cost-total__price"
+										id="prices_site"
+										style="font-size: 15px;">{{other_data.prices.cleaning}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.security_deposit %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Страховой депозит (Не включен в стоимость)</div>
+									<div class="cost-total__price"
+										id="prices_site"
+										style="font-size: 15px;">{{other_data.prices.security_deposit}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.prepayment_for_the_room_before_checkin > 0 %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Предоплата за номер до заселения</div>
+									<div class="cost-total__price"
+										id="prices_site"
+										style="font-size: 15px;">{{other_data.prices.prepayment_for_the_room_before_checkin}} ₽</div>
+								</div>
+								{% endif %}
+
+								<div class="cost-total">
+									<div class="cost-total__name"
+									style="font-size: 16px; background-color: #d9ffd9; padding: 6px; border-radius: 5px; margin-left: -6px;">Сейчас вы платите</div>
+									<div class="cost-total__price"
+										id="prices_site"
+										style="font-size: 15px;">{{other_data.prices.site}} ₽</div>
+								</div>
+							</div>
+							<div class="cost-item__bottom">Из-за сложной эпидемиологической ситуации в мире при регистрации заезда
+								может потребоваться справка, подтверждающая отрицательный результат теста на COVID-19, или сертификат о
+								вакцинации.</div>
+						</div>
+					</div>
+				</aside>
+			</div>
+		</div>
+	</section>
+</main>
+
+<script defer>
+	$("#grupe_card_travel_companions .card.active").click(function () {
+		$(this).toggleClass("select")
+	})
+</script>
+
+<script defer>
+
+
+	ym(94864675,'reachGoal','booking_start_no_auth')
+
+	$.ajaxSetup({
+		headers: {
+			'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+		}
+	});
+
+	function post_booking() {
+		if (window.FormData === undefined) {
+			alert('В вашем браузере FormData не поддерживается')
+		} else {
+
+			if ($("#use_bonus:checked").is(":checked"))
+				value_use_bonus = bonus_slider_value
+			else
+				value_use_bonus = 0
+
+			if ($("#use_balanc:checked").is(":checked"))
+				value_use_balanc = balance_slider_value
+			else
+				value_use_balanc = 0
+
+			form_data = new FormData();
+			form_data.append("name", $("*[name='name']").val());
+			form_data.append("lastname", $("*[name='lastname']").val());
+			form_data.append("middlename", $("*[name='middlename']").val());
+			form_data.append("email", $("*[name='email']").val());
+			form_data.append("phone", $("*[name='phone']").val());
+			form_data.append("value_use_bonus", value_use_bonus);
+			form_data.append("value_use_balanc", value_use_balanc);
+
+			form_data.append("rcs", "{{get_param.rcs}}");
+			form_data.append("adults", "{{get_param.adults}}");
+			form_data.append("date_1", "{{get_param.date_1}}");
+			form_data.append("date_2", "{{get_param.date_2}}");
+			form_data.append("age_c", "{{get_param.age_c}}");
+
+			var travel_companions = $('#grupe_card_travel_companions .card.active.select').map(function () { return $(this).data('id'); }).get();
+			form_data.append("travel_companions", JSON.stringify(travel_companions));
+
+			load_start()
+			$.ajax({
+				method: "POST",
+				data: form_data,
+				contentType: false,
+				processData: false,
+				url: "{% url 'hotel_room_booking_add' %}",
+				success: function (response) {
+					load_end()
+					if (response.status == "reload") {
+						location.reload()
+						ym(94864675,'reachGoal','quick-check-in-when-booking')
+					}
+					else if (response.status == "error" && response.error == "the_user_already_exists") {
+						popup_create("Такой пользователь уже есть", `<p>Войти в аккаунт или напишите в техподдержку</p>`,
+						[
+							{
+								name: "Войти", fun: go_page_login, param: [], type: "action", color: "green", style: "full",
+							},
+							{
+								name: "Закрыть", type: "close", color: "gray", style: "full",
+							}
+						],
+						[],
+						"error")
+					}
+					else if (response.status == "error" && response.error == "no_empty_rooms") {
+						popup_create("Нет свободных номеров", `<p>К сожалению, все номера уже заняты, поэтому мы не можем предоставить вам свободный номер.</p>`, [], [], "error")
+					}
+					else if (response["url"] != "") {
+						openPopup(response["url"], response["button_text"])
+					}
+				},
+			});
+		}
+	}
+	function openPopup(url, button_text) {
+		// Создаем элементы попапа
+		if (button_text == "Оплатить картой") {
+			var popup = $(`<div class="booking_popup_bg">
+			<div class="booking_popup">
+				<span class="title popup-text"
+					style=" font-size: 31px; ">Бронь оформлена</span>
+				<span class="popup-text"
+					style="max-width: 354px;font-size: 20px;text-align: center;">
+					Спасибо за оформление бронирования. Отель получил Ваш запрос. Вы должны доплатить сумму брони через карту, если вы не заплатите в течение 20 минут бронь будет отменена</span>
+				<a href="${url}" style="font-size: 20px;" class="button">${button_text}</a>
+			</div>
+		</div>`);
+		}
+		else {
+			var popup = $(`<div class="booking_popup_bg">
+			<div class="booking_popup">
+				<span class="title popup-text"
+					style=" font-size: 31px; ">Бронь оформлена</span>
+				<span class="popup-text"
+					style="max-width: 354px;font-size: 20px;text-align: center;">
+					Спасибо за оформление бронирования. Отель получил Ваш запрос. Вам ответят в чате и придет уведомление о подтверждении</span>
+				<a href="${url}" style="font-size: 20px;" class="button">${button_text}</a>
+			</div>
+		</div>`);
+		}
+
+		$("body").append(`<div class="overlay_popup"></div>`);
+		$("body").append(popup);
+
+		// Обработчик нажатия на кнопку закрытия
+		closeButton.click(function () {
+			popup.remove();
+		});
+	}
+</script>
+
+{% endblock content %}

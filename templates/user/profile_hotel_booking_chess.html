@@ -1,0 +1,323 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static cards %}
+{% block main_block %}
+
+<link rel="stylesheet" href="{% static 'css/chees.css' %}">
+
+<div id="calendar-table_parent">
+  {{html}}
+</div>
+
+
+<script defer>
+  function restart_sript() {
+    $('.booking_block').click(function (event) {
+      event.stopPropagation();
+      var bookingId = $(this).data('id');
+      var info_booking = $(`.info_booking[data-id="${bookingId}]`);
+      info_booking.show();
+      info_booking.offset({ top: event.pageY, left: event.pageX });
+      $('.info_booking').not(info_booking).hide();
+    });
+
+    $(document).click(function (event) {
+      if (!$('.info_booking').is(event.target) && $('.info_booking').has(event.target).length === 0) {
+        $('.info_booking').hide();
+      }
+    });
+
+    $(document).ready(function () {
+      let $input = $('.input_search');  // получаем инпут по классу input_search
+      let highlightColor = 'yellow';
+
+      $input.on('input', function () {
+        let inputValue = $input.val().toLowerCase();  // приводим введенный текст к нижнему регистру
+        if (inputValue) {
+          $('.calendar-table, .calendar-table *').highlight(inputValue, { caseSensitive: false, color: highlightColor });  // указываем caseSensitive: false для игнорирования регистра
+        } else {
+          $('.' + highlightColor).unhighlight();
+        }
+      });
+    });
+
+    date_ajax = {
+      visibility_days: $("#visibility_days_select").val(),
+      date_start: $("#date_start_input").val(),
+    }
+
+    currentDate = new Date($('#date_start_input').val());
+
+    $('#rc_input').change(function () {
+      date_ajax["rc"] = $(this).val()
+    });
+
+    let isMouseDown = false;
+    let startCell, endCell;
+    let rcCell;
+
+    $('.booking.dayon td').addClass('unselectable');
+
+    $('.booking.dayon').not(".booking_block").mousedown(function (e) {
+      e.preventDefault();
+      isMouseDown = true;
+      startCell = this;
+      rc_roomsCell = $(this).parent("tr").data("id")
+      return false; // prevent text selection
+    }).mouseover(function () {
+      if (!isMouseDown) return;
+      rc_rooms = $(this).parent("tr").data("id")
+      console.log(rc_rooms)
+      if (rc_rooms == rc_roomsCell) {
+        endCell = this;
+      }
+      $(".highlighted_cell").removeClass("highlighted_cell")
+      $(startCell).nextUntil(endCell).addBack().addClass("highlighted_cell");
+      $(endCell).addClass("highlighted_cell");
+    })
+      .bind('selectstart', function () {
+        e.preventDefault();
+      });
+
+    $(".booking.dayon").mouseup(function () {
+      isMouseDown = false;
+      let cells = $('.highlighted_cell');
+
+      let c_d_1 = cells.first().attr('data-date')
+      let c_d_2 = cells.last().attr('data-date')
+
+      let firstDate = new Date(c_d_1).toLocaleDateString('ru-RU');
+      let lastDate = new Date(c_d_2).toLocaleDateString('ru-RU');
+
+      $(".popup_new_close").show()
+      $(".popup_new_close input[name='start-date']").val(c_d_1)
+      $(".popup_new_close input[name='end-date']").val(c_d_2)
+      $(".popup_new_close input[name='room-id']").val(rc_roomsCell)
+
+      $(".booking.dayon.highlighted_cell").removeClass('highlighted_cell');
+    });
+
+    var months = [];
+    $('.month').each(function () {
+      var monthYear = $(this).attr('data-month-year');
+      var index = months.findIndex(m => m.monthYear == monthYear);
+      if (index < 0) {
+        months.push({
+          count: 1,
+          monthYear: monthYear
+        });
+      } else {
+        months[index].count++;
+      }
+    });
+
+
+    months.forEach(function (m) {
+      $(`.month[data-month-year='${m["monthYear"]}']`).attr("colspan", m["count"])
+      $(`.month[data-month-year='${m["monthYear"]}']`).slice(1).remove()
+    })
+
+
+    $('#rc_input').change(function () {
+      var selectedID = $(this).val();
+      $('.room_booking').hide();
+      $('.booking_block').hide();
+      if (selectedID == "all") {
+        $('.booking_block').show();
+        $('.room_booking').show();
+      }
+      else {
+        $('.room_booking[data-rc-id="' + selectedID + '"]').show();
+        $('.booking_block[data-rc-id="' + selectedID + '"]').show();
+      }
+    });
+
+
+    $(window).on('load', function () {
+      set_bookings()
+    });
+
+    $('.booking_block').click(function (event) {
+      event.stopPropagation();
+      var bookingId = $(this).data('id');
+      var status = $(this).data('status');
+      if (status == "close") {
+        let c_d_1 = $(this).attr('data-start-date')
+        let c_d_2 = $(this).attr('data-end-date')
+        let room = $(this).attr('data-room')
+
+        let firstDate = new Date(c_d_1).toLocaleDateString('ru-RU');
+        let lastDate = new Date(c_d_2).toLocaleDateString('ru-RU');
+
+        $(".popup_new_close").show()
+        $(".popup_new_close input[name='start-date']").val(c_d_1)
+        $(".popup_new_close input[name='end-date']").val(c_d_2)
+        $(".popup_new_close input[name='room-id']").val(room)
+        $(".popup_new_close input[name='room-id']").val(room)
+
+        console.log({
+          "start-date": c_d_1,
+          "end-date": c_d_2,
+          "room": room,
+        });
+
+        $(".booking.dayon.highlighted_cell").removeClass('highlighted_cell');
+      }
+      var info_booking = $('.info_booking[data-id="' + bookingId + '"]');
+      info_booking.show();
+      info_booking.offset({ top: event.pageY, left: event.pageX });
+      $('.info_booking').not(info_booking).hide();
+    });
+
+    $(document).click(function (event) {
+      if (!$('.info_booking').is(event.target) && $('.info_booking').has(event.target).length === 0) {
+        $('.info_booking').hide();
+      }
+    });
+
+    set_bookings()
+    startGenNavTable()
+  }
+
+  function changeDate(date, days) {
+    date.setDate(date.getDate() + days);
+    $('#date_start_input').val(date.toISOString().split('T')[0]);
+    date_ajax["date_start"] = $("#date_start_input").val()
+    post_ajax_fillter()
+  }
+
+  function startGenNavTable() {
+    let currentDate = new Date($('#date_start_input').val());
+    $('#visibility_days_select').change(function () {
+      date_ajax["visibility_days"] = $(this).val()
+      post_ajax_fillter()
+    });
+
+    $('#arrors_label .prev7').click(function () {
+      changeDate(currentDate, -7)
+    });
+
+    $('#arrors_label .prev30').click(function () {
+      changeDate(currentDate, -30)
+    });
+
+    $('#arrors_label .next7').click(function () {
+      changeDate(currentDate, 7)
+    });
+
+    $('#arrors_label .next30').click(function () {
+      changeDate(currentDate, 30)
+    });
+
+    $('#date_start_input').change(function () {
+      date_ajax["date_start"] = $('#date_start_input').val()
+      post_ajax_fillter()
+    });
+
+    $('#input_date_label .input_date_today').click(function () {
+      to_day = new Date().toISOString().slice(0, 10)
+      $('#date_start_input').val(to_day);
+      date_ajax["date_start"] = to_day
+      post_ajax_fillter()
+    });
+  }
+
+  function post_ajax_fillter() {
+    let csrftoken = getCookie('csrftoken');
+    $.ajax({
+      method: "POST",
+      data: date_ajax,
+      url: "{% url 'form_hotel_booking_chess' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (response) {
+        console.log(response)
+        $("#calendar-table_parent").html(response.html)
+        set_bookings()
+        startGenNavTable()
+        restart_sript()
+      }
+    });
+  }
+
+  function closeRoom() {
+    let id = $(".popup_new_close #popup-room-id").val()
+    let start_date = $(".popup_new_close #popup-start-date").val()
+    let end_date = $(".popup_new_close #popup-end-date").val()
+    let status = $(`.popup_new_close input[name='status']:checked`).val();
+
+    date_closeRoom = {
+      "id": id,
+      "start_date": start_date,
+      "end_date": end_date,
+      "status": status,
+    }
+
+    $.ajax({
+      method: "POST",
+      data: date_closeRoom,
+      url: "{% url 'form_open_or_close_booking' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (response) {
+        location.reload()
+      }
+    });
+  }
+
+  function set_bookings() {
+    const bookings = $('.booking_block');
+    ths_w = 0
+    $(".header_day").map(function () { ths_w += $(this).width() });
+    const cell_width = (ths_w / $(".header_day").length) * 1.050932882878138
+    const cell_height = 24
+    const cell_start_left = $(".room_booking .room_name").first().width()
+
+    console.log("cell", {
+      "cell_start_left": cell_start_left,
+      "cell_width": cell_width,
+    });
+
+    $(bookings).each(function () {
+      let start_day = parseInt($(this).data("start"));
+      let end_day = parseInt($(this).data("end"));
+      let diff_day = parseInt($(this).data("diff"));
+      let id_room = parseInt($(this).data("room"));
+      let status = $(this).data("status");
+
+      let isсropped = false
+
+      let start_px = start_day * cell_width + 10
+      let end_px = start_day * cell_width
+      let deff_px = diff_day * cell_width
+
+      if (status == "close") {
+        deff_px = (diff_day + 1) * cell_width
+      }
+
+      $(this).css("position", "absolute")
+      $(this).css("width", `${deff_px}px`);
+
+      $(this).css("height", `${cell_height}px`);
+      $(this).css("left", `${cell_start_left + start_px}px`);
+
+
+      console.dir({
+        "start": { "day": start_day, "px": start_px },
+        "end": { "day": end_day, "px": end_px },
+        "width": { "day": diff_day, "px": deff_px },
+        "left": { "cell_start_left": cell_start_left },
+        "id_room": id_room,
+        "isсropped": isсropped,
+      }, { depth: null });
+    });
+  }
+
+  $(window).on('load', function() {
+    restart_sript()
+    post_ajax_fillter()
+  });
+
+</script>
+{% endblock main_block %}

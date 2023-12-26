@@ -1,0 +1,914 @@
+{% extends 'user/v2/base.html' %}
+{% load cards menu form %}
+{% block main_block %}
+  <style>
+    .beds_label {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .beds_label .name {
+      margin-top: 2px;
+    }
+
+    .beds_label .input_span {
+      min-height: 45px;
+      width: 100%;
+      border: 1px solid #d2d2d2;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding-left: 14px;
+      justify-content: space-between;
+    }
+
+    .beds_label input {
+      border: none;
+      text-align: center;
+      height: 100%;
+      border-left: 1px solid #d2d2d2;
+      width: 42px;
+      background: transparent;
+    }
+  </style>
+
+  <style>
+    .record_card {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .record_card .icon {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .record_card > .params {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .record_card > .params > .name {
+      color: #000;
+      max-width: 277px;
+      font-size: 18px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .record_card > .params > .name .price_base {
+      display: none;
+    }
+
+    .record_card > .params > .param > span {
+      color: #898989;
+      font-size: 18px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .record_card > .params > .param {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      margin: 0 30px;
+      gap: 10px;
+    }
+
+    .record_card > .buttons {
+      display: flex;
+      gap: 5px;
+    }
+
+    .record_card > .buttons > .item {
+      background: #42cc36;
+      padding: 19px 8px;
+      border-radius: 9px;
+      color: white;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 1026px) {
+      .record_card {
+        display: flex;
+        gap: 7px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .record_card > .buttons > .item {
+        flex-grow: 1;
+        background: #42cc36;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+      }
+    }
+
+    @media screen and (max-width: 720px) {
+      .record_card {
+        display: flex;
+        gap: 7px;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 5px;
+      }
+
+      .record_card > .buttons > .item {
+        flex-grow: 1;
+        background: #42cc36;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+      }
+
+      .record_card > .params > .param {
+        display: none;
+      }
+
+      .record_card > .params > .name {
+        font-size: 14px;
+      }
+
+      .record_card > .params > .name .price_base {
+        display: flex;
+        flex-direction: column;
+        color: #898989;
+      }
+    }
+
+    @media screen and (max-width: 500px) {
+      .record_card > .buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+
+  <style>
+    .grupe_input .checkbox_text_value {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      height: 45px;
+    }
+
+    .grupe_input .fake-checkbox {
+      /* CSS styles for the fake checkbox */
+      border: 1px solid #ccc;
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      cursor: pointer;
+      background-color: white; /* Add this line to make the checkbox white */
+      position: relative;
+
+      display: flex;
+      flex-shrink: 0;
+    }
+
+    .grupe_input .checkbox_text_value.selected .fake-checkbox {
+      background-color: #fc7201;
+      border-color: #fc7201;
+    }
+
+    .grupe_input .checkbox_text_value.selected .fake-checkbox::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 2.5px;
+      width: 13px;
+      height: 7px;
+      border: 3px solid #fff;
+      border-top: none;
+      border-right: none;
+      transform: rotate(309deg);
+    }
+
+    .grupe_input .checkbox_text_value .name {
+      color: #acacac;
+      flex-shrink: 0;
+    }
+
+    .grupe_input .checkbox_text_value input {
+      height: 45px;
+      width: 100%;
+      border: 1px solid #d2d2d2;
+      border-radius: 5px;
+      display: none;
+      align-items: center;
+      padding-left: 14px;
+      padding-right: 14px;
+      flex-grow: 1;
+    }
+
+    .grupe_input .checkbox_text_value.selected .name {
+      color: black;
+    }
+
+    .grupe_input .checkbox_text_value.selected input {
+      display: flex;
+    }
+  </style>
+
+  <style>
+    .grupe_input .input_with_button {
+      flex-direction: row;
+      height: 45px;
+      border: 1px solid #d2d2d2;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .grupe_input .input_with_button_cont {
+      padding-right: 5px;
+      padding-left: 5px;
+    }
+
+    .grupe_input .input_with_button input {
+      background: transparent;
+      border: none;
+      padding-left: 10px;
+      flex-grow: 1;
+    }
+
+    .grupe_input .input_with_button .buttons {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .grupe_input .input_with_button .buttons .item {
+      color: white;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .grupe_input .input_with_button .buttons .item.red {
+      background: #ff5353;
+    }
+
+    .grupe_input .input_with_button .buttons .item.green {
+      background: #42cc36;
+    }
+
+    .grupe_input .input_with_button .buttons .item:last-child {
+      border-radius: 0 5px 5px 0;
+    }
+  </style>
+
+  <script>
+    $(document).ready(function () {
+      $('.fake-checkbox').click(function () {
+        if ($(this).parent().hasClass('selected')) {
+          $(this).parent().removeClass('selected')
+          $(this).parent().find('input').prop('disabled', true)
+        } else {
+          $(this).parent().addClass('selected')
+          $(this).parent().find('input').prop('disabled', false).focus()
+        }
+      })
+    })
+  </script>
+
+  <style>
+    .button_nav_section .item {
+      padding: 5px;
+      background: #fff;
+      filter: drop-shadow(0px 0px 18px #d9d9d9);
+      color: #868695;
+      font-family: Manrope;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 19px;
+      border-radius: 5px;
+      text-decoration-line: underline !important;
+    }
+
+    .button_nav_section .item.active {
+      color: #fff;
+      background: #fc7201;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-12 p-1 d-flex d-lg-none">
+      <div class="block_card icontext" style="background: linear-gradient(90deg, #7BF8F8 1.08%, #F9CCA8 81.21%); padding: 14px; min-height: 0; width: 100%;">
+        <div class="body_block_card" style=" display: flex; flex-direction: row-reverse; justify-content: space-between; ">
+          <div class="icon border-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="39" height="30" viewBox="0 0 39 30" fill="none">
+              <g clip-path="url(#clip0_0_354)">
+                <path d="M36.1187 30H2.98C2.19149 29.9948 1.43674 29.6793 0.87905 29.1218C0.321359 28.5644 0.00556802 27.8098 0 27.0213L0 8.42375C0.0052372 7.63524 0.320711 6.88049 0.878168 6.3228C1.43563 5.76511 2.19024 5.44932 2.97875 5.44375H36.1187C36.9073 5.44899 37.662 5.76446 38.2197 6.32192C38.7774 6.87938 39.0932 7.63399 39.0987 8.4225V27.0238C39.0987 27.4146 39.0218 27.8016 38.8722 28.1627C38.7226 28.5238 38.5034 28.8519 38.227 29.1283C37.9507 29.4046 37.6226 29.6239 37.2615 29.7734C36.9004 29.923 36.5133 30 36.1225 30H36.1187ZM2.98 7.43125H2.97125C2.71034 7.43125 2.46012 7.53489 2.27563 7.71938C2.09114 7.90387 1.9875 8.15409 1.9875 8.415V27.0338C1.9875 27.5775 2.4275 28.0175 2.97125 28.0175H36.1287C36.3897 28.0175 36.6399 27.9139 36.8244 27.7294C37.0089 27.5449 37.1125 27.2947 37.1125 27.0338V8.415C37.1125 8.15409 37.0089 7.90387 36.8244 7.71938C36.6399 7.53489 36.3897 7.43125 36.1287 7.43125H36.1187H2.98ZM28.3312 2.38375V2.38875C28.3312 2.67187 28.2188 2.94339 28.0186 3.14359C27.8184 3.34378 27.5469 3.45625 27.2637 3.45625H11.8375C11.5544 3.45625 11.2829 3.34378 11.0827 3.14359C10.8825 2.94339 10.77 2.67187 10.77 2.38875V2.37875C10.77 1.78875 11.2487 1.31125 11.8375 1.31125H27.2587C27.5391 1.32347 27.8046 1.44022 28.0031 1.6385C28.2016 1.83677 28.3187 2.10346 28.3312 2.38375ZM32.0662 3.17875V3.19625C32.0662 4.08625 31.345 4.8075 30.455 4.8075H30.4362H30.42C30.2084 4.8075 29.9989 4.76582 29.8034 4.68485C29.6079 4.60388 29.4303 4.48519 29.2807 4.33558C29.1311 4.18596 29.0124 4.00833 28.9314 3.81285C28.8504 3.61736 28.8087 3.40784 28.8087 3.19625V3.1775V1.61125C28.8087 0.72125 29.53 0 30.42 0H30.4387H30.455C31.345 0 32.0662 0.72125 32.0662 1.61125V1.63V1.62875V3.17875ZM10.2912 3.17875V3.19625C10.2912 4.08625 9.57 4.8075 8.68 4.8075H8.66125H8.645C8.21767 4.8075 7.80784 4.63774 7.50567 4.33558C7.20351 4.03341 7.03375 3.62358 7.03375 3.19625V3.1775V1.61125C7.03375 0.72125 7.755 0 8.645 0H8.66375H8.6625H8.68C9.57 0 10.2912 0.72125 10.2912 1.61125V1.63V1.62875V3.17875ZM37.2725 2.38375V2.38875C37.2725 2.67187 37.16 2.94339 36.9598 3.14359C36.7596 3.34378 36.4881 3.45625 36.205 3.45625H33.5337C33.2506 3.45625 32.9791 3.34378 32.7789 3.14359C32.5787 2.94339 32.4662 2.67187 32.4662 2.38875V2.37875C32.4662 1.78875 32.945 1.31125 33.5337 1.31125H36.2C36.4803 1.32347 36.7459 1.44022 36.9444 1.6385C37.1429 1.83677 37.26 2.10346 37.2725 2.38375ZM6.59625 2.38375V2.38875C6.59625 2.67187 6.48378 2.94339 6.28359 3.14359C6.08339 3.34378 5.81187 3.45625 5.52875 3.45625H2.89625C2.61313 3.45625 2.34161 3.34378 2.14141 3.14359C1.94122 2.94339 1.82875 2.67187 1.82875 2.38875V2.37875C1.82875 1.78875 2.3075 1.31125 2.89625 1.31125H5.5625C5.83881 1.32492 6.0995 1.44351 6.29137 1.64281C6.48324 1.84211 6.59309 2.10712 6.59625 2.38375Z" fill="#FC7201"></path>
+                <path d="M7.07254 18.1977V20.6977H9.49629V18.1977H10.9663V24.7152H9.49629V21.9727H7.07254V24.7152H5.60254V18.1977H7.07254ZM18.2388 21.379C18.2841 21.8157 18.2372 22.257 18.1012 22.6745C17.9651 23.0919 17.7428 23.4761 17.4488 23.8021C17.1548 24.1282 16.7956 24.3889 16.3944 24.5673C15.9932 24.7457 15.5591 24.8378 15.12 24.8377L15.0138 24.8365H15.0188H14.9825C14.5571 24.8367 14.1363 24.7475 13.7475 24.5746C13.3588 24.4018 13.0106 24.1493 12.7257 23.8333C12.4407 23.5174 12.2253 23.1451 12.0934 22.7406C11.9615 22.3361 11.9161 21.9084 11.96 21.4852L11.9588 21.4977C11.9221 21.0628 11.9761 20.625 12.1174 20.212C12.2587 19.799 12.4841 19.4198 12.7795 19.0985C13.0749 18.7771 13.4338 18.5206 13.8334 18.3451C14.2331 18.1696 14.6648 18.079 15.1013 18.079H15.14H15.1375L15.2138 18.0777C15.6357 18.0777 16.053 18.1657 16.439 18.336C16.825 18.5064 17.1713 18.7554 17.4556 19.0671C17.7399 19.3788 17.9561 19.7465 18.0903 20.1465C18.2245 20.5465 18.2738 20.9701 18.235 21.3902L18.2363 21.379H18.2388ZM13.55 21.4577C13.55 22.7302 14.15 23.6427 15.1388 23.6427C16.1275 23.6427 16.6888 22.689 16.6888 21.4177C16.6888 20.2252 16.1325 19.2327 15.1 19.2327C14.1075 19.2302 13.55 20.1852 13.55 21.4552V21.4577ZM20.225 19.4302H18.4775V18.1977H23.485V19.4302H21.6975V24.7152H20.2275L20.225 19.4302ZM28.1325 21.9327H25.7488V23.4827H28.4488V24.6752H24.2388V18.1977H28.2513V19.3902H25.7088V20.7415H28.0925V21.934L28.1325 21.9327ZM29.4438 18.1977H30.9138V23.4827H33.4963V24.7152H29.4438V18.1977ZM19.55 14.0277L17.4038 15.184L17.8038 12.8002L16.0925 11.084L18.4763 10.7265L19.5488 8.58398L20.6213 10.7302L23.005 11.0877L21.2963 12.7965L21.6963 15.1802L19.55 14.0277ZM26.98 14.304L25.3513 15.1777L25.6688 13.3502L24.3563 12.079L26.1438 11.8415L26.9775 10.1727L27.7725 11.8415L29.6 12.079L28.2888 13.3515L28.5663 15.179L26.98 14.304ZM31.7075 14.6227L30.635 15.179L30.835 13.9865L29.9613 13.1527L31.1538 12.9527L31.71 11.8802L32.2275 12.9527L33.42 13.1527L32.5863 13.9865L32.7863 15.179L31.7075 14.6227ZM12.1588 14.304L13.7475 15.1777L13.43 13.3502L14.7413 12.0777L12.9538 11.8402L12.16 10.1727L11.3263 11.8415L9.53754 12.079L10.8488 13.3515L10.5313 15.179L12.1588 14.304ZM7.39129 14.6227L8.46379 15.179L8.26379 13.9865L9.13754 13.1527L7.94504 12.9527L7.39004 11.8802L6.87254 12.9527L5.68004 13.1527L6.55379 13.9865L6.35379 15.179L7.39129 14.6227Z" fill="#FC7201"></path>
+              </g>
+              <defs>
+                <clipPath id="clip0_0_354">
+                  <rect width="38.75" height="30" fill="white"></rect>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <span class="title">Управление объектом размещения</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="button_nav_section d-flex d-lg-none gap-2 flex-wrap my-2">
+    <a href="{% url 'profile_v2_hotel_edit' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_edit' %}active{% endif %}">Объект</a>
+    <a href="{% url 'profile_v2_hotel_rooms' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_rooms' %}active{% endif %}">Управление номерами</a>
+    <a href="{% url 'profile_v2_hotel_price_calendar' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_price_calendar' %}active{% endif %}">Календарь цен</a>
+  </div>
+
+  {% hotel_shift_tab %}
+
+  <div class="section_title" style="  margin-bottom: 28px; ">Управления номерами</div>
+
+  <section class="grupe_cards" style="margin-bottom: 25px;">
+    {% for rc in rcs %}
+      <section class="row_crads">
+        <div class="block_card record_card" data-id="{{ rc.id }}">
+          <section class="params">
+            <img class="icon" src="{{ rc.img }}" alt="" />
+            <span class="name">
+              <span class="name">{{ rc.name }}</span>
+              <span class="price_base">{{ rc.price_base }} ₽</span>
+            </span>
+            <div class="param">
+              <span class="price_base">{{ rc.price_base }} ₽</span>
+              <span class="max_adults">Вместимость: {{ rc.max_adults }}</span>
+            </div>
+          </section>
+          <div class="buttons">
+            {% comment %} <div class="item" style="background: #42CC36;">Дублировать</div> {% endcomment %}
+
+            {% if rc.enable %}
+              <div class="item d-none" style="background: #ff9d9d;" long-press data-param="{{ rc.id }}" data-orig-color="#ff9d9d" data-gradient-color="#ff6666" data-max-time="2" data-funcName="switch_on_off" data-state="on">Выключить</div>
+              <div class="item" style="background: #8fbd96;" long-press data-param="{{ rc.id }}" data-orig-color="#8fbd96" data-gradient-color="#1def3f" data-max-time="2" data-funcName="switch_on_off" data-state="off">Включить</div>
+            {% else %}
+              <div class="item" style="background: #ff9d9d;" long-press data-param="{{ rc.id }}" data-orig-color="#ff9d9d" data-gradient-color="#ff6666" data-max-time="2" data-funcName="switch_on_off" data-state="on">Выключить</div>
+              <div class="item d-none" style="background: #8fbd96;" long-press data-param="{{ rc.id }}" data-orig-color="#8fbd96" data-gradient-color="#1def3f" data-max-time="2" data-funcName="switch_on_off" data-state="off">Включить</div>
+            {% endif %}
+            <div class="item edit_room_button" style="background: #6572ED;">Изменить</div>
+            <div class="item" style="background: #a99191;" long-press data-param="{{ rc.id }}" data-orig-color="#a99191" data-gradient-color="#FF5353" data-max-time="1" data-funcName="remove_room">Удалить</div>
+          </div>
+        </div>
+      </section>
+    {% endfor %}
+
+    <section class="row_crads">
+      <div class="block_card record_card clickable" data-id="new">
+        <span class="title">Добавить новый номер</span>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_room">
+      <div class="block_card form_card">
+        <div class="section_title">Основная информация</div>
+        <div class="grupe_input row">
+          <label class="text col-sm-12 col-md-6" for="">
+            <span class="name">Название*</span>
+            <input type="text" placeholder="" name="name" value="" required="" autocomplete="off" />
+          </label>
+
+          <label class="text col-sm-12 col-md-6" id="label_offer_type">
+            <span class="name">Тип*</span>
+            <select name="offer_type" required="">
+              <option value="number">Номер</option>
+
+              <option value="place_in_the_room">Место в номере</option>
+
+              <option value="atelier">Студия</option>
+
+              <option value="flat">Квартира</option>
+
+              <option value="apartments">Апартаменты</option>
+
+              <option value="house">Дом</option>
+
+              <option value="cottage">Коттедж</option>
+
+              <option value="villa">Вилла</option>
+            </select>
+          </label>
+
+          <label class="text col-sm-12 col-md-4" for="">
+            <span class="name">Площадь м2*</span>
+            <input type="text" placeholder="Площадь номера" name="square" value="" required="" autocomplete="off" />
+          </label>
+
+          <label class="text col-sm-12 col-md-4" for="">
+            <span class="name">Количество гостей*</span>
+            <input type="text" placeholder="Количество гостей" name="max_adults" value="" required="" autocomplete="off" />
+          </label>
+
+          <label class="text col-sm-12 col-md-4" for="">
+            <span class="name">Базовая цена за сутки*</span>
+            <input type="text" placeholder="Базовая цена за сутки" name="price_base" value="" required="" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_room">
+      <div class="block_card form_card">
+        <div class="section_title">Кровати</div>
+        <div class="grupe_input row">
+          <div class="label text beds_label">
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="bed_1">
+              <span>Односпальная</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="bed_2">
+              <span>Двухспальная</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="bed_1.5">
+              <span>Полутороспальная</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="sofa_1">
+              <span>Софа</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="two_tier">
+              <span>Двух-ярусная</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="sofa_2">
+              <span>Диван</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="armchair">
+              <span>Кресло</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="baby_bed">
+              <span>Детская кровать</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+
+            <div class="input_span col-sm-12 col-md-4" data-type-bed="baby_cradle">
+              <span>Детская люлька</span>
+              <input type="text" placeholder="0" name="beds" value="0" min="0" max="999" required="" />
+            </div>
+
+            <div class="disctiption">
+              Детская кровать от 2 до 6 лет<br />
+              Детская люлька от 3 мес. до 2 лет.<br />
+              ? - дети до 2х лет не считаются за 1 гостя
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_room">
+      <div class="block_card form_card">
+        <div class="section_title">Дополнительная информация</div>
+        <div class="grupe_input row">
+          <label class="text col-sm-12 col-md-4" for="">
+            <span class="name">Площадь м2*</span>
+            <input type="text" placeholder="Площадь номера" name="square" value="" required="" autocomplete="off" />
+          </label>
+          <label class="text col-sm-12 col-md-4" for="">
+            <span class="name">Количество комнат*</span>
+            <input type="text" placeholder="Количество комнат" name="count_room" value="" required="" autocomplete="off" />
+          </label>
+
+          <label class="text col-sm-12 col-md-4" for="">
+            <span class="name">Количество спален*</span>
+            <input type="text" placeholder="Количество спален" name="count_bedrooms" value="" required="" autocomplete="off" />
+          </label>
+
+          <label class="text col-sm-12 col-md-4" style="width: 100%;" for="">
+            <span class="name">Описание</span>
+            <textarea name="description_of_the_room" style="height: 100px; padding: 14px; resize: vertical; box-sizing:border-box;" autocomplete="off" placeholder="Описание номера"></textarea>
+          </label>
+
+          <label class="text col-sm-12 col-md-6" for="">
+            <span class="name">Минимум дней*</span>
+            <input type="text" placeholder="Минимум дней проживания" name="min_days" value="" required="" autocomplete="off" />
+          </label>
+
+          <label class="text col-sm-12 col-md-6">
+            <span class="name">Размер страхового депозита*</span>
+            <input type="number" name="the_amount_of_the_security_deposit" value="" autocomplete="off" required="" placeholder="Размер страхового депозита" />
+          </label>
+
+          <label class="text col-12" for="">
+            <span class="name">Предоплата за номер до заселения* (Укажите % от полной стоимости проживания)</span>
+            <input type="text" placeholder="45" name="prepayment_for_the_room_before_checkin" value="0" required="" autocomplete="off" />
+          </label>
+
+
+          <div class="disctiption">
+            Если вы не берете предоплату, то по статистике на 50%  увеличивается количество желающих забронировать у вас номер<br>
+          </div>
+
+
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_room">
+      <div class="block_card form_card">
+        <div class="section_title">Услуги</div>
+        <div class="grupe_input row">
+          <label class="checkradion" id="label_rservice">
+            <section class="row">
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="1" />
+                <span class="name">VIP-удобства в номере</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="2" />
+                <span class="name">Кабельное телевидение</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="3" />
+                <span class="name">Люкс для новобрачных</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="4" />
+                <span class="name">Музыкальный центр</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="5" />
+                <span class="name">Номера для аллергиков</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="6" />
+                <span class="name">Номера для курящих</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="7" />
+                <span class="name">Номера для некурящих</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="8" />
+                <span class="name">Обслуживание номеров</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="10" />
+                <span class="name">Семейные номера</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="11" />
+                <span class="name">Телевизор</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="12" />
+                <span class="name">Холодильник</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="13" />
+                <span class="name">Москитная сетка</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="14" />
+                <span class="name">Номера со звукоизоляцией</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="15" />
+                <span class="name">Мини-бар</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="16" />
+                <span class="name">Туалетные принадлежности</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="17" />
+                <span class="name">Халат</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="18" />
+                <span class="name">Запирающийся шкафчик</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="19" />
+                <span class="name">DVD-плеер</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="20" />
+                <span class="name">Пресс для брюк</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="22" />
+                <span class="name">Бутилированная вода</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="23" />
+                <span class="name">Ванна</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="24" />
+                <span class="name">Гладильные принадлежности</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="25" />
+                <span class="name">Душ</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="26" />
+                <span class="name">Затемнённые шторы</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="27" />
+                <span class="name">Кондиционер</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="28" />
+                <span class="name">Меню подушек</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="29" />
+                <span class="name">Микроволновка</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="30" />
+                <span class="name">Отопление</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="31" />
+                <span class="name">Патио</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="32" />
+                <span class="name">Письменный стол</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="33" />
+                <span class="name">Постельное бельё</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="34" />
+                <span class="name">Сейф в номере</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="35" />
+                <span class="name">Собственная ванная комната</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="36" />
+                <span class="name">Тапочки</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="37" />
+                <span class="name">Телефон</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="38" />
+                <span class="name">Фен</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="39" />
+                <span class="name">Чайник</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="40" />
+                <span class="name">Чайник или кофеварка</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="41" />
+                <span class="name">Шкаф</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="42" />
+                <span class="name">Кухня</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="43" />
+                <span class="name">Вид из окна</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="44" />
+                <span class="name">Компьютер</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="45" />
+                <span class="name">Посудомоечная машина</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="46" />
+                <span class="name">Стиральная машина</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="47" />
+                <span class="name">Сушилка</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="48" />
+                <span class="name">Утюг</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="49" />
+                <span class="name">Джакузи</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="50" />
+                <span class="name">Бесплатный чай/кофе</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="51" />
+                <span class="name">Предоставляется люлька</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="52" />
+                <span class="name">Не предоставляется люлька</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="53" />
+                <span class="name">Бесплатный Wi-Fi</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="54" />
+                <span class="name">Бесплатный доступ в интернет</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="55" />
+                <span class="name">Доступ в интернет</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="56" />
+                <span class="name">Wi-Fi</span>
+              </label>
+
+              <label class="col-sm-12 col-lg-6 col-xl-4 col-xxl-3">
+                <input type="checkbox" name="rservice" autocomplete="" value="57" />
+                <span class="name">Балкон</span>
+              </label>
+            </section>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_room">
+      <div class="block_card form_card">
+        <div class="section_title">Тарифы</div>
+        <div class="grupe_input row">
+          <label class="checkbox_text_value" for="">
+            <div class="fake-checkbox"></div>
+            <span class="name">Завтрак, обед, ужин (₽)</span>
+            <input type="number" min="0" placeholder="" name="food_rate_breakfast_lunch_dinner" value="0" required="" autocomplete="off" />
+          </label>
+
+          <label class="checkbox_text_value" for="">
+            <div class="fake-checkbox"></div>
+            <span class="name">Завтрак, обед (₽)</span>
+            <input type="number" min="0" placeholder="" name="food_rate_breakfast_lunch" value="0" required="" autocomplete="off" />
+          </label>
+
+          <label class="checkbox_text_value" for="">
+            <div class="fake-checkbox"></div>
+            <span class="name">Завтрак, ужин (₽)</span>
+            <input type="number" min="0" placeholder="" name="food_rate_breakfast_dinner" value="0" required="" autocomplete="off" />
+          </label>
+
+          <label class="checkbox_text_value" for="">
+            <div class="fake-checkbox"></div>
+            <span class="name">Обед, ужин (₽)</span>
+            <input type="number" min="0" placeholder="" name="food_rate_lunch_dinner" value="0" required="" autocomplete="off" />
+          </label>
+
+          <label class="checkbox_text_value" for="">
+            <div class="fake-checkbox"></div>
+            <span class="name">Завтрак (₽)</span>
+            <input type="number" min="0" placeholder="" name="food_rate_breakfast" value="0" required="" autocomplete="off" />
+          </label>
+
+          <label class="checkbox_text_value" for="">
+            <div class="fake-checkbox"></div>
+            <span class="name">Обед (₽)</span>
+            <input type="number" min="0" placeholder="" name="food_rate_lunch" value="0" required="" autocomplete="off" />
+          </label>
+
+          <label class="checkbox_text_value" for="">
+            <div class="fake-checkbox"></div>
+            <span class="name">Ужин (₽)</span>
+            <input type="number" min="0" placeholder="" name="food_rate_dinner" value="0" required="" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_room">
+      <div class="block_card form_card">
+        <div class="section_title">Фото номера</div>
+        <div class="grupe_input">
+          {% input_file 'many' 'Фото' 'photo_room' '' 0 20 True False 'Перетаскивайте изображения, чтобы изменить порядок' %}
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_room">
+      <div class="block_card form_card">
+        <div class="section_title">Однотипные номера* <span style="font-weight: 400;">(Добавьте количество одинаковых однотипных номеров. Обязательно для заполнения)</span></div>
+        <div class="grupe_input row" id="the_same_type_of_numbers"></div>
+      </div>
+    </section>
+
+    <section class="row p-1 p-xl-2 d-none" data-section="edit_room">
+      <div class="col-sm-12 col-md-4 p-1 p-xl-2">
+        {% comment %} <div class="block_card text clickable" long-press data-gradient-color="#c7ffd3" data-max-time="2" data-funcName="save_an_entry_simple"> {% endcomment %}
+          <div class="block_card text clickable" onclick="save_an_entry_simple()">
+          <div class="title">Сохранить</div>
+          <div class="text">Сохранить номер</div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-4 p-1 p-xl-2">
+        {% comment %} <div class="block_card text clickable" long-press data-gradient-color="#b5c4ff" data-max-time="2" data-funcName="save_an_entry_copy"> {% endcomment %}
+          <div class="block_card text clickable" onclick="save_an_entry_copy()">
+          <div class="title">Сохранить копию</div>
+          <div class="text">Создаёт новый номер с такими данными</div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-4 p-1 p-xl-2">
+        {% comment %} <div class="block_card text clickable close_the_save_form" long-press data-gradient-color="#ffb1b1" data-max-time="2" data-funcName="close_the_save_form"> {% endcomment %}
+          <div class="block_card text clickable close_the_save_form" onclick="close_the_save_form()">
+          <div class="title">Отмена</div>
+          <div class="text">Отменяет последние изменения</div>
+        </div>
+      </div>
+    </section>
+
+    <script src="/static/js/hotel_rooms.js?v8"></script>
+
+    <section class="row_crads">
+      {% telegram_card %}
+    </section>
+  </section>
+{% endblock %}

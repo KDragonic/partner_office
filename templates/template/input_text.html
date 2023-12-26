@@ -1,0 +1,118 @@
+{% if type == "text" %}
+<label class="text"
+	for="">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<input type="text"
+		placeholder="{{placeholder}}"
+		{% if maxlength %}
+		maxlength="{{maxlength}}"
+		{% endif %}
+		name="{{name}}"
+		value="{{value}}"
+		{% if required == 1 %}required{% endif %}
+		autocomplete="{{autocomplete}}">
+</label>
+{% endif %}
+
+{% if type == "readonly_text" %}
+<label class="text readonly_text"
+    for="">
+    <span class="name">{{label}}</span>
+    <input type="text"
+        placeholder="{{placeholder}}"
+        name="{{name}}"
+        value="{{value}}"
+        readonly>
+</label>
+{% endif %}
+
+
+{% if type == "email" %}
+<label class="text"
+	for="">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<input type="email"
+		placeholder="{{placeholder}}"
+		name="{{name}}"
+		value="{{value}}"
+		{% if required == 1 %}required{% endif %}
+		autocomplete="{{autocomplete}}">
+</label>
+{% endif %}
+
+{% if type == "tel" %}
+<label class="text"
+	for="">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<input type="tel"
+		placeholder="{{placeholder}}"
+		pattern="[0-9+]+"
+		name="{{name}}"
+		{% if value != None %} value="{{value}}" {% endif %}
+		{% if required == 1 %}required{% endif %}
+		autocomplete="{{autocomplete}}">
+</label>
+{% endif %}
+
+{% if type == "date" %}
+<label class="date">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<input type="date"
+	name="{{name}}"
+	value="{{value}}"
+	autocomplete="{{autocomplete}}"
+	{% if required == 1 %}required{% endif %}
+	placeholder="{{placeholder}}">
+</label>
+{% endif %}
+
+{% if type == "int" %}
+<label class="date">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<input type="number"
+	name="{{name}}"
+	value="{{value}}"
+	autocomplete="{{autocomplete}}"
+	{% if required == 1 %}required{% endif %}
+	placeholder="{{placeholder}}">
+</label>
+{% endif %}
+
+{% if type == "time" %}
+<label class="date">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<input type="time"
+	name="{{name}}"
+	value="{{value}}"
+	autocomplete="{{autocomplete}}"
+	{% if required == 1 %}required{% endif %}
+	placeholder="{{placeholder}}">
+</label>
+{% endif %}
+
+
+{% if type == "long" %}
+<label class="text" style="width: 100%;" for="">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<textarea name="{{name}}" style="height: 100px; padding: 14px; resize: vertical; box-sizing:border-box;"
+	{% if required == 1 %}required{% endif %}
+	autocomplete="{{autocomplete}}"
+	{% if required == 1 %}required{% endif %}
+	placeholder="{{placeholder}}">{{value}}</textarea>
+</label>
+{% endif %}
+
+
+{% if type == "list" %}
+<label class="text">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<select name="{{name}}"
+	{% if required == 1 %}required{% endif %}
+	autocomplete="{{autocomplete}}"
+	placeholder="{{placeholder}}">
+		{% for item in items %}
+		<option value="{{item.0}}">{{item.1}}</option>
+		{% endfor %}
+	</select>
+</label>
+{% endif %}

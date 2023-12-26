@@ -1,0 +1,150 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static cards %}
+{% block main_block %}
+<style>
+  .limiter_group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .button_grupe {
+    display: flex;
+    flex-direction: row;
+    width: min-content;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .button_grupe .button {
+    color: #11223e;
+    background: #f4f6fa;
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  .button_grupe .button:hover {
+    background: #ffb172;
+  }
+
+  .button_grupe .button.active {
+    background: #ffb172;
+  }
+
+  .button_grupe .button .count {
+    background-color: #0000000f;
+    padding: 5px;
+    border-radius: 5px;
+    margin-left: 5px;
+  }
+
+  #content .button_grupe .left {
+    width: auto;
+  }
+</style>
+
+{% hotel_shift_tab %}
+
+<div class="section">
+  <span class="title"
+    style="margin-bottom: 20px;">Бронирования</span>
+  <div class="button_grupe">
+    <button class="button all">
+      <span class="name">Все</span><span class="count">0</span>
+    </button>
+    <button class="button new">
+      <span class="name"></span>Новое</span><span class="count">0</span>
+    </button>
+    <button class="button verified">
+      <span class="name"></span>Подтверждено</span><span class="count">0</span>
+    </button>
+    <button class="button settled">
+      <span class="name"></span>Заселен</span><span class="count">0</span>
+    </button>
+    <button class="button left">
+      <span class="name"></span>Выехал</span><span class="count">0</span>
+    </button>
+    <button class="button cancelled">
+      <span class="name"></span>Отменен</span><span class="count">0</span>
+    </button>
+  </div>
+
+  {% get_card 'profile_booking' 'hotel' %}
+
+  <a href="/profile/#edit_user_profile_title" class="discription" style="text-decoration: underline; color: #5555f7; font-size: 20px;" id="edit_user_profile_title">Получать уведомления в Telegram</a>
+
+</div>
+
+
+<script defer>
+  function set_count_card() {
+    counts = {
+      "all": $(".card_booking").length,
+      "new": 0,
+      "verified": 0,
+      "settled": 0,
+      "left": 0,
+      "cancelled": 0,
+    }
+
+    $('.card_booking').each(function () { // проходим циклом по всем дивам с классом card_booking
+      type = $(this).attr('class').split(' ')[1];
+      counts[type] += 1
+    });
+
+    Object.keys(counts).forEach(key => {
+      console.log()
+      if (counts[key] <= 0) {
+        $(`.button_grupe .button.${key} .count`).css("display", "none")
+      }
+      else {
+        $(`.button_grupe .button.${key} .count`).css("display", "flex")
+        $(`.button_grupe .button.${key} .count`).html(counts[key])
+      }
+    });
+  }
+
+  function filterCards(button) {
+    $(`.button_grupe .button`).removeClass('active');
+    if (button === "all") {
+      $('.card_booking').show()
+    }
+    else {
+      $('.card_booking').each(function () { // проходим циклом по всем дивам с классом card_booking
+        if ($(this).hasClass(button)) { // проверяем есть ли у дива класс который соответствует нажатой кнопке
+          $(this).show(); // если да то показываем его
+        } else {
+          $(this).hide(); // если нет то скрываем
+        }
+      });
+    }
+
+    $(`.button_grupe .${button}`).addClass('active');
+  }
+
+  set_count_card()
+
+  // вызов функции при нажатии одной из 5 кнопок
+  $('.button_grupe .all').click(function () {
+    filterCards('all');
+  });
+  $('.button_grupe .verified').click(function () {
+    filterCards('verified');
+  });
+  $('.button_grupe .new').click(function () {
+    filterCards('new');
+  });
+  $('.button_grupe .settled').click(function () {
+    filterCards('settled');
+  });
+  $('.button_grupe .left').click(function () {
+    filterCards('left');
+  });
+  $('.button_grupe .cancelled').click(function () {
+    filterCards('cancelled');
+  });
+</script>
+
+{% endblock main_block %}

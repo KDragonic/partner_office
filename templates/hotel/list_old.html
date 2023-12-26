@@ -1,0 +1,677 @@
+{% extends "main/base.html" %}
+{% load static sass_tags %}
+{% block content %}
+
+<link href="{% static 'css/scss/list_hotel.css' %}"
+	rel="stylesheet"
+	type="text/css" />
+
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+	integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+	crossorigin="" />
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+	integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+	crossorigin=""></script>
+
+<link rel="stylesheet"
+	href="{% static 'noUiSlider/nouislider.min.css' %}">
+
+
+<link rel="stylesheet" href="{% static 'leaflet.markercluster-1.4.1/dist/MarkerCluster.css' %}">
+
+<script src="{% static 'leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js' %}" defer></script>
+<script src="{% static 'js/list_map.js' %}?v13" defer></script>
+<script src="{% static 'js/list_filter.js' %}?v13" defer></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.10/jquery.lazy.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.10/jquery.lazy.plugins.min.js"></script>
+
+
+<style>
+	.marker-div-icon .marker-icon {
+		width: 30px;
+		height: 30px;
+	}
+
+	.marker-div-icon .marker-price {
+		background: white;
+		padding: 3px 8px;
+		position: relative;
+		top: -44px;
+		min-width: 55px;
+		border-radius: 4px;
+		transform: translate(-25%, 0);
+		white-space: nowrap;
+	}
+
+	.marker-div-icon .marker-hover-div {
+		display: none;
+		z-index: 30;
+	}
+
+	#tool_map_by_location {
+		display: none;
+	}
+
+	.big_map #tool_map_by_location {
+		display: block;
+	}
+
+</style>
+
+
+<section class="s-main s-main--hotel">
+	<section class="hero">
+		<div class="container hero__container">
+			<div class="main-searchbox main-searchbox--select">
+				{% include "main/form_search.html" %}
+			</div>
+			<div id="buttons_for_opening_filter_settings">
+				<div class="buttons_sort BFOFS_button">
+					<svg width="17"
+						height="15"
+						viewBox="0 0 17 15"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path
+							d="M12.7498 -0.00012207L12.6689 0.00643835C12.5232 0.0291235 12.3897 0.112198 12.2929 0.240252C12.1961 0.368305 12.1428 0.532644 12.1427 0.702783V12.5978L9.53602 9.58188L9.46802 9.51441C9.34481 9.40838 9.19148 9.36032 9.03889 9.37992C8.88631 9.39951 8.7458 9.4853 8.64565 9.62001C8.5455 9.75472 8.49315 9.92835 8.49914 10.106C8.50513 10.2836 8.56901 10.4519 8.67792 10.5772L12.324 14.7946L12.392 14.8621C12.509 14.9621 12.6531 15.0102 12.7981 14.9977C12.9431 14.9851 13.0793 14.9127 13.1821 14.7937L16.8226 10.5763L16.8809 10.4975C16.9675 10.3621 17.0092 10.1951 16.9983 10.027C16.9875 9.85892 16.9248 9.70095 16.8218 9.58188L16.7538 9.51441C16.6368 9.41414 16.4925 9.36589 16.3473 9.37844C16.2022 9.391 16.0657 9.46353 15.9629 9.58282L13.357 12.6016V0.702783L13.3521 0.607188C13.3322 0.438909 13.2603 0.284687 13.1497 0.173043C13.0391 0.0613989 12.8974 -0.000114907 12.7507 -0.00012207H12.7498ZM3.8159 0.206063L0.17788 4.41881L0.118784 4.49754C0.0323961 4.63293 -0.0091528 4.79973 0.00169202 4.96759C0.0125368 5.13545 0.0750552 5.29323 0.17788 5.41225L0.24588 5.48067C0.362833 5.58068 0.506904 5.62878 0.651898 5.61623C0.796891 5.60367 0.933179 5.53129 1.03598 5.41225L3.64023 2.39632V14.297L3.64671 14.3926C3.66666 14.5608 3.73857 14.7151 3.84915 14.8267C3.95972 14.9384 4.10147 14.9999 4.24819 14.9999L4.32995 14.9933C4.47545 14.9704 4.60885 14.8873 4.70545 14.7592C4.80205 14.6312 4.8553 14.467 4.85533 14.297L4.85452 2.39819L7.46363 5.41319L7.53163 5.48067C7.65493 5.58537 7.80781 5.63235 7.95973 5.61223C8.11165 5.59211 8.25141 5.50637 8.3511 5.37214C8.45079 5.2379 8.50306 5.06507 8.49746 4.88816C8.49187 4.71125 8.42882 4.54331 8.32092 4.41787L4.67481 0.206063L4.606 0.138584C4.48905 0.0385713 4.34497 -0.0095303 4.19998 0.00302497C4.05499 0.0155802 3.9187 0.087959 3.8159 0.207001V0.206063Z"
+							fill="#185C5C" />
+						<path
+							d="M12.7498 -0.00012207L12.6689 0.00643835C12.5232 0.0291235 12.3897 0.112198 12.2929 0.240252C12.1961 0.368305 12.1428 0.532644 12.1427 0.702783V12.5978L9.53602 9.58188L9.46802 9.51441C9.34481 9.40838 9.19148 9.36032 9.03889 9.37992C8.88631 9.39951 8.7458 9.4853 8.64565 9.62001C8.5455 9.75472 8.49315 9.92835 8.49914 10.106C8.50513 10.2836 8.56901 10.4519 8.67792 10.5772L12.324 14.7946L12.392 14.8621C12.509 14.9621 12.6531 15.0102 12.7981 14.9977C12.9431 14.9851 13.0793 14.9127 13.1821 14.7937L16.8226 10.5763L16.8809 10.4975C16.9675 10.3621 17.0092 10.1951 16.9983 10.027C16.9875 9.85892 16.9248 9.70095 16.8218 9.58188L16.7538 9.51441C16.6368 9.41414 16.4925 9.36589 16.3473 9.37844C16.2022 9.391 16.0657 9.46353 15.9629 9.58282L13.357 12.6016V0.702783L13.3521 0.607188C13.3322 0.438909 13.2603 0.284687 13.1497 0.173043C13.0391 0.0613989 12.8974 -0.000114907 12.7507 -0.00012207H12.7498ZM3.8159 0.206063L0.17788 4.41881L0.118784 4.49754C0.0323961 4.63293 -0.0091528 4.79973 0.00169202 4.96759C0.0125368 5.13545 0.0750552 5.29323 0.17788 5.41225L0.24588 5.48067C0.362833 5.58068 0.506904 5.62878 0.651898 5.61623C0.796891 5.60367 0.933179 5.53129 1.03598 5.41225L3.64023 2.39632V14.297L3.64671 14.3926C3.66666 14.5608 3.73857 14.7151 3.84915 14.8267C3.95972 14.9384 4.10147 14.9999 4.24819 14.9999L4.32995 14.9933C4.47545 14.9704 4.60885 14.8873 4.70545 14.7592C4.80205 14.6312 4.8553 14.467 4.85533 14.297L4.85452 2.39819L7.46363 5.41319L7.53163 5.48067C7.65493 5.58537 7.80781 5.63235 7.95973 5.61223C8.11165 5.59211 8.25141 5.50637 8.3511 5.37214C8.45079 5.2379 8.50306 5.06507 8.49746 4.88816C8.49187 4.71125 8.42882 4.54331 8.32092 4.41787L4.67481 0.206063L4.606 0.138584C4.48905 0.0385713 4.34497 -0.0095303 4.19998 0.00302497C4.05499 0.0155802 3.9187 0.087959 3.8159 0.207001V0.206063Z"
+							fill="black"
+							fill-opacity="0.2" />
+					</svg>
+					<span>Сортировка</span>
+				</div>
+				<div class="buttons_filter BFOFS_button">
+					<svg width="16"
+						height="16"
+						viewBox="0 0 16 16"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd"
+							clip-rule="evenodd"
+							d="M10.7699 0.0318308C10.5849 0.0880367 10.3748 0.216677 10.2389 0.356783C10.0326 0.569658 9.94035 0.811045 9.91832 1.19574L9.89959 1.52315H5.09774C1.63473 1.52315 0.273074 1.53472 0.214185 1.56472C-0.0218942 1.68492 -0.0724825 1.97614 0.110952 2.1588L0.220242 2.2676H5.06053H9.90079L9.91672 2.59329C9.94397 3.15111 10.2045 3.55419 10.6433 3.71763C10.8299 3.78716 10.9321 3.79372 11.8302 3.79372C12.9727 3.79372 13.051 3.77838 13.3649 3.49274C13.6263 3.25485 13.7224 3.03226 13.7506 2.5988L13.7722 2.2676H14.7195H15.6668L15.7776 2.16523C15.9445 2.01098 15.9467 1.79495 15.783 1.63195L15.6737 1.52315H14.7229H13.7722L13.7497 1.21606C13.7179 0.782458 13.6362 0.575055 13.4075 0.347365C13.0801 0.0214457 12.966 -0.00356785 11.8248 0.000228836C11.296 0.00197829 10.8213 0.0161974 10.7699 0.0318308ZM12.6845 0.780188C12.7606 0.801256 12.8573 0.86204 12.8994 0.915268C12.9716 1.00665 12.9759 1.06185 12.9759 1.8998V2.78752L12.8669 2.90909L12.7579 3.03066L11.9054 3.04201C11.4366 3.04823 11.0131 3.04339 10.9644 3.03118C10.9156 3.01901 10.8351 2.96541 10.7854 2.91207L10.6951 2.81506V1.91141V1.00773L10.7899 0.895652C10.842 0.833974 10.9219 0.776354 10.9675 0.767569C11.1443 0.733511 12.553 0.743859 12.6845 0.780188ZM4.55072 6.16605C4.31371 6.2447 4.03037 6.50239 3.90863 6.75007C3.83426 6.90145 3.80592 7.02887 3.78906 7.28805L3.76696 7.62763L2.02452 7.62845C0.430036 7.62923 0.275317 7.63474 0.202332 7.69359C0.0387521 7.8255 -0.000918505 8.00108 0.0923316 8.18057C0.190592 8.36969 0.21482 8.37208 2.05432 8.37208H3.76696L3.78906 8.71166C3.81628 9.13 3.92516 9.37552 4.18763 9.61047C4.48301 9.87482 4.60591 9.8982 5.70109 9.8982C6.82324 9.8982 6.9237 9.87862 7.22955 9.60034C7.49692 9.35706 7.59604 9.1284 7.6208 8.69777L7.63953 8.37208H11.7044H15.7692L15.8667 8.28218C16.0444 8.11814 16.0444 7.88156 15.8667 7.71752L15.7692 7.62763H11.7044H7.63953L7.6208 7.30193C7.59616 6.87313 7.49666 6.64239 7.23299 6.40249C6.91862 6.11647 6.84025 6.10114 5.70629 6.10382C4.9143 6.10568 4.69755 6.11736 4.55072 6.16605ZM6.73496 6.98614L6.84399 7.1077V7.99985V8.892L6.73488 9.01357L6.62578 9.13514H5.7036H4.78142L4.67232 9.01357L4.56321 8.892V8.00428C4.56321 7.15379 4.56658 7.11232 4.64315 7.01539C4.68712 6.95975 4.75865 6.89944 4.80206 6.88147C4.8455 6.86345 5.27362 6.85228 5.75348 6.85664L6.62593 6.86457L6.73496 6.98614ZM9.10457 12.281C8.67384 12.4485 8.4172 12.8486 8.38549 13.4019L8.36661 13.7321H4.31255C1.60351 13.7321 0.2346 13.7448 0.186554 13.7704C0.100221 13.8164 0.00166142 13.9953 0.00166142 14.106C0.00166142 14.2199 0.110914 14.3889 0.215232 14.4362C0.277523 14.4644 1.51662 14.4766 4.33543 14.4766H8.36661L8.38534 14.804C8.41507 15.3228 8.62243 15.671 9.02893 15.8846L9.21824 15.9841L10.23 15.9955C11.1767 16.0062 11.2549 16.002 11.4481 15.9301C11.956 15.7409 12.2281 15.3045 12.2281 14.6795V14.4766H13.9705H15.7128L15.84 14.35C15.9206 14.2697 15.9671 14.1873 15.9671 14.1248C15.9671 13.9976 15.8741 13.8194 15.7822 13.7704C15.7358 13.7457 15.0936 13.7321 13.9747 13.7321H12.2392L12.2175 13.3989C12.1836 12.8776 12.0023 12.5658 11.5925 12.3239L11.4242 12.2246L10.3586 12.2161C9.37565 12.2083 9.2784 12.2134 9.10457 12.281ZM11.3158 13.077L11.4429 13.2035V14.0956C11.4429 14.9379 11.4387 14.993 11.3665 15.0844C11.3244 15.1377 11.2276 15.1984 11.1515 15.2195C10.9335 15.2798 9.5605 15.2694 9.40889 15.2063C9.16776 15.106 9.162 15.0798 9.16335 14.0867C9.16458 13.1424 9.16511 13.1394 9.34809 13.0139C9.4287 12.9586 9.5522 12.9504 10.3146 12.9504H11.1887L11.3158 13.077Z"
+							fill="#185C5C" />
+						<path fill-rule="evenodd"
+							clip-rule="evenodd"
+							d="M10.7699 0.0318308C10.5849 0.0880367 10.3748 0.216677 10.2389 0.356783C10.0326 0.569658 9.94035 0.811045 9.91832 1.19574L9.89959 1.52315H5.09774C1.63473 1.52315 0.273074 1.53472 0.214185 1.56472C-0.0218942 1.68492 -0.0724825 1.97614 0.110952 2.1588L0.220242 2.2676H5.06053H9.90079L9.91672 2.59329C9.94397 3.15111 10.2045 3.55419 10.6433 3.71763C10.8299 3.78716 10.9321 3.79372 11.8302 3.79372C12.9727 3.79372 13.051 3.77838 13.3649 3.49274C13.6263 3.25485 13.7224 3.03226 13.7506 2.5988L13.7722 2.2676H14.7195H15.6668L15.7776 2.16523C15.9445 2.01098 15.9467 1.79495 15.783 1.63195L15.6737 1.52315H14.7229H13.7722L13.7497 1.21606C13.7179 0.782458 13.6362 0.575055 13.4075 0.347365C13.0801 0.0214457 12.966 -0.00356785 11.8248 0.000228836C11.296 0.00197829 10.8213 0.0161974 10.7699 0.0318308ZM12.6845 0.780188C12.7606 0.801256 12.8573 0.86204 12.8994 0.915268C12.9716 1.00665 12.9759 1.06185 12.9759 1.8998V2.78752L12.8669 2.90909L12.7579 3.03066L11.9054 3.04201C11.4366 3.04823 11.0131 3.04339 10.9644 3.03118C10.9156 3.01901 10.8351 2.96541 10.7854 2.91207L10.6951 2.81506V1.91141V1.00773L10.7899 0.895652C10.842 0.833974 10.9219 0.776354 10.9675 0.767569C11.1443 0.733511 12.553 0.743859 12.6845 0.780188ZM4.55072 6.16605C4.31371 6.2447 4.03037 6.50239 3.90863 6.75007C3.83426 6.90145 3.80592 7.02887 3.78906 7.28805L3.76696 7.62763L2.02452 7.62845C0.430036 7.62923 0.275317 7.63474 0.202332 7.69359C0.0387521 7.8255 -0.000918505 8.00108 0.0923316 8.18057C0.190592 8.36969 0.21482 8.37208 2.05432 8.37208H3.76696L3.78906 8.71166C3.81628 9.13 3.92516 9.37552 4.18763 9.61047C4.48301 9.87482 4.60591 9.8982 5.70109 9.8982C6.82324 9.8982 6.9237 9.87862 7.22955 9.60034C7.49692 9.35706 7.59604 9.1284 7.6208 8.69777L7.63953 8.37208H11.7044H15.7692L15.8667 8.28218C16.0444 8.11814 16.0444 7.88156 15.8667 7.71752L15.7692 7.62763H11.7044H7.63953L7.6208 7.30193C7.59616 6.87313 7.49666 6.64239 7.23299 6.40249C6.91862 6.11647 6.84025 6.10114 5.70629 6.10382C4.9143 6.10568 4.69755 6.11736 4.55072 6.16605ZM6.73496 6.98614L6.84399 7.1077V7.99985V8.892L6.73488 9.01357L6.62578 9.13514H5.7036H4.78142L4.67232 9.01357L4.56321 8.892V8.00428C4.56321 7.15379 4.56658 7.11232 4.64315 7.01539C4.68712 6.95975 4.75865 6.89944 4.80206 6.88147C4.8455 6.86345 5.27362 6.85228 5.75348 6.85664L6.62593 6.86457L6.73496 6.98614ZM9.10457 12.281C8.67384 12.4485 8.4172 12.8486 8.38549 13.4019L8.36661 13.7321H4.31255C1.60351 13.7321 0.2346 13.7448 0.186554 13.7704C0.100221 13.8164 0.00166142 13.9953 0.00166142 14.106C0.00166142 14.2199 0.110914 14.3889 0.215232 14.4362C0.277523 14.4644 1.51662 14.4766 4.33543 14.4766H8.36661L8.38534 14.804C8.41507 15.3228 8.62243 15.671 9.02893 15.8846L9.21824 15.9841L10.23 15.9955C11.1767 16.0062 11.2549 16.002 11.4481 15.9301C11.956 15.7409 12.2281 15.3045 12.2281 14.6795V14.4766H13.9705H15.7128L15.84 14.35C15.9206 14.2697 15.9671 14.1873 15.9671 14.1248C15.9671 13.9976 15.8741 13.8194 15.7822 13.7704C15.7358 13.7457 15.0936 13.7321 13.9747 13.7321H12.2392L12.2175 13.3989C12.1836 12.8776 12.0023 12.5658 11.5925 12.3239L11.4242 12.2246L10.3586 12.2161C9.37565 12.2083 9.2784 12.2134 9.10457 12.281ZM11.3158 13.077L11.4429 13.2035V14.0956C11.4429 14.9379 11.4387 14.993 11.3665 15.0844C11.3244 15.1377 11.2276 15.1984 11.1515 15.2195C10.9335 15.2798 9.5605 15.2694 9.40889 15.2063C9.16776 15.106 9.162 15.0798 9.16335 14.0867C9.16458 13.1424 9.16511 13.1394 9.34809 13.0139C9.4287 12.9586 9.5522 12.9504 10.3146 12.9504H11.1887L11.3158 13.077Z"
+							fill="black"
+							fill-opacity="0.2" />
+					</svg>
+					<span>Фильтры</span>
+				</div>
+				<div class="buttons_map BFOFS_button">
+					<svg width="14"
+						height="16"
+						viewBox="0 0 14 16"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path
+							d="M2.05034 2.04192C3.36309 0.734441 5.14355 -9.15527e-05 7.00005 -9.15527e-05C8.85655 -9.15527e-05 10.637 0.734441 11.9498 2.04192C13.2625 3.34939 14 5.12271 14 6.97176C14 8.82081 13.2625 10.5941 11.9498 11.9016L10.9955 12.8416C10.2921 13.5286 9.37964 14.4126 8.25738 15.4935C7.92007 15.8183 7.46924 15.9999 7.00005 15.9999C6.53086 15.9999 6.08003 15.8183 5.74273 15.4935L2.93626 12.7744C2.58334 12.4293 2.2883 12.1386 2.05034 11.9016C1.40031 11.2542 0.884667 10.4857 0.532868 9.63979C0.181069 8.79393 0 7.88733 0 6.97176C0 6.0562 0.181069 5.1496 0.532868 4.30373C0.884667 3.45786 1.40031 2.6893 2.05034 2.04192ZM11.0968 2.89065C10.0101 1.80848 8.53622 1.20061 6.99948 1.20076C5.46275 1.20091 3.98902 1.80907 2.90249 2.89145C1.81596 3.97383 1.20565 5.44176 1.2058 6.97233C1.20595 8.50289 1.81656 9.97071 2.9033 11.0529L4.09792 12.2283C4.92312 13.0313 5.75062 13.832 6.58041 14.6304C6.69285 14.7387 6.84319 14.7993 6.99965 14.7993C7.15611 14.7993 7.30644 14.7387 7.41889 14.6304L10.1474 11.9881C10.5252 11.619 10.8412 11.3075 11.096 11.0529C12.1825 9.97069 12.7929 8.50296 12.7929 6.97256C12.7929 5.44216 12.1825 3.97443 11.096 2.89225L11.0968 2.89065ZM7.00005 4.78908C7.31698 4.78908 7.6308 4.85125 7.9236 4.97205C8.2164 5.09285 8.48245 5.2699 8.70655 5.4931C8.93065 5.7163 9.10842 5.98128 9.2297 6.27291C9.35098 6.56453 9.41341 6.8771 9.41341 7.19275C9.41341 7.50841 9.35098 7.82097 9.2297 8.1126C9.10842 8.40422 8.93065 8.6692 8.70655 8.8924C8.48245 9.1156 8.2164 9.29266 7.9236 9.41345C7.6308 9.53425 7.31698 9.59642 7.00005 9.59642C6.36772 9.58492 5.76519 9.32667 5.32209 8.87722C4.879 8.42777 4.63074 7.82305 4.63074 7.19315C4.63074 6.56326 4.879 5.95853 5.32209 5.50908C5.76519 5.05963 6.36772 4.80138 7.00005 4.78988V4.78908ZM7.00005 5.99012C6.84148 5.99012 6.68447 6.02122 6.53797 6.08166C6.39147 6.1421 6.25836 6.23068 6.14623 6.34236C6.03411 6.45403 5.94517 6.58661 5.88448 6.73252C5.8238 6.87843 5.79257 7.03482 5.79257 7.19275C5.79257 7.35068 5.8238 7.50707 5.88448 7.65298C5.94517 7.79889 6.03411 7.93147 6.14623 8.04314C6.25836 8.15482 6.39147 8.2434 6.53797 8.30384C6.68447 8.36428 6.84148 8.39539 7.00005 8.39539C7.32019 8.39539 7.62721 8.26872 7.85359 8.04326C8.07996 7.8178 8.20713 7.512 8.20713 7.19315C8.20713 6.8743 8.07996 6.56851 7.85359 6.34304C7.62721 6.11758 7.32019 5.99092 7.00005 5.99092V5.99012Z"
+							fill="#185C5C" />
+						<path
+							d="M2.05034 2.04192C3.36309 0.734441 5.14355 -9.15527e-05 7.00005 -9.15527e-05C8.85655 -9.15527e-05 10.637 0.734441 11.9498 2.04192C13.2625 3.34939 14 5.12271 14 6.97176C14 8.82081 13.2625 10.5941 11.9498 11.9016L10.9955 12.8416C10.2921 13.5286 9.37964 14.4126 8.25738 15.4935C7.92007 15.8183 7.46924 15.9999 7.00005 15.9999C6.53086 15.9999 6.08003 15.8183 5.74273 15.4935L2.93626 12.7744C2.58334 12.4293 2.2883 12.1386 2.05034 11.9016C1.40031 11.2542 0.884667 10.4857 0.532868 9.63979C0.181069 8.79393 0 7.88733 0 6.97176C0 6.0562 0.181069 5.1496 0.532868 4.30373C0.884667 3.45786 1.40031 2.6893 2.05034 2.04192ZM11.0968 2.89065C10.0101 1.80848 8.53622 1.20061 6.99948 1.20076C5.46275 1.20091 3.98902 1.80907 2.90249 2.89145C1.81596 3.97383 1.20565 5.44176 1.2058 6.97233C1.20595 8.50289 1.81656 9.97071 2.9033 11.0529L4.09792 12.2283C4.92312 13.0313 5.75062 13.832 6.58041 14.6304C6.69285 14.7387 6.84319 14.7993 6.99965 14.7993C7.15611 14.7993 7.30644 14.7387 7.41889 14.6304L10.1474 11.9881C10.5252 11.619 10.8412 11.3075 11.096 11.0529C12.1825 9.97069 12.7929 8.50296 12.7929 6.97256C12.7929 5.44216 12.1825 3.97443 11.096 2.89225L11.0968 2.89065ZM7.00005 4.78908C7.31698 4.78908 7.6308 4.85125 7.9236 4.97205C8.2164 5.09285 8.48245 5.2699 8.70655 5.4931C8.93065 5.7163 9.10842 5.98128 9.2297 6.27291C9.35098 6.56453 9.41341 6.8771 9.41341 7.19275C9.41341 7.50841 9.35098 7.82097 9.2297 8.1126C9.10842 8.40422 8.93065 8.6692 8.70655 8.8924C8.48245 9.1156 8.2164 9.29266 7.9236 9.41345C7.6308 9.53425 7.31698 9.59642 7.00005 9.59642C6.36772 9.58492 5.76519 9.32667 5.32209 8.87722C4.879 8.42777 4.63074 7.82305 4.63074 7.19315C4.63074 6.56326 4.879 5.95853 5.32209 5.50908C5.76519 5.05963 6.36772 4.80138 7.00005 4.78988V4.78908ZM7.00005 5.99012C6.84148 5.99012 6.68447 6.02122 6.53797 6.08166C6.39147 6.1421 6.25836 6.23068 6.14623 6.34236C6.03411 6.45403 5.94517 6.58661 5.88448 6.73252C5.8238 6.87843 5.79257 7.03482 5.79257 7.19275C5.79257 7.35068 5.8238 7.50707 5.88448 7.65298C5.94517 7.79889 6.03411 7.93147 6.14623 8.04314C6.25836 8.15482 6.39147 8.2434 6.53797 8.30384C6.68447 8.36428 6.84148 8.39539 7.00005 8.39539C7.32019 8.39539 7.62721 8.26872 7.85359 8.04326C8.07996 7.8178 8.20713 7.512 8.20713 7.19315C8.20713 6.8743 8.07996 6.56851 7.85359 6.34304C7.62721 6.11758 7.32019 5.99092 7.00005 5.99092V5.99012Z"
+							fill="black"
+							fill-opacity="0.2" />
+					</svg>
+					<span>Карта</span>
+				</div>
+			</div>
+		</div>
+	</section>
+</section>
+<script>
+	$("#buttons_for_opening_filter_settings .BFOFS_button").click(function () {
+		$("#buttons_for_opening_filter_settings .BFOFS_button").removeClass("select")
+		$(this).addClass("select")
+		$(".sidebar-content").show()
+		$(".inner-content__sidebar").css("display", "flex")
+
+		$(`[data-type]`).hide()
+		$("#mode-switcher").hide()
+		if ($(this).hasClass("buttons_sort")) {
+			$(`[data-type="Сортировка"]`).show()
+			$(`[data-type="Применить фильтры"]`).show()
+		}
+
+		if ($(this).hasClass("buttons_filter")) {
+			$(`[data-type="Название отеля"]`).show()
+			$(`[data-type="Питание"]`).show()
+			$(`[data-type="Количество звёзд"]`).show()
+			$(`[data-type="Цена"]`).show()
+			$(`[data-type="Расстояние от центра"]`).show()
+			$(`[data-type="Тип размещения"]`).show()
+			$(`[data-type="Дополнительные критерии"]`).show()
+			$(`[data-type="Услуги в номере"]`).show()
+			$(`[data-type="Основные услуги"]`).show()
+			$(`[data-type="Применить фильтры"]`).show()
+			noUi_mormal()
+		}
+
+		if ($(this).hasClass("buttons_map")) {
+			$(`[data-type="Карта"]`).show()
+			$("#mode-switcher").show()
+		}
+	})
+
+
+</script>
+<main class="main">
+	<section class="inner">
+		<div class="container inner__container">
+			<div class="breadcrumbs">
+				<div class="breadcrumbs__item"><a href="{% url 'main_home' %}">Главная</a></div>
+				<div class="breadcrumbs__item breadcrumbs__item--current"><a>{{data.city}}</a></div>
+			</div>
+			<div class="inner-content">
+				<aside class="inner-content__sidebar">
+					<div class="sidebar-content js-filter-range">
+						<div class="sidebar-map"
+							id="hotel_map"
+							data-type="Карта">
+						</div>
+						<div id="mode-switcher">
+							<span class="list-mode active">Список</span>
+							<span class="map-mode">Карта</span>
+						</div>
+						<div class="filter__item"
+							data-type="Название отеля">
+							<p class="filter__title">Название отеля</p>
+							<input class="filter-input"
+								name="name_hotel"
+								type="text"
+								placeholder="Например, Hilton">
+						</div>
+						<div class="filter__item"
+							data-type="Сортировка">
+							<p class="filter__title">Сортировка</p>
+							<div class="filter__options">
+								<select class="filter__select"
+									name="sorting">
+									<option value="not"
+										selected>Нет</option>
+									<option value="price_down">Сначала дешевые</option>
+									<option value="price_up">Сначала дорогие</option>
+									<option value="rating_up">Рейтинг</option>
+									<option value="count_up">Кол-во отзывов</option>
+								</select>
+							</div>
+						</div>
+						<div class="filter-select"
+							data-type="Питание">
+							<div class="filter-select__title">Питание</div>
+							<div class="filter-select">
+								{% for item in choices.food %}
+								<div class="filter-select__row">
+									<label class="filter-select__label">
+										<input class="filter-select__input"
+											type="checkbox"
+											name="food[]"
+											value="{{item.code}}">
+										<span class="filter-select__name">{{item.name}}</span>
+									</label>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="filter-select"
+							data-type="Количество звёзд">
+							<div class="filter-select__title">Количество звёзд</div>
+							<div class="filter-select">
+								<div class="filter-select__row"> <label class="filter-select__label"> <input
+											class="filter-select__input"
+											type="checkbox"
+											name="stars[]"
+											value="5"><span class="filter-select__name"
+											style="color:#FC7201; letter-spacing: 4.6px; font-size: 24px;">★★★★★</span> </label>
+								</div>
+							</div>
+							<div class="filter-select">
+								<div class="filter-select__row"> <label class="filter-select__label"> <input
+											class="filter-select__input"
+											type="checkbox"
+											name="stars[]"
+											value="4"><span class="filter-select__name"
+											style="color:#FC7201; letter-spacing: 4.6px; font-size: 24px;">★★★★</span> </label>
+								</div>
+							</div>
+							<div class="filter-select">
+								<div class="filter-select__row"> <label class="filter-select__label"> <input
+											class="filter-select__input"
+											type="checkbox"
+											name="stars[]"
+											value="3"><span class="filter-select__name"
+											style="color:#FC7201; letter-spacing: 4.6px; font-size: 24px;">★★★</span> </label>
+								</div>
+							</div>
+							<div class="filter-select">
+								<div class="filter-select__row"> <label class="filter-select__label"> <input
+											class="filter-select__input"
+											type="checkbox"
+											name="stars[]"
+											value="2"><span class="filter-select__name"
+											style="color:#FC7201; letter-spacing: 4.6px; font-size: 24px;">★★</span> </label>
+								</div>
+							</div>
+							<div class="filter-select">
+								<div class="filter-select__row"> <label class="filter-select__label"
+										style="display: flex;"> <input class="filter-select__input"
+											type="checkbox"
+											name="stars[]"
+											value="1_or_not"><span class="filter-select__name"
+											style="color:#FC7201; font-size: 24px; margin-right: 5px;">★</span><span>или без звёзд</span>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="filter-select filter-select--range"
+							data-type="Цена">
+							<div class="filter-select__title price__title">Цена: от - до</div>
+							<div class="filter-select__row--range__price_input_grupe" style="display: flex; flex-direction: row; width: 100%; height: 35px; padding: 1px; border: 1px solid #D2D2D2; border-radius: 5px; margin-top: -10px; margin-bottom: 10px;">
+								<label for="price_input_min" style="width: 100%; display: flex; flex-direction: row; flex-grow: 1; border-right: 1px solid #D2D2D2; ">
+									<input name="price_input_min" type="number" style=" width: 100%; border: none; text-align: end; padding-right: 5px; ">
+									<span style=" display: flex; align-items: center; margin-right: 4px; ">₽</span>
+								</label>
+								<label for="price_input_max" style="width: 100%; display: flex; flex-grow: 1; flex-direction: row; ">
+									<input name="price_input_max" type="text" style=" width: 100%; border: none; text-align: end; padding-right: 5px; ">
+									<span style=" display: flex; align-items: center; margin-right: 4px; ">₽</span>
+								</label>
+							</div>
+							<div class="filter-select__row--range__price">
+							</div>
+						</div>
+						<div class="filter-select filter-select--range"
+							data-type="Расстояние от центра">
+							<div class="filter-select__title duration__title">Расстояние от центра</div>
+							<div class="filter-select__row--range__duration_input_grupe" style="display: flex; flex-direction: row; width: 100%; height: 35px; padding: 1px; border: 1px solid #D2D2D2; border-radius: 5px; margin-top: -10px; margin-bottom: 10px;">
+								<label for="duration_input_max" style="width: 100%; display: flex; flex-direction: row; flex-grow: 1; ">
+									<input name="duration_input_max" type="number" style=" width: 100%; border: none; text-align: end; padding-right: 5px; ">
+									<span style=" display: flex; align-items: center; margin-right: 4px; ">км</span>
+								</label>
+							</div>
+							<div class="filter-select__row--range__duration">
+							</div>
+						</div>
+						<div class="filter-select"
+							data-type="Тип размещения">
+							<div class="filter-select__title">Тип размещения</div>
+							{% for item in choices.building %}
+							<div class="filter-select__row">
+								<label class="filter-select__label">
+									<input class="filter-select__input"
+										type="checkbox"
+										name="building[]"
+										value="{{item.code}}"><span class="filter-select__name">{{item.name}}</span>
+								</label>
+							</div>
+							{% endfor %}
+
+						</div>
+						<div class="filter-select"
+							data-type="Дополнительные критерии">
+							<div class="filter-select__title">Дополнительные критерии</div>
+							<!-- <div class="filter-select__row">
+								<label class="filter-select__label">
+									<input class="filter-select__input" type="checkbox" name="additional_criteria[]" value="allowed_child"><span class="filter-select__name">Можно с детьми</span>
+								</label>
+							</div> -->
+							<div class="filter-select__row">
+								<label class="filter-select__label">
+									<input class="filter-select__input"
+										type="checkbox"
+										name="additional_criteria[]"
+										value="allowed_animal"><span class="filter-select__name">Можно с животными</span>
+								</label>
+							</div>
+							<div class="filter-select__row">
+								<label class="filter-select__label">
+									<input class="filter-select__input"
+										type="checkbox"
+										name="additional_criteria[]"
+										value="allowed_smoking"><span class="filter-select__name">Можно курить</span>
+								</label>
+							</div>
+							<div class="filter-select__row">
+								<label class="filter-select__label">
+									<input class="filter-select__input"
+										type="checkbox"
+										name="additional_criteria[]"
+										value="allowed_party"><span class="filter-select__name">Можно устраивать вечеринку</span>
+								</label>
+							</div>
+						</div>
+						<div class="filter-select"
+							data-type="Основные услуги"
+							id="grupe_fillter_services">
+							<div class="filter-select__title">Основные услуги</div>
+							<div class="filter-select__item">
+								{% for item in choices.hservices %}
+								<div class="filter-select__row">
+									<label class="filter-select__label"
+										style="cursor: pointer">
+										<input class="filter-select__input"
+											type="checkbox"
+											name="hservices[]"
+											value="{{item.code}}"><span class="filter-select__name">{{item.name}}</span>
+									</label>
+									<!-- <div class="filter-select__count">{{item.count}}</div> -->
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="filter-select"
+							data-type="Услуги в номере"
+							id="grupe_fillter_services">
+							<div class="filter-select__title">Услуги в номере</div>
+							<div class="filter-select__item">
+								{% for item in choices.rservices %}
+								<div class="filter-select__row">
+									<label class="filter-select__label"
+										style="cursor: pointer">
+										<input class="filter-select__input"
+											type="checkbox"
+											name="rservices[]"
+											value="{{item.code}}"><span class="filter-select__name">{{item.name}}</span>
+									</label>
+									<!-- <div class="filter-select__count">{{item.count}}</div> -->
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="filter-bottom"
+							data-type="Применить фильтры">
+							<button class="filter-bottom__reset"
+								type="reset"
+								onclick="clear_fillter()">Очистить</button>
+							<button class="filter-bottom__apply"
+								onclick="get_hotel_fillter()">Применить фильтры</button>
+						</div>
+					</div>
+				</aside>
+				<style>
+					button.show-more-button {
+						margin-top: 10px;
+						width: 100%;
+						color: #fc7201;
+					}
+				</style>
+				<script>
+					$(".filter-select__subtitle").click(function () {
+						$(this).toggleClass("hide")
+					});
+
+					function limitListHeight(listSelector, itemsToShow) {
+						const list = $(listSelector);
+
+						// Проверяем, что количество элементов в списке больше значения itemsToShow
+						if (list.children().length > itemsToShow) {
+							const showMoreBtn = $('<button>', {
+								text: `Показать ещё ${list.children().length - itemsToShow}`,
+								class: 'show-more-button'
+							});
+							list.after(showMoreBtn);
+
+							// скрываем все элементы списка, кроме первых itemsToShow
+							list.children(':gt(' + (itemsToShow - 1) + ')').hide();
+
+							// при клике на кнопку "Показать еще" отображаем скрытые элементы списка
+							showMoreBtn.on('click', function () {
+								list.children(':hidden').show();
+								showMoreBtn.hide();
+							});
+						}
+					}
+
+					// пример использования
+					limitListHeight(`.filter-select[data-type="Услуги в номере"] .filter-select__item`, 5);
+					limitListHeight(`.filter-select[data-type="Основные услуги"] .filter-select__item`, 5);
+				</script>
+
+				<style>
+					@font-face {
+						font-family: 'slick';
+						src: url('https://cdn.jsdelivr.net/jquery.slick/1.5.0/fonts/slick.woff');
+					}
+
+					.card_hotel_img_grupe::before {
+						display: block;
+						width: 40px;
+						height: 40px;
+						position: absolute;
+						content: "";
+						background-image: url('/static/img/arrow_mini_slider.svg');
+						right: 5px;
+						bottom: 5px;
+						pointer-events: none;
+						background-repeat: no-repeat;
+						background-size: cover;
+						background-position: center;
+					}
+
+					#next_card-hotel {
+						position: relative;
+						display: flex;
+						justify-content: center;
+						font-size: 22px;
+						text-align: center;
+						text-decoration: none;
+						color: #000000;
+						cursor: pointer;
+						height: 62px;
+						align-items: center;
+						background: #e3e3e3;
+						border-radius: 15px;
+					}
+
+					#next_card-hotel:hover {
+						background: #c5c5c5;
+					}
+
+				</style>
+				<div class="inner-content__main">
+					<p class="inner-content__header">{{data.city}}: <span class="h_c_cur_h_c_max_type">подбираем варианты</span> <span id="h_c_cur">0</span> из <span
+							id="h_c_max">0</span> отелей
+					</p>
+					<ul id="card-hotel"> </ul>
+					<div id="pagination">
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="mailing-list">
+		<div class="container mailing-list__container">
+			<div class="mailing-list__top">
+				<img src="{% static '/img/sprite/mail.svg' %}"
+					class="svg-icon icon-mail">
+				<h2 class="mailing-list__title">Подпишитесь, чтобы получать лучшие предложения</h2>
+			</div>
+			<div class="mailing-form"
+				action="#">
+				<div class="mailing-form__row">
+					<input class="mailing-form__input"
+						type="email"
+						name="email"
+						placeholder="Введите ваш e-mail">
+					<button class="mailing-form__button"
+						type="submit">Подписаться</button>
+				</div>
+				<a href="/privacy-policy/" class="privacy">Нажимая на кнопку, вы соглашаетесь с Политикой конфиденциальности.</a>
+			</d>
+		</div>
+	</section>
+</main>
+
+<style>
+	.filter-select--range .noUi-target {
+		height: 10px;
+	}
+
+	.filter-select--range .noUi-handle {
+		border-color: #FC7201;
+		background: #FFF;
+		border-radius: 100%;
+		width: 22px;
+		height: 22px;
+		right: 0;
+	}
+
+	.noUi-handle:after,
+	.noUi-handle:before {
+		display: none;
+	}
+
+	.filter-select--range .noUi-connect {
+		background: #fc7201;
+		/* height: 10px; */
+	}
+
+	@media screen and (max-width: 375px) {
+		.BFOFS_button svg {
+			display: none;
+		}
+
+		.BFOFS_button span {
+			text-align: center;
+			width: 100%;
+		}
+	}
+
+	/* @media screen and (max-width: 430px) {
+		.noUi-horizontal .noUi-origin {
+			width: 262px !important;
+		}
+	}
+
+	@media screen and (max-width: 306px) {
+		.noUi-horizontal .noUi-origin {
+			width: 31vh !important
+		}
+	} */
+</style>
+
+<script defer>
+	function noUi_mormal() {
+		$(".noUi-base").map(function () {
+			origins = $(this).children(".noUi-origin")
+
+			connects = $(this).children(".noUi-connects")
+			width = connects.width() + -20
+			console.log(width)
+			$(origins[0]).width(width)
+		});
+	}
+	noUi_mormal()
+</script>
+
+<script src="{% static 'noUiSlider/nouislider.min.js' %}"></script>
+
+<script src="{% static 'js/fillter.js' %}"></script>
+
+<script defer>
+	$(document).ready(function () {
+		$(document).keypress(function (event) {
+			if (event.keyCode === 13) { // Код клавиши Enter
+				event.preventDefault(); // Отменяем стандартное поведение клавиши
+				get_hotel_fillter()
+			}
+		});
+	});
+</script>
+
+<style>
+	.marker-hover-div {
+		position: relative;
+		width: 267px;
+		height: 90px;
+		top: -100px;
+		left: -100px;
+		display: flex;
+		background: white;
+		cursor: pointer;
+	}
+
+	.marker-tooltip-div {
+		position: relative;
+		width: 93px;
+		height: 28px;
+		top: -42px;
+		left: -43px;
+		display: flex;
+		background: white;
+		cursor: pointer;
+	}
+
+	.marker-tooltip-div-price {
+		font-size: 18px;
+		width: 100%;
+		text-align: center;
+	}
+
+	.marker-hover-div .rating_stat {
+		background: #024849;
+		border-radius: 3px 3px 3px 0px;
+		color: white;
+		padding: 2px 7px;
+		width: min-content;
+		position: absolute;
+		top: 5px;
+		left: 5px;
+
+	}
+
+	.marker-hover-div .l_div .img {
+		height: 90px;
+		width: 90px;
+	}
+
+	.marker-hover-div .star {
+		color: #FC7201;
+	}
+
+	.marker-hover-div .r_div {
+		padding-left: 5px;
+	}
+
+	.marker-hover-div .name {
+		height: 40px;
+	}
+
+
+	#mode-switcher {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		background: #e9e9e9;
+		border-radius: 5px;
+	}
+
+
+	#mode-switcher span {
+		cursor: pointer;
+		padding: 5px;
+		font-size: 18px;
+		font-weight: bold;
+		width: 100%;
+		color: #555;
+		border-radius: 5px;
+		text-align: center;
+		user-select: none;
+	}
+
+	#mode-switcher span.active {
+		color: #fff;
+		background-color: #9f9f9f;
+		pointer-events: none;
+	}
+
+</style>
+
+
+<script defer>
+	$(".leaflet-attribution-flag").remove()
+</script>
+{% endblock content %}

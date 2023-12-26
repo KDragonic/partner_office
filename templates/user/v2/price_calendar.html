@@ -1,0 +1,997 @@
+{% extends 'user/v2/base.html' %}
+{% load cards humanize static menu %}
+{% block main_block %}
+  <style>
+    #scheduler .scheduler_default_cell.scheduler_default_cellparent {
+      background-color: rgb(214 214 214);
+    }
+
+    #setToDay {
+      width: min-content;
+      background: #e6e6e6;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #setToDay:hover {
+      background: #cccccc;
+    }
+
+    #range_width {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #nav_shess {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .popup_new_close {
+      width: 343px;
+      padding: 35px;
+      height: 100%;
+      position: fixed;
+      right: 0;
+      background: white;
+      border-left: 1px solid black;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: flex-start;
+      top: 0;
+      /* align-items: center; */
+      padding-top: 61px;
+      z-index: 99;
+    }
+
+    .popup_new_close > div {
+      display: flex;
+      flex-direction: column;
+      gap: 19px;
+    }
+
+    .popup_new_close .grupe_dates,
+    .popup_new_close .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .popup_new_close .button {
+      background: #eeeeee;
+      color: black;
+      border-radius: 5px;
+      padding: 8px;
+      width: max-content;
+      margin-top: 5px;
+    }
+
+    .popup_new_close input {
+      border: 1px solid #d2d2d2;
+      padding: 5px;
+    }
+
+    .popup-lebel-radio {
+      display: flex;
+      gap: 5px;
+    }
+
+    .info_booking {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cell_full {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .def_cell {
+      color: #2b2b2b;
+    }
+
+    .value_cell {
+      color: #000000;
+    }
+
+    .scheduler_default_rowheader_inner_indent {
+      margin-left: -17px !important;
+    }
+
+    @media screen and (max-width: 768px) {
+      .scheduler_default_main {
+        font-size: 10px !important;
+      }
+    }
+  </style>
+
+  <script src="{% static 'js/daypilot-all.min.js' %}"></script>
+
+  <style>
+    .button_nav_section .item {
+      padding: 5px;
+      background: #FFF;
+      filter: drop-shadow(0px 0px 18px #D9D9D9);
+      color: #868695;
+      font-family: Manrope;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 19px;
+      border-radius: 5px;
+      text-decoration-line: underline !important;
+    }
+
+    .button_nav_section .item.active {
+      color: #FFF;
+      background: #FC7201;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-12 p-1 d-flex d-lg-none">
+      <div class="block_card icontext" style="background: linear-gradient(90deg, #7BF8F8 1.08%, #F9CCA8 81.21%); padding: 14px; min-height: 0; width: 100%;">
+        <div class="body_block_card" style=" display: flex; flex-direction: row-reverse; justify-content: space-between; ">
+          <div class="icon border-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="39" height="30" viewBox="0 0 39 30" fill="none">
+              <g clip-path="url(#clip0_0_354)">
+                <path d="M36.1187 30H2.98C2.19149 29.9948 1.43674 29.6793 0.87905 29.1218C0.321359 28.5644 0.00556802 27.8098 0 27.0213L0 8.42375C0.0052372 7.63524 0.320711 6.88049 0.878168 6.3228C1.43563 5.76511 2.19024 5.44932 2.97875 5.44375H36.1187C36.9073 5.44899 37.662 5.76446 38.2197 6.32192C38.7774 6.87938 39.0932 7.63399 39.0987 8.4225V27.0238C39.0987 27.4146 39.0218 27.8016 38.8722 28.1627C38.7226 28.5238 38.5034 28.8519 38.227 29.1283C37.9507 29.4046 37.6226 29.6239 37.2615 29.7734C36.9004 29.923 36.5133 30 36.1225 30H36.1187ZM2.98 7.43125H2.97125C2.71034 7.43125 2.46012 7.53489 2.27563 7.71938C2.09114 7.90387 1.9875 8.15409 1.9875 8.415V27.0338C1.9875 27.5775 2.4275 28.0175 2.97125 28.0175H36.1287C36.3897 28.0175 36.6399 27.9139 36.8244 27.7294C37.0089 27.5449 37.1125 27.2947 37.1125 27.0338V8.415C37.1125 8.15409 37.0089 7.90387 36.8244 7.71938C36.6399 7.53489 36.3897 7.43125 36.1287 7.43125H36.1187H2.98ZM28.3312 2.38375V2.38875C28.3312 2.67187 28.2188 2.94339 28.0186 3.14359C27.8184 3.34378 27.5469 3.45625 27.2637 3.45625H11.8375C11.5544 3.45625 11.2829 3.34378 11.0827 3.14359C10.8825 2.94339 10.77 2.67187 10.77 2.38875V2.37875C10.77 1.78875 11.2487 1.31125 11.8375 1.31125H27.2587C27.5391 1.32347 27.8046 1.44022 28.0031 1.6385C28.2016 1.83677 28.3187 2.10346 28.3312 2.38375ZM32.0662 3.17875V3.19625C32.0662 4.08625 31.345 4.8075 30.455 4.8075H30.4362H30.42C30.2084 4.8075 29.9989 4.76582 29.8034 4.68485C29.6079 4.60388 29.4303 4.48519 29.2807 4.33558C29.1311 4.18596 29.0124 4.00833 28.9314 3.81285C28.8504 3.61736 28.8087 3.40784 28.8087 3.19625V3.1775V1.61125C28.8087 0.72125 29.53 0 30.42 0H30.4387H30.455C31.345 0 32.0662 0.72125 32.0662 1.61125V1.63V1.62875V3.17875ZM10.2912 3.17875V3.19625C10.2912 4.08625 9.57 4.8075 8.68 4.8075H8.66125H8.645C8.21767 4.8075 7.80784 4.63774 7.50567 4.33558C7.20351 4.03341 7.03375 3.62358 7.03375 3.19625V3.1775V1.61125C7.03375 0.72125 7.755 0 8.645 0H8.66375H8.6625H8.68C9.57 0 10.2912 0.72125 10.2912 1.61125V1.63V1.62875V3.17875ZM37.2725 2.38375V2.38875C37.2725 2.67187 37.16 2.94339 36.9598 3.14359C36.7596 3.34378 36.4881 3.45625 36.205 3.45625H33.5337C33.2506 3.45625 32.9791 3.34378 32.7789 3.14359C32.5787 2.94339 32.4662 2.67187 32.4662 2.38875V2.37875C32.4662 1.78875 32.945 1.31125 33.5337 1.31125H36.2C36.4803 1.32347 36.7459 1.44022 36.9444 1.6385C37.1429 1.83677 37.26 2.10346 37.2725 2.38375ZM6.59625 2.38375V2.38875C6.59625 2.67187 6.48378 2.94339 6.28359 3.14359C6.08339 3.34378 5.81187 3.45625 5.52875 3.45625H2.89625C2.61313 3.45625 2.34161 3.34378 2.14141 3.14359C1.94122 2.94339 1.82875 2.67187 1.82875 2.38875V2.37875C1.82875 1.78875 2.3075 1.31125 2.89625 1.31125H5.5625C5.83881 1.32492 6.0995 1.44351 6.29137 1.64281C6.48324 1.84211 6.59309 2.10712 6.59625 2.38375Z" fill="#FC7201"></path>
+                <path d="M7.07254 18.1977V20.6977H9.49629V18.1977H10.9663V24.7152H9.49629V21.9727H7.07254V24.7152H5.60254V18.1977H7.07254ZM18.2388 21.379C18.2841 21.8157 18.2372 22.257 18.1012 22.6745C17.9651 23.0919 17.7428 23.4761 17.4488 23.8021C17.1548 24.1282 16.7956 24.3889 16.3944 24.5673C15.9932 24.7457 15.5591 24.8378 15.12 24.8377L15.0138 24.8365H15.0188H14.9825C14.5571 24.8367 14.1363 24.7475 13.7475 24.5746C13.3588 24.4018 13.0106 24.1493 12.7257 23.8333C12.4407 23.5174 12.2253 23.1451 12.0934 22.7406C11.9615 22.3361 11.9161 21.9084 11.96 21.4852L11.9588 21.4977C11.9221 21.0628 11.9761 20.625 12.1174 20.212C12.2587 19.799 12.4841 19.4198 12.7795 19.0985C13.0749 18.7771 13.4338 18.5206 13.8334 18.3451C14.2331 18.1696 14.6648 18.079 15.1013 18.079H15.14H15.1375L15.2138 18.0777C15.6357 18.0777 16.053 18.1657 16.439 18.336C16.825 18.5064 17.1713 18.7554 17.4556 19.0671C17.7399 19.3788 17.9561 19.7465 18.0903 20.1465C18.2245 20.5465 18.2738 20.9701 18.235 21.3902L18.2363 21.379H18.2388ZM13.55 21.4577C13.55 22.7302 14.15 23.6427 15.1388 23.6427C16.1275 23.6427 16.6888 22.689 16.6888 21.4177C16.6888 20.2252 16.1325 19.2327 15.1 19.2327C14.1075 19.2302 13.55 20.1852 13.55 21.4552V21.4577ZM20.225 19.4302H18.4775V18.1977H23.485V19.4302H21.6975V24.7152H20.2275L20.225 19.4302ZM28.1325 21.9327H25.7488V23.4827H28.4488V24.6752H24.2388V18.1977H28.2513V19.3902H25.7088V20.7415H28.0925V21.934L28.1325 21.9327ZM29.4438 18.1977H30.9138V23.4827H33.4963V24.7152H29.4438V18.1977ZM19.55 14.0277L17.4038 15.184L17.8038 12.8002L16.0925 11.084L18.4763 10.7265L19.5488 8.58398L20.6213 10.7302L23.005 11.0877L21.2963 12.7965L21.6963 15.1802L19.55 14.0277ZM26.98 14.304L25.3513 15.1777L25.6688 13.3502L24.3563 12.079L26.1438 11.8415L26.9775 10.1727L27.7725 11.8415L29.6 12.079L28.2888 13.3515L28.5663 15.179L26.98 14.304ZM31.7075 14.6227L30.635 15.179L30.835 13.9865L29.9613 13.1527L31.1538 12.9527L31.71 11.8802L32.2275 12.9527L33.42 13.1527L32.5863 13.9865L32.7863 15.179L31.7075 14.6227ZM12.1588 14.304L13.7475 15.1777L13.43 13.3502L14.7413 12.0777L12.9538 11.8402L12.16 10.1727L11.3263 11.8415L9.53754 12.079L10.8488 13.3515L10.5313 15.179L12.1588 14.304ZM7.39129 14.6227L8.46379 15.179L8.26379 13.9865L9.13754 13.1527L7.94504 12.9527L7.39004 11.8802L6.87254 12.9527L5.68004 13.1527L6.55379 13.9865L6.35379 15.179L7.39129 14.6227Z" fill="#FC7201"></path>
+              </g>
+              <defs>
+                <clipPath id="clip0_0_354">
+                  <rect width="38.75" height="30" fill="white"></rect>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <span class="title">Управление объектом размещения</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="button_nav_section d-flex d-lg-none gap-2 flex-wrap my-2">
+    <a href="{% url 'profile_v2_hotel_edit' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_edit' %}active{% endif %}">Объект</a>
+    <a href="{% url 'profile_v2_hotel_rooms' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_rooms' %}active{% endif %}">Управление номерами</a>
+    <a href="{% url 'profile_v2_hotel_price_calendar' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_price_calendar' %}active{% endif %}">Календарь цен</a>
+  </div>
+
+  {% hotel_shift_tab %}
+
+  <section class="grupe_cards" style="margin-bottom: 25px;">
+    <section class="row_crads">
+      <a href="{% url 'profile_v2_hotel_booking_chess' %}"  class="block_card text clickable">
+        <span class="title">Закрыть номера</span>
+        <span class="text">Закрыть номера на определенные даты можно в Шахматке бронирования</span>
+      </a>
+    </section>
+  </section>
+
+  <div class="section_title" style="  margin-bottom: 28px; ">Календарь цен</div>
+  <section class="grupe_cards" style="margin-bottom: 25px;">
+    <section class="row_crads">
+    <div class="block_card" id="nav_shess">
+      <div id="range_width">
+        Длина ячейки:<input type="range" min="10" max="200" step="10" id="cellwidth" value="60" /><span id="label">60</span>
+      </div>
+
+      <div id="setToDay">
+        <span>Сегодня</span>
+      </div>
+    </div>
+  </section>
+
+
+    <section class="row_crads">
+      <div class="block_card padding_0">
+        <div id="scheduler" style="user-select: unset"></div>
+      </div>
+    </section>
+
+    <style>
+      .buttons_checkbox span {
+        background: #ff6464;
+        color: white;
+        width: 100%;
+        padding: 4px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        min-width: 64px;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .buttons_checkbox label:hover span {
+        background: #ff2a2a;
+      }
+
+      .buttons_checkbox input[type="checkbox"]:checked ~ span {
+        background: #32b332;
+      }
+
+      .buttons_checkbox label:hover input[type="checkbox"]:checked ~ span {
+        background: #1ce922;
+      }
+
+      .buttons_checkbox input[type="checkbox"] {
+        display: none;
+      }
+
+      #weekend_prices_popup {
+        position: fixed;
+        z-index: 999;
+        height: min-content;
+        max-width: 730px;
+        width: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+    </style>
+
+    <section class="d-none">
+      {% telegram_card %}
+    </section>
+
+    <style>
+      .weekend_prices_section {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .weekend_prices_section > .item {
+        position: relative;
+        width: max-content;
+        display: flex;
+        padding: 5px 50px 5px 5px;
+        align-items: flex-start;
+        gap: 5px;
+        flex-shrink: 0;
+        flex-direction: column;
+        border-radius: 5px;
+        background: #F6F6F6;
+        box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.25);
+        justify-content: center;
+        flex-grow: 1;
+        max-width: 340px;
+      }
+
+      @media screen and (max-width: 1200px) {
+        .weekend_prices_section > .item {
+          max-width: 446px;
+        }
+      }
+
+      @media screen and (max-width: 766px) {
+        .weekend_prices_section > .item {
+          max-width: 100%;
+        }
+      }
+
+
+      .weekend_prices_section > .item {
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+      }
+
+      .weekend_prices_section > .item .close {
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        height: 23px;
+        width: 21px;
+      }
+      .weekend_prices_section > .item .weekends {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+      }
+
+      .weekend_prices_section > .item .weekends .item {
+        color: #cfcfcf;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+      }
+
+      .weekend_prices_section > .item .weekends .item[selected] {
+        color: #00dd1f;
+      }
+
+      .weekend_prices_section > .item .param .name {
+        color: #9D9793;
+      }
+
+      .weekend_prices_section > .item .param .value {
+        color: #FC7201;
+      }
+      .weekend_prices_section > .item .dates .value {
+        color: #3177FF;
+      }
+
+      .section_title_room_name {
+        color: #9A9A9A;
+        font-size: 17px;
+        margin: 13px 0px 5px 0;
+        font-weight: 800;
+        line-height: normal;
+      }
+
+    </style>
+
+    <section class="row_crads">
+      <div class="block_card form_card" id="weekend_prices_block">
+        <div class="d-flex" style="gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
+          <div class="section_title">Цены выходного дня</div>
+          <button class="button p-2 h-100" data-button-event="weekend_prices_add" style="font-size: 16px; line-height: 17px;">Задать новый период цен</button>
+        </div>
+        <section class="weekend_prices_section_rooms">
+          <section class="weekend_prices_section_room">
+            <div class="section_title_room_name">Однокомнатный люкс</div>
+            <section data-section="weekend_prices" class="weekend_prices_section">
+              <div class="item" data-id="1">
+                <div class="close">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none">
+                  <path d="M14 1.5L2 13.5" stroke="#FF5252" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M14 13.4888L2.32136 1.5002" stroke="#FF5252" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="weekends">
+                  <span class="item" selected>Пн</span>
+                  <span class="item">Вт</span>
+                  <span class="item" selected>Ср</span>
+                  <span class="item">Чт</span>
+                  <span class="item">Пт</span>
+                  <span class="item" selected>Сб</span>
+                  <span class="item" selected>Вс</span>
+                </div>
+                <div class="param">
+                  <span class="name">Мин. срок проживания:</span>
+                  <span class="value">2 дня</span>
+                </div>
+                <div class="param">
+                  <span class="name">Цена проживания:</span>
+                  <span class="value">2467 ₽</span>
+                </div>
+                <div class="dates">
+                  <span>с</span>
+                  <span class="value" data-value="21.06.2023">21.06.2023</span>
+                  <span>по</span>
+                  <span class="value" data-value="20.01.2024">20.01.2024</span>
+                </div>
+              </div>
+            </section>
+          </section>
+        </section>
+      </div>
+    </section>
+  </section>
+
+
+  <div class="block_card form_card d-none" id="weekend_prices_popup">
+    <div class="section_title">Цены выходного дня</div>
+    <div class="grupe_input row">
+      <label class="text col-sm-12 col-lg-12">
+        <!-- # TODO: Измен изменить -->
+        <span class="name">Номер*</span>
+        <select name="number_to_change"
+          required="">
+        </select>
+      </label>
+
+      <label class="text col-sm-12 col-md-6"
+        for="">
+        <span class="name">С*</span>
+        <input type="date"
+          placeholder=""
+          name="date_1"
+          value=""
+          required=""
+          autocomplete="off">
+      </label>
+
+      <label class="text col-sm-12 col-md-6"
+        for="">
+        <span class="name">До*</span>
+        <input type="date"
+          placeholder=""
+          name="date_2"
+          value=""
+          required=""
+          autocomplete="off">
+      </label>
+
+
+      <label class="col-sm-12 col-md-12"
+        for="">
+        <span class="name">Применить ко дням недели*</span>
+        <div class="row buttons_checkbox">
+          <label class="col d-flex flex-column align-items-center">
+            <input type="checkbox"
+              name="weekday"
+              value="1"
+              id="">
+            <span>Пн</span>
+          </label>
+          <label class="col d-flex flex-column align-items-center">
+            <input type="checkbox"
+              name="weekday"
+              value="2"
+              id="">
+            <span>Вт</span>
+          </label>
+          <label class="col d-flex flex-column align-items-center">
+            <input type="checkbox"
+              name="weekday"
+              value="3"
+              id="">
+            <span>Ср</span>
+          </label>
+          <label class="col d-flex flex-column align-items-center">
+            <input type="checkbox"
+              name="weekday"
+              value="4"
+              id="">
+            <span>Чт</span>
+          </label>
+          <label class="col d-flex flex-column align-items-center">
+            <input type="checkbox"
+              name="weekday"
+              value="5"
+              id="">
+            <span>Пт</span>
+          </label>
+          <label class="col d-flex flex-column align-items-center">
+            <input type="checkbox"
+              name="weekday"
+              value="6"
+              id="">
+            <span>Сб</span>
+          </label>
+          <label class="col d-flex flex-column align-items-center">
+            <input type="checkbox"
+              name="weekday"
+              value="7"
+              id="">
+            <span>Вс</span>
+          </label>
+        </div>
+      </label>
+
+      <label class="text col-sm-12 col-md-6"
+        for="">
+        <span class="name">Цена за ночь*</span>
+        <input type="number"
+          placeholder=""
+          name="price"
+          value=""
+          required=""
+          autocomplete="off">
+      </label>
+      <label class="text col-sm-12 col-md-6"
+        for="">
+        <span class="name">Минимальный срок проживания*</span>
+        <input type="number"
+          placeholder=""
+          name="min_days"
+          value=""
+          required=""
+          autocomplete="off">
+      </label>
+      <div class="col mb-1">
+        <button class="button w-100" data-button-event="weekend_prices_popup_close"
+          style="background-color: white; color: black; border: 1px solid black;">Отменить</button>
+      </div>
+      <div class="col mb-1">
+        <button class="button w-100" data-button-event="weekend_prices_popup_save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      $(`[data-button-event="weekend_prices_add"]`).click(function() {
+        $("#weekend_prices_popup").removeClass("d-none")
+      })
+
+      $(`[data-button-event="weekend_prices_popup_close"]`).click(function() {
+        $("#weekend_prices_popup").addClass("d-none")
+      })
+      $(`[data-button-event="weekend_prices_popup_save"]`).click(function() {
+        add_weekend_prices()
+      })
+
+      // weekend_prices = generateWeekendPrices()
+      weekend_prices = {}
+      load_weekend_prices()
+      reset_weekend_prices_section_rooms()
+    });
+
+    function generateWeekendPrices() {
+      let weekend_prices = [];
+
+      for (let i = 1; i <= 10; i++) {
+        let categories = ["Двухместный люкс", "Одноместный стандарт", "Трехместный номер", "Семейный люкс", "Свадебный номер", "Полулюкс", "VIP-номер", "Студия", "Апартаменты", "Двухэтажный номер"];
+        let category = categories[Math.floor(Math.random() * categories.length)];
+
+        let item = {
+          title: category,
+          items: []
+        };
+
+        for (let j = 0; j < Math.floor(Math.random() * 6) + 4; j++) {
+          let weekday = [];
+          for (let j = 0; j < 7; j++) {
+            weekday.push(Math.random() < 0.5);
+          }
+
+          let min_days = Math.floor(Math.random() * 10) + 1;
+          let price = Math.floor(Math.random() * 1000) + 500;
+
+          let dates = [];
+          for (let j = 0; j < 2; j++) {
+            let day = Math.floor(Math.random() * 28) + 1;
+            let month = Math.floor(Math.random() * 12) + 1;
+            let year = Math.floor(Math.random() * 2) + 2023;
+            let date = `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${year}`;
+            dates.push(date);
+          }
+
+          let newItem = {
+            weekday: weekday,
+            min_days: min_days,
+            price: price,
+            dates: dates
+          };
+
+          item.items.push(newItem);
+        }
+
+        weekend_prices.push(item);
+      }
+
+      return weekend_prices;
+    }
+
+    function convertToRussianDateFormat(dateString) {
+      const dateParts = dateString.split('-');
+      const year = dateParts[0];
+      const month = dateParts[1];
+      const day = dateParts[2];
+
+      return `${day}.${month}.${year}`;
+    }
+
+    function reset_weekend_prices_section_rooms() {
+      $(".weekend_prices_section_rooms").empty()
+      for (index in weekend_prices) {
+        let item_room = weekend_prices[index]
+        let room_name = item_room["title"]
+
+        let weekend_prices_section_room = $(`
+        <section class="weekend_prices_section_room" data-id="${index}">
+          <div class="section_title_room_name">${room_name}</div>
+          <section data-section="weekend_prices" class="weekend_prices_section"></section>
+        </section>
+        `)
+
+        let weekend_prices_section = $(weekend_prices_section_room).find(".weekend_prices_section")
+
+        item_room["items"].forEach((item, index) => {
+          let el = $(`
+          <div class="item" data-id="${index}">
+            <div class="close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none">
+              <path d="M14 1.5L2 13.5" stroke="#FF5252" stroke-width="3" stroke-linecap="round"/>
+              <path d="M14 13.4888L2.32136 1.5002" stroke="#FF5252" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="weekends">
+              <span class="item" data-index="0" ${item["weekday"][0] ? "selected" : ""}>Пн</span>
+              <span class="item" data-index="1" ${item["weekday"][1] ? "selected" : ""}>Вт</span>
+              <span class="item" data-index="2" ${item["weekday"][2] ? "selected" : ""}>Ср</span>
+              <span class="item" data-index="3" ${item["weekday"][3] ? "selected" : ""}>Чт</span>
+              <span class="item" data-index="4" ${item["weekday"][4] ? "selected" : ""}>Пт</span>
+              <span class="item" data-index="5" ${item["weekday"][5] ? "selected" : ""}>Сб</span>
+              <span class="item" data-index="6" ${item["weekday"][6] ? "selected" : ""}>Вс</span>
+            </div>
+            <div class="param">
+              <span class="name">Мин. срок проживания:</span>
+              <span class="value">${item["min_days"]} дней</span>
+            </div>
+            <div class="param">
+              <span class="name">Цена проживания:</span>
+              <span class="value">${item["price"]} ₽</span>
+            </div>
+            <div class="dates">
+              <span>с</span>
+              <span class="value" data-value="${item["dates"][0]}">${item["dates"][0]}</span>
+              <span>по</span>
+              <span class="value" data-value="${item["dates"][1]}">${item["dates"][1]}</span>
+            </div>
+          </div>
+          `)
+          $(weekend_prices_section).append(el)
+        })
+
+        $(".weekend_prices_section_rooms").append(weekend_prices_section_room)
+      }
+    }
+
+    function correction_weekend_prices() {
+      for (index in weekend_prices) {
+        let item_room = weekend_prices[index]
+        if (item_room["items"].length == 0) {
+          delete weekend_prices[index]
+        }
+      }
+    }
+
+    function add_weekend_prices() {
+      let weekend_prices_popup = $("#weekend_prices_popup")
+      let rc_id = $(weekend_prices_popup).find("[name='number_to_change']").val()
+      let date_1 = $(weekend_prices_popup).find("[name='date_1']").val()
+      let date_2 = $(weekend_prices_popup).find("[name='date_2']").val()
+
+      let weekday = [];
+
+      $(weekend_prices_popup).find('input[name="weekday"][type="checkbox"]').each(function() {
+        weekday.push($(this).prop('checked'));
+      });
+
+      let price = $(weekend_prices_popup).find("[name='price']").val()
+      let min_days = $(weekend_prices_popup).find("[name='min_days']").val()
+
+      if (!(rc_id in weekend_prices)) {
+        let name = $(weekend_prices_popup).find(`[name='number_to_change'] option[value=${rc_id}]`).text()
+        weekend_prices[rc_id] = {
+          "title": name,
+          "items": []
+        }
+      }
+      weekend_prices[rc_id]["items"].push({
+        weekday: weekday,
+        min_days: parseInt(min_days),
+        price: parseInt(price),
+        dates: [convertToRussianDateFormat(date_1), convertToRussianDateFormat(date_2)]
+      })
+
+      $("#weekend_prices_popup").find("input, select").val("")
+      $("#weekend_prices_popup").addClass("d-none")
+      correction_weekend_prices()
+      reset_weekend_prices_section_rooms()
+      save_weekend_prices()
+    }
+
+    $("body").on("click", ".weekend_prices_section_room .item .close", function() {
+      let rc_id = $(this).parents(".weekend_prices_section_room").data("id")
+      let index = $(this).parents(".item").data("id")
+
+      let obj = weekend_prices[rc_id]["items"][index]
+      console.log(`Удаление => ${weekend_prices[rc_id]["title"]}`, obj)
+      weekend_prices[rc_id]["items"].splice(index, 1)
+      correction_weekend_prices()
+      reset_weekend_prices_section_rooms()
+      save_weekend_prices()
+    })
+
+    function load_weekend_prices() {
+      $.ajax({
+        type: "GET",
+        url: "/profile/hotel/price_calendar/weekend_prices/get/",
+        success: function(response) {
+          weekend_prices = response["weekend_prices"];
+          reset_weekend_prices_section_rooms()
+        },
+        error: function(xhr, status, error) {
+          console.error(xhr.responseText);
+        }
+      });
+    }
+
+    function save_weekend_prices() {
+      $.ajax({
+        type: "POST",
+        url: "/profile/hotel/price_calendar/weekend_prices/save/",
+        data: JSON.stringify(weekend_prices),
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function(xhr, settings) {
+          if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+        },
+        success: function(response) {
+          loadPPD(false)
+        },
+        error: function(xhr, status, error) {
+          loadPPD(false)
+        }
+      });
+    }
+
+  </script>
+
+  <script>
+    date_ppd = {}
+
+    async function loadRooms() {
+      let csrftoken = getCookie('csrftoken');
+
+      $.ajax({
+        method: "GET",
+        url: "{% url 'form_get_room_ppd' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", csrftoken);
+        },
+        success: function (response) {
+          dp.resources = response.data;
+
+          response.data.forEach(element => {
+            let name = element["name"]
+            let id = element["id"].split("_")[1]
+            let el = `<option value="${id}">${name}</option>`
+            $(`[name="number_to_change"]`).append(el)
+          });
+
+          dp.update();
+          $(".scheduler_default_corner").html("")
+        }
+      });
+    }
+
+    function loadPPD(popup = true) {
+      let csrftoken = getCookie('csrftoken');
+      start = start_date_dps.toString("yyyy-MM-dd");
+      end = end_date_dps.toString("yyyy-MM-dd");
+      if (popup) load_start()
+      $.ajax({
+        method: "GET",
+        data: { "start": start, "end": end },
+        url: "{% url 'form_get_value_ppd' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", csrftoken);
+        },
+        success: function (response) {
+          date_ppd = response.data;
+          dp.update();
+          $(".scheduler_default_corner").html("")
+          if (popup) load_end()
+        }
+      });
+    }
+
+    function savePPD(inputs_val) {
+      data_result = inputs_val
+      let csrftoken = getCookie('csrftoken');
+      console.log(data_result)
+      load_start()
+      $.ajax({
+        method: "POST",
+        data: data_result,
+        url: "{% url 'form_edit_price_calendar' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", csrftoken);
+        },
+        success: function (response) {
+          load_end()
+          loadPPD()
+        }
+      });
+    }
+
+    function savePPDs(inputs_val) {
+      dates = generateDatesInRange(inputs_val["date_start"], inputs_val["date_end"])
+      data_result = inputs_val
+      for (const date of dates) {
+        data_result["date"] = date
+        let csrftoken = getCookie('csrftoken');
+        $.ajax({
+          method: "POST",
+          data: data_result,
+          url: "{% url 'form_edit_price_calendar' %}",
+          beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", csrftoken);
+          },
+          success: function (response) {
+          }
+        });
+      }
+      loadPPD()
+    }
+
+    $("#setToDay").click(function () {
+      setToDay();
+    })
+
+    function setToDay() {
+      dp.scrollTo(DayPilot.Date.today());
+    }
+
+    function generateDatesInRange(startDateStr, endDateStr) {
+      const startDate = new Date(startDateStr);
+      const endDate = new Date(endDateStr);
+
+      const dates = [];
+      let currentDate = startDate;
+      while (currentDate <= endDate) {
+        dates.push(DayPilot.Date(currentDate).toString("yyyy-MM-dd"));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return dates;
+    }
+  </script>
+
+  <script>
+    const start_date_dps = DayPilot.Date.today()
+    const end_date_dps = start_date_dps.addDays(365)
+    loadPPD()
+
+    let rowHeaderWidth = 160
+
+    if (window.innerWidth < 768) {
+      rowHeaderWidth = 120
+    }
+
+    const dp = new DayPilot.Scheduler("scheduler", {
+      locale: "ru-ru",
+      allowEventOverlap: false,
+      eventMoveHandling: "Disabled",
+      // timeRangeSelectedHandling: "Disabled",
+      scale: "Day",
+      cellWidth: 60,
+      eventHeight: 60,
+      eventHoverHandling: "Disabled",
+      eventClickHandling: "Bubble",
+      eventHtmlEnabled: true,
+      smoothscroll: true,
+      scrollDelay: 50,
+      timeHeaders: [
+        { groupBy: "Month", format: "MMM yyyy" },
+        { groupBy: "Cell", format: "d" }
+      ],
+      rowHeaderWidthAutoFit: false,
+      rowHeaderWidth: rowHeaderWidth,
+      floatingTimeHeaders: false,
+      // days: DayPilot.Date.today().daysInYear(),
+      startDate: start_date_dps,
+      days: (end_date_dps.getTime() - start_date_dps.getTime()) / (1000 * 60 * 60 * 24),
+      // startDate: DayPilot.Date.today(),
+      treeEnabled: true,
+      onBeforeCellRender: function (args) {
+        let str = args.cell.resource
+        let list_param = str.split(".")
+        let id = list_param[0]
+        let type = list_param[1]
+        // console.log("id - ", id)
+        // console.log("type - ", type)
+        start_date = args.cell.start
+        start_date_str = start_date.toString("yyyy-MM-dd");
+        // console.log("start_date_str", start_date_str)
+        id_div = args.cell.i
+        // console.log(args.cell)
+        if (type == "free") {
+          data_default = dp.rows.find(`${id}.free`).data.default
+          value = date_ppd[id] && date_ppd[id][type] && date_ppd[id][type][start_date_str] ? date_ppd[id][type][start_date_str] : 0;
+          args.cell.properties.html = `<span style="userSelect: auto" class="cell_full" data-cell-id="${id_div}">${value}</span>`;
+        }
+        if (type == "price") {
+          data_default = dp.rows.find(`${id}.price`).data.default
+          value = date_ppd[id] && date_ppd[id][type] && date_ppd[id][type][start_date_str] ? date_ppd[id][type][start_date_str] : data_default;
+          if (value == data_default) {
+            args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #b7ffc1;" class="cell_full def_cell" data-cell-id="${id_div}">${value}</span>`;
+          }
+          else {
+            args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #b7ffc1;" class="cell_full value_cell" data-cell-id="${id_div}">${value}</span>`;
+          }
+        }
+        if (type == "min_days") {
+          data_default = dp.rows.find(`${id}.min_days`).data.default
+          value = date_ppd[id] && date_ppd[id][type] && date_ppd[id][type][start_date_str] ? date_ppd[id][type][start_date_str] : data_default;
+          if (value == data_default) {
+            args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #bcf8fc;" class="cell_full def_cell" data-cell-id="${id_div}">${value}</span>`;
+          }
+          else {
+            args.cell.properties.html = `<span style="cursor: pointer; userSelect: auto; background: #bcf8fc;" class="cell_full value_cell" data-cell-id="${id_div}">${value}</span>`;
+          }
+        }
+      },
+      onTimeRangeSelected: function (args) {
+        // console.log(args)
+        let str = args.resource
+        let list_param = str.split(".")
+        let id = list_param[0]
+        let type = list_param[1]
+
+        let date_1 = args.start.toString("yyyy-MM-dd");
+        let date_2 = args.end.addDays(-1).toString("yyyy-MM-dd");
+        let rc = id
+        if (args.end.getTime() - args.start.getTime() > 86400000) { //86400000 - количество миллисекунд в одном дне
+          if (type == "price") {
+            popup_create(
+              "Изменить на выбраный период",
+              "Изменение цены",
+              [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPDs }],
+              [
+                [{ type: "hidden", name: "type", val: "price" }, { type: "hidden", name: "rc", val: rc }],
+                [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_2, name: "date_end" }],
+                [{ type: "number", "label": "Цена", name: "value" }]
+              ]
+            );
+          }
+          if (type == "min_days") {
+            popup_create(
+              "Изменить на выбраный период",
+              "Изменение минимального количества дней до заселения",
+              [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPDs }],
+              [
+                [{ type: "hidden", name: "type", val: "min_days" }, { type: "hidden", name: "rc", val: rc }],
+                [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_2, name: "date_end" }],
+                [{ type: "number", "label": "Дней", name: "value" }]
+              ]
+            );
+          }
+        }
+        else {
+          if (type == "price") {
+            popup_create(
+              "Изменить на выбраный период",
+              "Изменения цены",
+              [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPDs }],
+              [
+                [{ type: "hidden", name: "type", val: "price" }, { type: "hidden", name: "rc", val: rc }],
+                [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_1, name: "date_end" }],
+                [{ type: "number", "label": "Цена", name: "value" }],
+              ]
+            );
+
+          }
+          if (type == "min_days") {
+            popup_create(
+              "Изменить на выбраный период",
+              "Изменение минимального количества дней до заселения",
+              [{ type: "close", name: "Отмена" }, { type: "use-inputs", name: "Изменить", fun: savePPDs }],
+              [
+                [{ type: "hidden", name: "type", val: "min_days" }, { type: "hidden", name: "rc", val: rc }],
+                [{ type: "date", "label": "Дата 1", val: date_1, name: "date_start" }, { type: "date", "label": "Дата 2", val: date_1, name: "date_end" }],
+                [{ type: "number", "label": "Дней", name: "value" }],
+              ]
+            );
+          }
+        }
+        dp.clearSelection();
+      }
+    });
+
+    dp.init();
+    $(".scheduler_default_corner").html("")
+    loadRooms()
+
+    document.querySelector("#cellwidth").addEventListener("input", function (ev) {
+      var cellwidth = parseInt(this.value);
+      document.querySelector("#label").innerText = cellwidth;
+      var start = dp.getViewPort().start;
+
+      dp.cellWidth = cellwidth;
+      dp.update();
+      $(".scheduler_default_corner").html("")
+      dp.scrollTo(start);
+    });
+  </script>
+
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "main/base.html" %}
+{% load menu sass_tags form static %}
+{% block content %}
+
+<link href="{% static 'css/scss/profile.css' %}"
+	rel="stylesheet"
+	type="text/css" />
+
+<div id="content">
+	<div class="left">
+		{% bread_crumb %}
+		{% tabs %}
+	</div>
+	<div class="right">
+		<div id="main_block">
+			{% block main_block %}
+			{% endblock main_block %}
+		</div>
+	</div>
+</div>
+
+<script defer>
+	function set_width_table_section() {
+		$(".greyGridTable").parent(".section").map(function () {
+			pos_x = $(this).offset().left
+			w_body = $("body").width()
+			$(this).width(w_body - pos_x - 10)
+			$(this).css("overflow", "auto")
+		});
+
+	}
+
+	set_width_table_section()
+
+	window.addEventListener('resize', function () {
+		set_width_table_section()
+	});
+</script>
+
+{% endblock content %}

@@ -1,0 +1,459 @@
+{% load static form sass_tags %}
+
+<link href="{% static 'css/scss/form_search.css' %}"
+	rel="stylesheet"
+	type="text/css" />
+
+<form class="form_search"
+	action="">
+	<div id="search_input_menu"
+		class="dropdown-content">
+		<input type="text"
+			placeholder="Куда вы хотите поехать?"
+			required
+			id="search_input">
+		<div id="search_input_menu_items">
+		</div>
+	</div>
+	<div class="form-search__label form-search__label--date">
+		<input id="date_1"
+			readonly
+			class="form-search__input input-date">
+		<input id="date_2"
+			readonly
+			class="form-search__input input-date">
+	</div>
+	<div class="form-search__label form-search__label--persons">
+		<span class="guests">
+			<span>
+				<p class="adults">1</p> взрослых
+			</span>
+			<span>•</span>
+			<span>
+				<p class="сhildren">0</p> детей
+			</span>
+		</span>
+		<div id="guests_popup">
+			<div class="adults input">
+				<span class="label">Взрослых</span>
+				<span class="minus">-</span>
+				<input type="number"
+					name=""
+					id=""
+					placeholder="1"
+					value="1"
+					required>
+				<span class="plus">+</span>
+			</div>
+			<div class="сhildren input">
+				<span class="label">Детей</span>
+				<span class="minus">-</span>
+				<input type="number"
+					name=""
+					id=""
+					placeholder="1"
+					value="0"
+					required>
+				<span class="plus">+</span>
+			</div>
+			<span class="children_age_label label">Возраст ребёнка</span>
+			<div class="children_age_group">
+				{% for age in search.age_c %}
+				<input type="number"
+					name="age_c[]"
+					value="{{age}}"
+					placeholder="0-17">
+				{% endfor %}
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+				<input type="number"
+					name="age_c[]"
+					placeholder="0-17"
+					style="display: none;">
+			</div>
+		</div>
+		{% csrf_token %}
+	</div>
+	<script>
+		$(`.children_age_group input`).hide()
+		$(`.children_age_label`).hide()
+		$(".сhildren input").change(function () {
+			index = $(this).val()
+			$(`.children_age_group input`).hide()
+			$(`.children_age_label`).hide()
+			$(`.children_age_group input:nth-child(-n + ${index})`).show()
+			if (index > 0) {
+				$(`.children_age_label`).show()
+			}
+
+			// Удалить значение в тех которые не видны
+			$(`.children_age_group input`).not(`input:nth-child(-n + ${index})`).val("")
+		})
+
+	</script>
+	<a class="button form-search__button"
+		type="submit"
+		onclick="go_list(); return false;">Поиск</a>
+</form>
+
+<style>
+	.ui-autocomplete-category {
+		font-size: 12px;
+		font-weight: normal;
+		color: #999;
+	}
+
+	.ui-menu .ui-menu-item:not(.ui-autocomplete-category):hover {
+		margin-right: 10px;
+	}
+</style>
+
+<script>
+	function formatDate(date) {
+		var dd = date.getDate();
+		if (dd < 10) dd = '0' + dd;
+		var mm = date.getMonth() + 1;
+		if (mm < 10) mm = '0' + mm;
+		var yyyy = date.getFullYear();
+		return dd + '.' + mm + '.' + yyyy;
+	}
+
+	date_1 = new Date()
+	date_2 = new Date()
+	date_2.setDate(date_1.getDate() + 7);
+	//{% if search.date_1 %}
+	$("#date_1").val("{{search.date_1}}")
+	//{% else %}
+	$("#date_1").val(formatDate(date_1))
+	//{% endif %}
+
+	//{% if search.date_2 %}
+	$("#date_2").val("{{search.date_2}}")
+	//{% else %}
+	$("#date_2").val(formatDate(date_2))
+	//{% endif %}
+
+	$("#search_input").val("{% if search.city %}{{ search.city }}{% endif %}")
+	//{% data_list 'city' as city_data_list %}
+	list_city = [
+		//{% for item in city_data_list %}
+		"{{item}}",
+		//{% endfor %}
+	]
+
+	value_search_input_slug = "{{value_search_input_slug}}"
+
+	places = []
+
+	let searchResults = []; // результаты поиска
+	let popularItems = []; // популярные направления
+	let historyItems = []
+
+	$("#search_input").autocomplete({
+		minLength: 3,
+		autoFocus: true,
+		source: function (request, response) {
+			$.ajax({
+				url: "{% url 'utils.ajax.search.place' %}",
+				dataType: "json",
+				data: {
+					q: request.term
+				},
+				success: function (request) {
+					searchResults = request.results;
+					popularItems = request.popular;
+
+					let data = [];
+
+					searchResults.forEach(item => {
+						data.push(item);
+						places.push(item)
+					});
+
+
+					popularItems.forEach(item => {
+						data.push(item);
+						places.push(item)
+					});
+
+					response(data);
+				}
+			});
+		},
+		select: function (event, ui) {
+			value_search_input_slug = ui.item.slug
+
+			let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+			// проверяем, что такого города еще нет
+
+			history.forEach(history_item => {
+				if (history_item.slug == ui.item.slug) {
+					let index = history.indexOf(history_item);
+					history.splice(index, 1);
+				}
+			});
+
+			history.push(ui.item);
+
+			if (history.length > 5) {
+				history.shift()
+			}
+
+			localStorage.setItem('searchHistory', JSON.stringify(history));
+
+			$("#search_input").val(ui.item.label)
+			return false;
+		},
+		close: function( event, ui ) {
+			if (value_search_input_slug == "") {
+				if (places.length > 0) {
+					first = places[0]
+					value_search_input_slug = first.slug
+					$("#search_input").val(first.label)
+				}
+			}
+		},
+	})
+
+	var autocomplete = $("#search_input").autocomplete("instance");
+
+
+	autocomplete._renderMenu = function(ul, items) {
+		var search = $("<li>")
+			.addClass("ui-autocomplete-category")
+			.text("Поиск")
+			.appendTo(ul);
+
+		searchResults.forEach(item => {
+			this._renderItemData(ul, item);
+		});
+
+		var popular = $("<li>")
+			.addClass("ui-autocomplete-category")
+			.text("Популярное")
+			.appendTo(ul);
+
+		popularItems.forEach(item => {
+			this._renderItemData(ul, item);
+		});
+
+		historyItems = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+		if (historyItems.length > 0) {
+			$("<li>")
+				.addClass("ui-autocomplete-category")
+				.text("История")
+				.appendTo(ul);
+
+			historyItems.reverse().forEach(item => {
+				this._renderItemData(ul, item);
+			});
+		}
+
+
+	}
+
+	autocomplete._renderItem = function (ul, item) {
+		console.log("render", item)
+		return $(`<li style='display: flex; justify-content: space-between'>`)
+			.append(`<span class='search_input_sity' style='display: flex; justify-content: space-between'><img style='margin-right: 5px;' src="{% static 'img\sprite\location_black.svg' %}">${item.label}<span class="additional_address">, ${item.additional_address}</span></span>`)
+			.appendTo(ul);
+	}
+
+	$.datepicker.setDefaults($.datepicker.regional["ru"]);
+
+
+	$("#date_2").datepicker({ minDate: 0, changeMonth: true, })
+
+	$("#date_1").datepicker({ minDate: 0, changeMonth: true, onClose: function(date_str, e) {
+		console.log(date_str)
+		$("#date_2").datepicker("option", "minDate", date_str)
+		}
+	})
+
+
+	$("#guests_popup .adults input").change(function () {
+		adults = $(".guests .adults")
+		val = $(this).val()
+		adults.html(val)
+	})
+	$("#guests_popup .adults .minus").click(function () {
+		val = $("#guests_popup .adults input").val()
+		val = val - 1;
+		if (val < 0) val = 0
+		$("#guests_popup .adults input").val(val)
+		$("#guests_popup .adults input").change()
+	})
+	$("#guests_popup .adults .plus").click(function () {
+		val = $("#guests_popup .adults input").val()
+		val = Number(val) + 1;
+		$("#guests_popup .adults input").val(val)
+		$("#guests_popup .adults input").change()
+	})
+
+	$("#guests_popup .сhildren input").change(function () {
+		сhildren = $(".guests .сhildren")
+		val = $(this).val()
+		сhildren.html(val)
+	})
+
+	$("#guests_popup .сhildren .minus").click(function () {
+		val = $("#guests_popup .сhildren input").val()
+		val = val - 1;
+		if (val < 0) val = 0
+		$("#guests_popup .сhildren input").val(val)
+		$("#guests_popup .сhildren input").change()
+	})
+
+	$("#guests_popup .сhildren .plus").click(function () {
+		val = $("#guests_popup .сhildren input").val()
+		val = Number(val) + 1;
+		$("#guests_popup .сhildren input").val(val)
+		$("#guests_popup .сhildren input").change()
+	})
+
+	//{% if search.a %}
+	$("#guests_popup .adults input").val("{{search.a}}")
+	//{% else %}
+	$("#guests_popup .adults input").val(1)
+	//{% endif %}
+
+	//{% if search.a %}
+	$("#guests_popup .сhildren input").val("{{search.c}}")
+	//{% else %}
+	$("#guests_popup .сhildren input").val(0)
+	//{% endif %}
+
+	$(".сhildren input").change()
+	$(".adults input").change()
+
+
+	function go_list() {
+		childs = Array.from($("*[name='age_c[]']"), item => $(item).val())
+
+		childs_count = $("#guests_popup .сhildren input").val()
+
+		childs_count_int = parseInt(childs_count)
+
+		count_age_c_empty = 0
+		$("*[name='age_c[]']").not('[style="display: none;"]').map(function () {
+			if ($(this).val() == "") {
+				count_age_c_empty++
+			}
+		})
+
+		if (count_age_c_empty > 0) {
+			alert("Укажите возраст всех детей")
+			return
+		}
+
+		date_1 = $("#date_1").datepicker("getDate")
+		date_2 = $("#date_2").datepicker("getDate")
+
+		if (date_1 > date_2) {
+			alert("Дата начала бронирования не может быть больше даты конца бронирования")
+			return
+		}
+
+		childs = childs.filter(child => child !== "");
+
+		data = {
+			"adults": $("#guests_popup .adults input").val(),
+			"date_1": $("#date_1").val(),
+			"date_2": $("#date_2").val(),
+		}
+		if (childs.length > 0) {
+			data["age_c"] = childs.join("-")
+		}
+
+
+		if (value_search_input_slug != "") {
+			query_string = getQueryString(data)
+			url = `https://turgorodok.ru/hotel/search/${value_search_input_slug}/?${query_string}`
+			console.log(url)
+			location.href = url
+		}
+
+	}
+
+	function getQueryString(params) {
+		let queryString = '';
+		for (let key in params) {
+			if (params.hasOwnProperty(key)) {
+				if (queryString.length > 0) {
+					queryString += '&';
+				}
+				queryString += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+			}
+		}
+		return queryString;
+	}
+
+	function getQueryParams() {
+		const urlParams = new URLSearchParams(window.location.search);
+		const params = {};
+		for (let [key, value] of urlParams) {
+			params[key] = value;
+		}
+		return params;
+	}
+
+</script>
+
+<script src="{% static 'js/datepicker-ru.js' %}"
+	defer></script>

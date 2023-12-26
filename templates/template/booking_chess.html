@@ -1,0 +1,82 @@
+<div data-id="{{booking.id}}"
+  class="info_booking"
+  style="display: none;">
+  {% if booking.info.booking_user.value %}
+  <span class="info_field booking_user">
+    <span class="name"></span>
+    <span class="value">{{booking.info.booking_user.value}}</span>
+  </span>
+  {% endif %}
+
+  {% if booking.info.id.value %}
+  <span class="info_field id">
+    <span class="name">ID:</span>
+    <a href="{{booking.url}}"
+      class="value">{{booking.info.id.value}}</a>
+  </span>
+  {% endif %}
+
+  {% if booking.info.booked_room.value %}
+  <span class="info_field booked_room">
+    <span class="name">Номер:</span>
+    <span class="value">{{booking.info.booked_room.value}}</span>
+  </span>
+  {% endif %}
+  {% if booking.status == "close" %}
+  {% if booking.info.start_date_time.value %}
+  <span class="info_field start_date_time">
+    <span class="name">C:</span>
+    <span class="value">{{booking.info.start_date_time.value}}</span>
+  </span>
+  {% endif %}
+
+  {% if booking.info.end_date_time.value %}
+  <span class="info_field end_date_time">
+    <span class="name">До:</span>
+    <span class="value">{{booking.info.end_date_time.value}}</span>
+  </span>
+  {% endif %}
+  {% else %}
+  {% if booking.info.start_date_time.value %}
+  <span class="info_field start_date_time">
+    <span class="name">Начало бронирования:</span>
+    <span class="value">{{booking.info.start_date_time.value}}</span>
+  </span>
+  {% endif %}
+
+  {% if booking.info.end_date_time.value %}
+  <span class="info_field end_date_time">
+    <span class="name">Окончание бронирования:</span>
+    <span class="value">{{booking.info.end_date_time.value}}</span>
+  </span>
+  {% endif %}
+  {% endif %}
+
+  {% if booking.info.adults_count.value %}
+  <span class="info_field adults_count">
+    <span class="name">Количество взрослых:</span>
+    <span class="value">{{booking.info.adults_count.value}}</span>
+  </span>
+  {% endif %}
+
+  {% if booking.info.children_count.value %}
+  <span class="info_field children_count">
+    <span class="name">Количество детей:</span>
+    <span class="value">{{booking.info.children_count.value}}</span>
+  </span>
+  {% endif %}
+
+  {% if booking.info.children_ages.value %}
+  <span class="info_field children_ages">
+    <span class="name">Возраст детей:</span>
+    <span class="value">{{booking.info.children_ages.value}}</span>
+  </span>
+  {% endif %}
+
+  {% if booking.info.status.value %}
+  <span class="info_field status">
+    <span class="name">Статус:</span>
+    <span class="value">{{booking.info.status.value}}</span>
+  </span>
+  {% endif %}
+</div>

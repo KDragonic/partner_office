@@ -1,0 +1,154 @@
+{% if type == "radio" %}
+<label class="checkradion" id="label_{{name}}">
+	<span class="name">{{label}}{% if required == true %}*{% endif %}</span>
+	<section>
+		{% for item in values %}
+		<label>
+			<input type="radio"
+				name="{{name}}"
+				autocomplete="{{autocomplete}}"
+				value="{{item.0.0}}"
+				{% if item.1 == 1 %}checked{% endif %}
+				{% if required == 1 %}required{% endif %}>
+			<span class="name">{{item.0.1}}</span>
+		</label>
+		{% endfor %}
+	</section>
+</label>
+{% endif %}
+
+{% if type == "checkbox" %}
+<label class="checkradion" id="label_{{name}}">
+	<span class="name">{{label}}{% if required == true %}*{% endif %}</span>
+	<section>
+		{% for item in values %}
+		<label>
+			<input type="checkbox"
+				name="{{name}}"
+				autocomplete="{{autocomplete}}"
+				value="{{item.0.0}}"
+				{% if item.1 == 1 %}checked{% endif %}>
+			<span class="name">{{item.0.1}}</span>
+		</label>
+		{% endfor %}
+	</section>
+</label>
+{% endif %}
+
+{% if type == "checkbox_grupe" %}
+<div class="checkradion" id="label_{{name}}"
+	style="width: 100%;">
+	<span class="name">{{label}}{% if required == true %}*{% endif %}</span>
+	<section>
+		{% for grupe in values %}
+		<div class="accordion-item"
+			style="width: 100%;">
+			<span class="name accordion-header" style="width: 100%;"><b>{{grupe.0}}</b></span>
+			<div class="accordion-content">
+				{% for item in grupe.1 %}
+				<label>
+					<input type="checkbox"
+						name="{{name}}[]"
+						value="{{item.0}}"
+						{% if item.2 == 1 %}checked{% endif %}>
+					<span class="name">{{item.1}}</span>
+				</label>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+	</section>
+</div>
+
+<script defer>
+	$(document).ready(function () {
+		// Скрыть все содержимое аккордеона
+		$(".accordion-content").hide();
+
+		// Добавить обработчики событий для заголовков
+		$(".accordion-header").click(function () {
+			// $(".accordion-header").removeClass("open")
+			$(this).toggleClass("open")
+			// Скрыть все содержимое аккордеона
+			// $(".accordion-content").hide();
+			// Отобразить содержимое, соответствующее заголовку, на котором был сделан клик
+			$(this).next(".accordion-content").toggle();
+		});
+	});
+</script>
+<style>
+	.grupe_input .accordion-content {
+		display: flex;
+		flex-direction: column;
+		gap: 9px;
+	}
+
+	.grupe_input .accordion-content label {
+		display: flex;
+		gap: 7px;
+	}
+
+	.grupe_input .accordion-content label input {
+		cursor: pointer;
+	}
+
+	.grupe_input .accordion-content label span {
+		line-height: 17px;
+		cursor: pointer;
+	}
+
+
+	.grupe_input .accordion-header {
+		font-size: 18px;
+    color: #343434;
+	}
+
+	.grupe_input .accordion-header b {
+		cursor: pointer;
+	}
+
+	.grupe_input .checkradion section {
+		column-count: 1 !important;
+	}
+
+	span.name.accordion-header.open::before {
+		content: "-";
+		font-weight: 800;
+		margin-right: 5px;
+	}
+
+	span.name.accordion-header::before {
+		content: "+";
+		font-weight: 800;
+		margin-right: 5px;
+	}
+</style>
+
+{% endif %}
+
+{% if type == "list" %}
+<label class="text" id="label_{{name}}">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	<select name="{{name}}"
+		{% if required == 1 %}required{% endif %}>
+		{% for item in values %}
+		<option value="{{item.0.0}}" {% if item.1 == 1 %}selected{% endif %}>{{item.0.1}}</option>
+		{% endfor %}
+	</select>
+</label>
+{% endif %}
+
+
+{% if type == "lists_and_quantity" %}
+<div id="label_{{name}}">
+	<span class="name">{{label}}{% if required == 1 %}*{% endif %}</span>
+	{% for item in values %}
+	<div class="input_line">
+		<select name="{{name}}">
+			<option value="{{item.value.id}}" {% if item.value.selected %}selected{% endif %}>{{item.value.name}}</option>
+		</select>
+		<input type="number" value="{{item.value.count}}" placeholder="0" required>
+	</div>
+	{% endfor %}
+</div>
+{% endif %}

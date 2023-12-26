@@ -1,0 +1,3 @@
+User-agent: * #указывает, для каких роботов установлены директивы
+Disallow: /admin/ # запрещает ссылки из панели администратора
+Sitemap: http://turgorodok.ru/sitemap.xml # указывает роботу на файл Sitemap для сайта

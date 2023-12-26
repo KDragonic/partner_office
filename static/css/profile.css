@@ -1,0 +1,1201 @@
+
+@media screen and (max-width: 1301px) {
+  .grupe_input {
+    width: auto !important;
+    flex-direction: column !important;
+  }
+
+  .grupe_card {
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 997px) {
+  #content {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+
+  #content>.left {
+    width: 100% !important;
+  }
+
+  #content>.right {
+    margin-left: 0 !important;
+  }
+
+  #content .breadcrumb {
+    width: 100%;
+    margin-left: 0;
+    display: flex;
+    margin-bottom: -39px;
+  }
+
+  #content #tabs {
+    width: auto;
+    margin-left: 0;
+    min-height: auto;
+  }
+
+  .grupe_card .card {
+    width: 151px !important;
+    height: 198.32px !important;
+  }
+
+  #content #main_block {
+    width: 100%;
+    flex-grow: 1;
+    height: 100%;
+    background: #FFFFFF;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+  }
+
+  .grupe_input {
+    width: auto !important;
+  }
+
+  .grupe_input>label {
+    width: auto !important;
+  }
+
+  #content .section {
+    width: auto !important;
+  }
+}
+
+
+table {
+  border: 1px solid rgb(0 0 0);
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table td,
+table th {
+  border: 1px solid rgb(0 0 0);
+  padding: 3px;
+}
+
+table th {
+  background: rgb(24 92 92);
+  color: white;
+}
+
+table td:nth-child(1) {
+  background: rgb(222, 222, 222);
+}
+
+.flex_row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.section .mini_text {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: #000000;
+}
+
+.section>.title {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 30px;
+
+  color: #000000;
+}
+
+.section>.discription {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 22px;
+  width: 100%;
+
+  color: #000000;
+  margin-top: 20px;
+}
+
+.grupe_input {
+  margin-top: 20px;
+  row-gap: 20px;
+  column-gap: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 696px;
+}
+
+.grupe_input>label {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  width: 328px;
+}
+
+.grupe_input>label.flat input {
+  border: none !important;
+  padding: 0 !important;
+  font-size: 20px;
+}
+
+.grupe_input>label.flat input::placeholder {
+  display: none !important;
+}
+
+.grupe_input>label.flat input[readonly] {
+  background: none;
+}
+
+.grupe_input>label>.name {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+
+  color: #000000;
+}
+
+.grupe_input>label.text input,
+.grupe_input>label.text select,
+.grupe_input>label.date input {
+  height: 45px;
+  width: 100%;
+  border: 1px solid #D2D2D2;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+.grupe_input>label.text textarea {
+  width: 100%;
+  border: 1px solid #D2D2D2;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding-left: 14px;
+  resize: horizontal;
+}
+
+.grupe_input>label.text input::placeholder {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: #818181;
+}
+
+.grupe_input .date_3 section {
+  display: flex;
+  gap: 10px;
+}
+
+.grupe_input .date_3 section .d {
+  flex: 1 2 100%;
+  min-width: 75px;
+}
+
+.grupe_input .date_3 section .m {
+  flex: 2 1 100%;
+}
+
+.grupe_input .date_3 section .y {
+  flex: 1 2 100%;
+  min-width: 75px;
+}
+
+.grupe_input .checkradion section {
+  column-count: 2;
+  column-width: 339px;
+}
+
+.grupe_input .checkradion section>label {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+
+  color: #000000;
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.grupe_input .checkradion input {
+  width: 18px;
+}
+
+.button {
+  background: #FC7201;
+  height: 50px;
+  color: white;
+  border-radius: 5px;
+  padding: 14px 32px;
+  width: max-content;
+}
+
+.grupe_card {
+  display: flex;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.grupe_card .card {
+  border-radius: 8px;
+  width: 174px;
+  height: 224.32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.grupe_card .card.active {
+  background: rgba(238, 238, 238, 0.5);
+}
+
+.grupe_card .card.add {
+  border: 0.8px solid #07151C;
+}
+
+.grupe_card .card .close {
+  cursor: pointer;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+}
+
+.grupe_card .card .close:before,
+.grupe_card .card .close:after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 1.5px;
+  background: #747474;
+}
+
+.grupe_card .card .close:before {
+  transform: rotate(45deg);
+}
+
+.grupe_card .card .close:after {
+  transform: rotate(-45deg);
+}
+
+.grupe_card .card .name {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 130%;
+  /* identical to box height, or 19px */
+
+  text-align: center;
+  letter-spacing: 0.1px;
+
+  color: #000000;
+}
+
+.grupe_card .card.add .plus {
+  position: relative;
+  left: -15px;
+  margin-bottom: 15px;
+}
+
+.grupe_card .card.add .plus:before,
+.grupe_card .card.add .plus:after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 3px;
+  background: #024849;
+  border-radius: 10px;
+}
+
+.grupe_card .card.add .plus:before {
+  transform: rotate(0deg);
+}
+
+.grupe_card .card.add .plus:after {
+  transform: rotate(90deg);
+}
+
+.grupe_card .card.add .name {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 130%;
+  /* or 16px */
+
+  text-align: center;
+  letter-spacing: 0.1px;
+
+  color: #024849;
+}
+
+.grupe_input input[type="checkbox"]:checked::before {
+  background: #FC7201;
+}
+
+.br {
+  border: 1px solid rgba(118, 118, 118, 0.3);
+  width: 100%;
+  height: 1px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+#content {
+  display: flex;
+  min-height: 76vh;
+}
+
+#content .left {
+  width: 473px;
+}
+
+#content .right {
+  width: 100%;
+  margin-left: 46px;
+}
+
+#bread_crumb {
+  margin-left: 57px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  display: flex;
+}
+
+#bread_crumb .item {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: #787878;
+}
+
+#bread_crumb .arrow {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: #787878;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.grupe_input>label input[readonly] {
+  background: #0000000a;
+  border: none;
+}
+
+#content .link:hover {
+  color: #000000;
+  text-decoration: underline;
+}
+
+#tabs {
+  background: #FFFFFF;
+  border-radius: 13px;
+  margin-left: 57px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 535px;
+  width: 370px;
+}
+
+#tabs .username {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 25px;
+
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+#tabs .edit_profil {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+
+  color: #024849;
+  margin-bottom: 45px;
+}
+
+#main_block {
+  width: 100%;
+  flex-grow: 1;
+  height: 100%;
+  background: #FFFFFF;
+  padding-left: 65px;
+  padding-right: 65px;
+  padding-top: 104px;
+  padding-bottom: 104px;
+}
+
+
+.limiter_group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card_booking #card_bookingDIV_5.status_new {
+  background-color: #54d39c
+}
+
+.card_booking #card_bookingDIV_5.status_verified {
+  background-color: #60C0FF
+}
+
+.card_booking #card_bookingDIV_5.status_settled {
+  background-color: #54d39c
+}
+
+.card_booking #card_bookingDIV_5.status_left {
+  background-color: #B3BAC4
+}
+
+.card_booking #card_bookingDIV_5.status_cancelled {
+  background-color: #D34141
+}
+
+#card_bookingDIV_17,
+#card_bookingDIV_28 {
+  width: 100% !important
+}
+
+#card_bookingDIV_12 {
+  display: flex !important;
+  width: 100% !important
+}
+
+#card_bookingA_1 {
+  box-shadow: rgba(0, 0, 0, .06) 0 .857143px 9.42857px 0;
+  color: #11223e;
+  display: block;
+  height: 178.432px;
+  inline-size: 385.773px;
+  text-decoration: none;
+  width: min-content !important;
+  background: #fff;
+  border: .727273px solid rgba(0, 0, 0, .05);
+  border-radius: 5px;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  overflow: hidden;
+  padding: 8.57143px;
+}
+
+#card_bookingA_1:before {
+  color: #11223e;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_2 {
+  color: #11223e;
+  cursor: pointer;
+  height: 49.3182px;
+  inline-size: 367.182px;
+  text-decoration: none;
+  width: max-content !important;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+
+#card_bookingDIV_2:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_3 {
+  align-items: center;
+  color: #11223e;
+  cursor: pointer;
+  display: flex;
+  height: 26.3864px;
+  inline-size: 367.182px;
+  text-decoration: none;
+  width: max-content;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_3:before {
+  color: #11223e;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_4 {
+  color: #11223e;
+  cursor: pointer;
+  height: 8.56818px;
+  inline-size: 15.4205px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  width: 15.4205px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  padding: 0 6.85714px 0 0
+}
+
+#card_bookingDIV_4:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_5 {
+  color: #11223e;
+  cursor: pointer;
+  height: 8.56818px;
+  inline-size: 8.56818px;
+  text-decoration: none;
+  width: 8.56818px;
+  background: #54d39c;
+  border: 0 none #11223e;
+  border-radius: 100%;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_5:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_6 {
+  bottom: 0;
+  color: #11223e;
+  cursor: pointer;
+  height: 26.3864px;
+  inline-size: 270.341px;
+  inset-block-end: 0;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  inset-inline-start: 0;
+  left: 0;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  position: relative;
+  right: 0;
+  text-decoration: none;
+  top: 0;
+  width: 270.341px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  flex: 1 1 auto;
+  font: 12px/13.2px "Manrope", "Arial", sans-serif;;
+  overflow: hidden;
+  padding: 0 12.8571px 0 0
+}
+
+#card_bookingDIV_6:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/13.2px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_7 {
+  color: #11223e;
+  cursor: pointer;
+  height: 15.0795px;
+  inline-size: 257.489px;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 257.489px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 13.7143px/15.0857px "Cera Pro Medium";
+  overflow: hidden
+}
+
+
+#card_bookingDIV_7:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 13.7143px/15.0857px "Cera Pro Medium";
+}
+
+#card_bookingSPAN_8 {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 13.7143px/15.0857px "Cera Pro Medium";
+}
+
+#card_bookingSPAN_8:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 13.7143px/15.0857px "Cera Pro Medium";
+}
+
+#card_bookingDIV_9 {
+  color: #a4aab5;
+  cursor: pointer;
+  height: 11.3068px;
+  inline-size: 257.489px;
+  text-decoration: none solid #a4aab5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 257.489px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 10.2857px/11.3143px "Manrope", "Arial", sans-serif;;
+  overflow: hidden
+}
+
+#card_bookingDIV_9:before {
+  color: #a4aab5;
+  cursor: pointer;
+  text-decoration: none solid #a4aab5;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 10.2857px/11.3143px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingSPAN_10 {
+  color: #a4aab5;
+  cursor: pointer;
+  text-decoration: none solid #a4aab5;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 10.2857px/11.3143px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingSPAN_10:before {
+  color: #a4aab5;
+  cursor: pointer;
+  text-decoration: none solid #a4aab5;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 10.2857px/11.3143px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_11 {
+  color: #11223e;
+  cursor: pointer;
+  height: 13.7727px;
+  inline-size: 81.4205px;
+  max-inline-size: 81.4286px;
+  max-width: 81.4286px;
+  min-height: auto;
+  min-inline-size: 81.4286px;
+  min-width: 81.4286px;
+  text-align: right;
+  text-decoration: none;
+  width: 81.4205px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 10.2857px/13.7829px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_11:before {
+  color: #11223e;
+  cursor: pointer;
+  text-align: right;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 10.2857px/13.7829px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_12 {
+  align-items: center;
+  color: #11223e;
+  cursor: pointer;
+  display: flex;
+  height: 22.9318px;
+  inline-size: 367.182px;
+  justify-content: space-between;
+  text-decoration: none;
+  width: max-content;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  padding: 6.85714px 0 0 .857143px
+}
+
+#card_bookingDIV_12:before {
+  color: #11223e;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_13 {
+  color: #11223e;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 94.6364px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  width: 94.6364px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_13:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_14 {
+  width: max-content;
+  color: #a4aab5;
+  cursor: pointer;
+  height: 13.7727px;
+  inline-size: 29.5114px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none solid #a4aab5;
+  width: 29.5114px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 10.2857px/13.7829px "Manrope", "Arial", sans-serif;;
+  width: 60px;
+  transform: matrix(1, 0, 0, 1, 0, 0);
+  text-align: center
+}
+
+#card_bookingDIV_14:before {
+  color: #a4aab5;
+  cursor: pointer;
+  text-decoration: none solid #a4aab5;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 10.2857px/13.7829px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_15 {
+  width: max-content !important;
+  color: #11223e;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 93.8523px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  width: 93.8523px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_15:before {
+  color: #11223e;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_16,
+#card_bookingDIV_33 {
+  color: #11223e;
+  cursor: pointer;
+  height: .852273px;
+  inline-size: 367.182px;
+  margin-block-end: 8.57143px;
+  margin-block-start: 8.57143px;
+  text-decoration: none;
+  width: max-content;
+  background: #edf0f4;
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  margin: 8.57143px 0;
+}
+
+
+#card_bookingDIV_17 {
+  color: #11223e;
+  cursor: pointer;
+  height: 58.4659px;
+  inline-size: 367.182px;
+  text-decoration: none;
+  width: max-content;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_18,
+#card_bookingDIV_23,
+#card_bookingDIV_28 {
+  align-items: center;
+  color: #11223e;
+  cursor: pointer;
+  display: flex;
+  height: 19.4886px;
+  inline-size: 367.182px;
+  justify-content: space-between;
+  text-decoration: none;
+  width: max-content;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  padding: 1.71429px 0
+}
+
+#card_bookingDIV_19 {
+  color: #a4aab5;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 57.2955px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none solid #a4aab5;
+  width: 57.2955px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingSPAN_20,
+#card_bookingSPAN_25,
+#card_bookingSPAN_30 {
+  color: #a4aab5;
+  cursor: pointer;
+  text-decoration: none solid #a4aab5;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+
+#card_bookingDIV_21 {
+  color: #34425a;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 53px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 53px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  overflow: hidden;
+  padding: 0 0 0 8.57143px
+}
+
+#card_bookingSPAN_22,
+#card_bookingSPAN_27,
+#card_bookingSPAN_32 {
+  color: #34425a;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_24 {
+  color: #a4aab5;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 39.0568px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none solid #a4aab5;
+  width: 39.0568px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_26 {
+  color: #34425a;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 136.307px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 136.307px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  overflow: hidden;
+  padding: 0 0 0 8.57143px
+}
+
+#card_bookingDIV_29 {
+  width: 100% !important;
+  color: #a4aab5;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 67.125px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none solid #a4aab5;
+  width: 67.125px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #a4aab5;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_31 {
+  color: #34425a;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 27.375px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 27.375px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+  overflow: hidden;
+  padding: 0 0 0 8.57143px
+}
+
+#card_bookingDIV_34 {
+  align-items: center;
+  color: #11223e;
+  cursor: pointer;
+  display: flex;
+  height: 16.0795px;
+  inline-size: 367.182px;
+  justify-content: space-between;
+  text-decoration: none;
+  width: max-content;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #11223e;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_35 {
+  align-items: center;
+  color: #34425a;
+  cursor: pointer;
+  display: flex;
+  height: 16.0795px;
+  inline-size: 54.8409px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  width: 54.8409px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_36 {
+  color: #34425a;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 39.4205px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  width: 39.4205px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingSPAN_37,
+#card_bookingSPAN_42 {
+  color: #34425a;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_38 {
+  bottom: -.857143px;
+  color: #34425a;
+  cursor: pointer;
+  height: 14.9318px;
+  inline-size: 15.4205px;
+  inset-block-end: -.857143px;
+  inset-block-start: .857143px;
+  inset-inline-end: 0;
+  inset-inline-start: 0;
+  left: 0;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  position: relative;
+  right: 0;
+  text-decoration: none;
+  top: .857143px;
+  width: 15.4205px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 11.1429px/14.9314px "Manrope", "Arial", sans-serif;;
+  padding: 0 0 0 8.57143px
+}
+
+#card_bookingSPAN_39,
+#card_bookingSPAN_44 {
+  color: #34425a;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 11.1429px/14.9314px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_40 {
+  align-items: center;
+  color: #34425a;
+  cursor: pointer;
+  display: flex;
+  height: 16.0795px;
+  inline-size: 88.3636px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  width: 88.3636px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_41 {
+  color: #34425a;
+  cursor: pointer;
+  height: 16.0795px;
+  inline-size: 33.4886px;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  text-decoration: none;
+  width: 33.4886px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 12px/16.08px "Manrope", "Arial", sans-serif;;
+}
+
+#card_bookingDIV_43 {
+  bottom: -.857143px;
+  color: #34425a;
+  cursor: pointer;
+  height: 14.9318px;
+  inline-size: 54.875px;
+  inset-block-end: -.857143px;
+  inset-block-start: .857143px;
+  inset-inline-end: 0;
+  inset-inline-start: 0;
+  left: 0;
+  min-height: auto;
+  min-inline-size: auto;
+  min-width: auto;
+  position: relative;
+  right: 0;
+  text-decoration: none;
+  top: .857143px;
+  width: 54.875px;
+  background: rgba(0, 0, 0, 0);
+  border: 0 none #34425a;
+  font: 11.1429px/14.9314px "Manrope", "Arial", sans-serif;;
+  padding: 0 0 0 8.57143px
+}

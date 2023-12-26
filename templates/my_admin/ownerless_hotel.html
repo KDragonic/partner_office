@@ -1,0 +1,355 @@
+{% extends "template/base_profile.html" %}
+{% load form static %}
+{% block main_block %}
+<style>
+  .switch {
+    background: #dedede;
+    width: 55px;
+    height: 22px;
+    border-radius: 5px;
+    position: relative;
+    top: 8px;
+  }
+
+  .part {
+    position: relative;
+    width: 28px;
+    height: 22px;
+    border-radius: 5px;
+    transition: left 0.5s;
+  }
+
+  .user_item.select {
+    background: #dfdfdf;
+  }
+
+  .user_item.select .divTableCell {
+    border-color: #dfdfdf;
+  }
+
+  .switch.on .part {
+    background: #FC7201;
+    left: 27px;
+  }
+
+  .switch.off .part {
+    background: #242424;
+  }
+
+  .divTableCell.action .del {
+    color: rgb(255, 74, 74)
+  }
+
+  .divTableCell.action .edit {
+    color: rgb(74, 110, 255)
+  }
+
+
+  div.greyGridTable {
+    border: 3px solid #FFFFFF;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+
+  .divTable.greyGridTable .divTableCell,
+  .divTable.greyGridTable .divTableHead {
+    border: 1px solid #FFFFFF;
+    padding: 10px;
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell {
+    font-size: 14px;
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell[data-active="True"] {
+    color: rgb(42, 213, 42)
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell[data-active="False"] {
+    color: rgb(255 15 15)
+  }
+
+  .divTable.greyGridTable .divTableHeading {
+    background: #FFFFFF;
+    border-bottom: 2px solid #CDCDCD;
+  }
+
+  .divTable.greyGridTable .divTableHeading .divTableHead {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 2px solid #CDCDCD;
+    text-align: left;
+  }
+
+  .greyGridTable .tableFootStyle {
+    font-size: 14px;
+  }
+
+  /* DivTable.com */
+  .divTable {
+    display: table;
+  }
+
+  .divTableRow {
+    display: table-row;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableCell,
+  .divTableHead {
+    display: table-cell;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableFoot {
+    display: table-footer-group;
+  }
+
+  .divTableBody {
+    display: table-row-group;
+  }
+
+  .hidden_cell {
+    display: none;
+  }
+
+
+  #search-form {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  #search-form #search-input {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #D2D2D2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+</style>
+
+
+
+<form id="search-form">
+  <input type="text"
+    id="search-input"
+    name="search"
+    placeholder="Поиск..."
+    value="">
+  <button type="submit"
+    id="search-button">Найти</button>
+</form>
+
+<script defer>
+  $(document).ready(function () {
+    // Получаем значение параметра search из URL
+    var searchParams = new URLSearchParams(window.location.search);
+    var searchValue = searchParams.get('search');
+
+    // Записываем значение параметра в input
+    $('#search-input').val(searchValue);
+
+    // Обработка отправки формы
+    $('#search-form').submit(function (e) {
+      e.preventDefault();
+      var searchValue = $('#search-input').val();
+      // Отправляем GET-запрос с параметром search
+      window.location.href = window.location.pathname + '?search=' + searchValue;
+    });
+
+  });
+</script>
+<div class="section">
+  <span class="title">Список пользователей</span>
+
+  <div class="divTable greyGridTable">
+    <div class="divTableHeading">
+      <div class="divTableRow">
+        <div class="divTableHead"
+          data-type="user_type">Тип пользователя</div>
+        <div class="divTableHead"
+          data-type="username">Имя</div>
+        <div class="divTableHead"
+          data-type="lastnasme">Фамилия</div>
+        <div class="divTableHead"
+          data-type="middlename">Отчество</div>
+        <div class="divTableHead"
+          data-type="phone">Телефон</div>
+        <div class="divTableHead"
+          data-type="phone_2">Доп. Телефон</div>
+        <div class="divTableHead"
+          data-type="email">Почта</div>
+        <div class="divTableHead"
+          data-type="hotel">Отель</div>
+        <div class="divTableHead"
+          data-type="login">Действие</div>
+      </div>
+    </div>
+    <div class="divTableBody">
+      {% for user in users %}
+      <div class="divTableRow user_item {% if select_user == user.id %}select{% endif %}"
+        data-id="{{user.id}}">
+        <div class="hidden_cell"
+          data-type="bonus">{{user.bonus_sum.sum}}</div>
+        <div class="divTableCell"
+          data-type="user_type">{{user.user_type}}</div>
+        <div class="divTableCell"
+          data-type="username">{{user.username}}</div>
+        <div class="divTableCell"
+          data-type="lastname">{{user.lastname}}</div>
+        <div class="divTableCell"
+          data-type="middlename">{{user.middlename}}</div>
+        <div class="divTableCell"
+          data-active="{% if user.active_phone %}True{% else %}False{% endif %}"
+          data-type="phone">{{user.phone}}</div>
+        <div class="divTableCell"
+          data-active="{% if user.active_phone_2 %}True{% else %}False{% endif %}"
+          data-type="phone_2">{{user.phone_2}}</div>
+        <div class="divTableCell"
+          data-active="{% if user.active_email %}True{% else %}False{% endif %}"
+          data-type="email">{{user.email}}</div>
+        <div class="divTableCell {% if user.hotel %}c_point{% endif %}"
+          data-type="hotel"
+          data-hotel-id="{{user.hotel.id}}">{{user.hotel.name}}</div>
+        <div class="divTableCell c_point"
+          data-type="action_popup">Выбрать</div>
+      </div>
+
+
+      {% if user.hotel %}
+      <script>
+        $(`.divTableCell[data-type="hotel"][data-hotel-id="{{user.hotel.id}}"]`).click(function () {
+          popup_create(
+            "Информация",
+            `
+            ID: {{user.hotel.id}}<br>
+            Название: {{user.hotel.name}}<br>
+            Статус: {{user.hotel.status_hotel}}<br>
+            Адресс: {{user.hotel.address}}<br>
+            Координаты: {{user.hotel.coordinates}}<br>
+            Описание: {% if user.hotel.descriptions %}{{user.hotel.descriptions}}Нет{% else %}{% endif %}<br>
+            Тип: {{user.hotel.type_hotel}}<br>
+            Время заселения: {{user.hotel.check_in_time}}<br>
+            Время выселения: {{user.hotel.check_in_time}}<br>
+            Звездость: {{user.hotel.stars}}<br>
+            Проценты: {{user.hotel.percentage}}%<br>
+            `,
+            [
+              { type: "close", name: "Закрыть" },
+              { type: "open", name: "Детальная", fun: open_detal_hotel, param: ["{{user.hotel.id}}"] },
+            ],
+            [],
+            "left_text"
+          )
+        })
+        function open_detal_hotel(id) {
+          location.href = `/hotel/${id}/`
+        }
+      </script>
+      {% endif %}
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+<script defer>
+  $("*[data-type='action_popup']").click(function () {
+    id_user = $(this).parent(".user_item").data("id")
+    console.log(id_user)
+    popup_create("Действие", "Упраление пользователем",
+      [
+        {
+          name: "Войти из под пользователя", fun: user_fun_action, param: ["login", id_user], type: "action", color: "purple", style: "full",
+        },
+        {
+          name: "Открыть чат", type: "action", color: "green", fun: user_fun_action, param: ["open_chat", id_user], style: "full",
+        },
+        {
+          name: "Операции с балансом", type: "action", color: "blue", fun: user_fun_action, param: ["user_financial_transactions", id_user], style: "full",
+        },
+        {
+          name: "Управление бонусами", type: "action", color: "blue", fun: user_fun_action, param: ["edit_bonus", id_user], style: "full",
+        },
+        {
+          name: "Закрыть", type: "close", color: "gray", style: "full",
+        },
+      ]
+    )
+  })
+
+  function user_fun_action(type, user_id) {
+    console.log(type, user_id)
+    if (type == "login") {
+      location.href = `{% url 'admin.ajax.auth_user' %}?user_id=${user_id}`
+    }
+    if (type == "open_chat") {
+      location.href = `{% url 'admin.redirect.open_user_chat' %}?user_id=${user_id}`
+    }
+    if (type == "user_financial_transactions") {
+      location.href = `{% url 'admin.page.user.financial_transactions' %}?user_id=${user_id}`
+    }
+    if (type == "edit_bonus") {
+      all_popup_close()
+
+      value_bonus = $(`.user_item[data-id="${user_id}"] .hidden_cell[data-type="bonus"]`).text()
+
+      popup_create("Управление бонусами", `Добавить или удалить бонусы пользователю<br>Сейчас: ${value_bonus} бонусов`,
+        [
+          {
+            name: "Отнять бонусы", fun: deny_bonus, type: "use-inputs", color: "red",
+          },
+          {
+            name: "Добавить бонусы", fun: add_bonus, type: "use-inputs", color: "green",
+          },
+          {
+            name: "Закрыть", type: "close", fun: all_popup_close, param: [], color: "gray", style: "full",
+          },
+        ],
+        [
+          [{ type: "hidden", name: "user_id", val: user_id }, { type: "text", "label": "Сумма", name: "count" }]
+        ]
+      )
+    }
+  }
+
+  function add_bonus(params) {
+    $.ajax({
+      method: "POST",
+      data: params,
+      url: "{% url 'admin.ajax.bonus.add' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+        location.reload()
+      }
+    });
+  }
+
+  function deny_bonus(params) {
+    $.ajax({
+      method: "POST",
+      data: params,
+      url: "{% url 'admin.ajax.bonus.deny' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+        location.reload()
+      }
+    });
+  }
+</script>
+{% endblock main_block %}

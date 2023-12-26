@@ -1,0 +1,292 @@
+{% load static %}
+<style>
+  .btn-primary {
+    background: #ff7600;
+  }
+
+  .btn-primary:hover {
+    background: #ffa14f;
+  }
+
+  .btn-primary:first-child:active {
+    background: #ffb16e;
+  }
+
+  .btn {
+    border: none;
+  }
+
+  .rows {
+    display: flex;
+    flex-direction: column;
+    padding: 0px 25px;
+  }
+
+  .promocodes {
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%), linear-gradient(127deg, #18a2a2 19.41%, rgba(255, 255, 255, 0.35) 43.56%, rgba(10, 14, 35, 0.49) 76.65%);
+  }
+
+  .promocodes .title {
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .promocodes .list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .promocodes .list .promocodes-item {
+    width: 100%;
+    min-height: 100px;
+    border-radius: 20px;
+    background: #ffffffad;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 17px;
+    position: relative;
+  }
+
+  .promocodes .list .promocodes-item .body .header {
+    gap: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .promocodes .list .promocodes-item .body .header .promo {
+    color: #333333;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .promocodes .list .promocodes-item .body .header .name {
+    color: #262626;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .promocodes .list .promocodes-item .body .footer {
+    color: #828282;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .promocodes .list .promocodes-item .button-menu {
+    cursor: pointer;
+  }
+
+  .promocodes .list .promocodes-item .button-menu svg path,
+  .promocodes .list .promocodes-item .button-menu svg {
+    transition: all 0.15s;
+  }
+
+  .promocodes .list .promocodes-item .button-menu:hover svg {
+    transform: rotate(90deg);
+  }
+
+  .promocodes .list .promocodes-item .button-menu:hover svg path,
+  .promocodes .list .promocodes-item .button-menu.active svg path {
+    fill: #888888;
+  }
+
+  .promocodes .list .promocodes-item.add {
+    min-height: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .promocodes .list .promocodes-item.add .title {
+    color: black;
+    font-size: 18px;
+    font-family: Manrope;
+    font-weight: 700;
+    line-height: 25.2px;
+    word-wrap: break-word;
+  }
+
+  .promocodes .list .promocodes-item.add button {
+    background: #ff7600;
+    color: white;
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+
+  .promocodes .list .promocodes-item.add button:hover {
+    background: #ff973d;
+  }
+
+  .promocodes .list .promocodes-item.add button:active {
+    background: #ffa65b;
+  }
+
+  .promocodes .list .promocodes-item .item-menu {
+    position: absolute;
+    top: calc(100% - 50% + 25px);
+    right: 0;
+    z-index: 999;
+    background: #ffffffe8;
+    padding: 5px;
+    border-radius: 6px;
+    flex-direction: column;
+    display: none;
+    gap: 2px;
+    box-shadow: 6px 4px 7px 0px rgba(0, 0, 0, 0.25);
+  }
+
+  .promocodes .list .promocodes-item .item-menu.show {
+    display: flex;
+  }
+
+  .promocodes .list .promocodes-item .item-menu .item-menu-item {
+    cursor: pointer;
+    padding: 4px;
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+
+  .promocodes .list .promocodes-item .item-menu .item-menu-item:hover {
+    background: #00000033;
+    color: white;
+  }
+
+  .promocodes .list .promocodes-item .item-menu .item-menu-item[hover-color='red']:hover {
+    background: #ff000054;
+  }
+  .promocodes .list .promocodes-item .item-menu .item-menu-item[hover-color='green']:hover {
+    background: #00ba255e;
+  }
+
+  .promocodes-item[enable-status="True"] .item-menu .item-menu-item[button-event="turn_on"] {
+    display: none;
+  }
+
+  .promocodes-item[enable-status="False"] .item-menu .item-menu-item[button-event="turn_off"] {
+    display: none;
+  }
+
+  .promocodes-item[enable-status="False"] {
+    background-color: #ffffff4a !important;
+  }
+
+
+</style>
+
+<div class="row">
+
+  <div class="col-12 col-xxl-6">
+    <div class="kdjq-card promocode_from" kdjq>
+      <div class="kdjq-card--header">
+        <span class="kdjq-card--header--title">Конструктор каналов</span>
+        <div class="kdjq-card--header--buttons">
+          <div class="kdjq-card--header--buttons--item" button-event="hide">▼</div>
+        </div>
+      </div>
+      <div class="kdjq-card--body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist" style="margin: 0 -15px; margin-bottom: 10px; padding-left: 15px;">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="promocode_new-tab" data-bs-toggle="tab" data-bs-target="#promocode_new_pane" type="button" role="tab" aria-controls="promocode_new" aria-selected="true">Новый канал</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="promocode_edit-tab" data-bs-toggle="tab" data-bs-target="#promocode_edit_pane" type="button" role="tab" aria-controls="promocode_edit" aria-selected="false">Изменить канал</button>
+          </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div class="tab-pane active" id="promocode_new_pane" role="tabpanel">
+            <div class="kdjq-form" kdjq form-id="channel.new">
+              <div class="mb-2">
+                <label for="input_name" class="form-label">Название</label>
+                <input type="text" class="form-control" name="name" id="input_name" aria-describedby="helpId" placeholder="" />
+                <small id="helpId" class="form-text text-muted">Будет видно, только вам</small>
+              </div>
+              <div class="mb-2">
+                <label for="input_url" class="form-label">Ссыкла</label>
+                <input type="text" class="form-control" name="url" id="input_url" aria-describedby="helpId" placeholder="" />
+              </div>
+
+
+              <div class="button-group">
+                <button class="btn btn-secondary" type="reset">Очистить</button>
+                <button class="btn btn-primary" type="submit">Добавить</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="promocode_edit_pane" role="tabpanel">
+            <div class="kdjq-form" kdjq form-id="channel.edit">
+              <div class="mb-2">
+                <label for="input_item_id" class="form-label">Канал</label>
+                <select class="form-control" name="item_id" id="input_item_id">
+                  {% for channel in channels.values %}
+                  <option value="{{channel.id}}">[{{channel.name}}] {{channel.url}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="mb-2">
+                <label for="input_name" class="form-label">Название</label>
+                <input type="text" class="form-control" name="name" id="input_name" placeholder="" />
+                <small class="form-text text-muted">Будет видно, только вам</small>
+              </div>
+
+              <div class="mb-2">
+                <label for="input_url" class="form-label">Ссыкла</label>
+                <input type="text" class="form-control" name="url" id="input_url" placeholder="" />
+              </div>
+
+              <div class="button-group">
+                <button class="btn btn-primary" type="submit">Изменить</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="kdjq-card--footer"></div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xxl-6 mb-3">
+    <div class="kdjq-card promocodes" kdjq>
+      <div class="kdjq-card--header">
+        <span class="kdjq-card--header--title text-white">Мои каналы</span>
+        <div class="kdjq-card--header--buttons">
+          <div class="kdjq-card--header--buttons--item text-white" button-event="hide">▼</div>
+        </div>
+      </div>
+      <div class="kdjq-card--body">
+        <div class="list">
+          {% for item in channels.values %}
+            <div class="promocodes-item" promocode-id="{{ item.id }}" enable-status="{{ item.enable }}">
+              <div class="body">
+                <div class="header">
+                  <span class="name">{{ item.name }}</span>
+                </div>
+                <div class="footer">{{ item.url }}</div>
+              </div>
+              <div class="button-menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="44" height="22" viewBox="0 0 44 22" fill="none">
+                  <path d="M12.8333 10.9987C12.8333 11.9712 12.447 12.9038 11.7594 13.5914C11.0718 14.2791 10.1391 14.6654 9.16667 14.6654C8.19421 14.6654 7.26157 14.2791 6.57394 13.5914C5.88631 12.9038 5.5 11.9712 5.5 10.9987C5.5 10.0262 5.88631 9.09361 6.57394 8.40597C7.26157 7.71834 8.19421 7.33203 9.16667 7.33203C10.1391 7.33203 11.0718 7.71834 11.7594 8.40597C12.447 9.09361 12.8333 10.0262 12.8333 10.9987ZM25.6667 10.9987C25.6667 11.9712 25.2804 12.9038 24.5927 13.5914C23.9051 14.2791 22.9725 14.6654 22 14.6654C21.0275 14.6654 20.0949 14.2791 19.4073 13.5914C18.7196 12.9038 18.3333 11.9712 18.3333 10.9987C18.3333 10.0262 18.7196 9.09361 19.4073 8.40597C20.0949 7.71834 21.0275 7.33203 22 7.33203C22.9725 7.33203 23.9051 7.71834 24.5927 8.40597C25.2804 9.09361 25.6667 10.0262 25.6667 10.9987ZM38.5 10.9987C38.5 11.9712 38.1137 12.9038 37.4261 13.5914C36.7384 14.2791 35.8058 14.6654 34.8333 14.6654C33.8609 14.6654 32.9282 14.2791 32.2406 13.5914C31.553 12.9038 31.1667 11.9712 31.1667 10.9987C31.1667 10.0262 31.553 9.09361 32.2406 8.40597C32.9282 7.71834 33.8609 7.33203 34.8333 7.33203C35.8058 7.33203 36.7384 7.71834 37.4261 8.40597C38.1137 9.09361 38.5 10.0262 38.5 10.9987Z" fill="#333333" />
+                </svg>
+              </div>
+              <div class="item-menu">
+                <div class="item-menu-item" button-event="edit">Изменить</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="kdjq-card--footer"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,182 @@
+@charset "UTF-8";
+.notifications_container {
+  position: relative;
+  display: flex;
+}
+
+.notifications_container .count {
+  color: white;
+  font-size: 18px;
+  display: flex;
+  margin-left: 5px;
+  align-items: center;
+}
+
+@media (max-width: 754px) {
+  .hotel_register {
+    display: none !important;
+  }
+}
+
+@media (max-width: 439px) {
+  .header_nav_item a span {
+    display: none !important;
+  }
+  /* .main-header__logo {
+    margin-right: 15px;
+  } */
+  .notifs_list {
+    width: auto !important;
+    left: 0 !important;
+    top: 84px !important;
+  }
+  .notif_item {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    background: #ebebeb;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .notifications_container {
+    position: static !important;
+  }
+  #push_notifs_list {
+    width: 100% !important;
+    left: 0px !important;
+    right: auto !important;
+  }
+}
+
+.notifications_icon {
+  height: 28px;
+  cursor: pointer;
+}
+
+.notifs_list {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  background: white;
+  border: 1px solid gray;
+  padding: 10px;
+  width: 326px;
+  border-radius: 5px;
+  position: absolute;
+  right: 0;
+  z-index: 99;
+  top: 47px;
+}
+
+.notif_item {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  background: #ebebeb;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.notif_item_title {
+  font-size: 20px;
+}
+
+.notif_item_text {
+  font-size: 17px;
+  color: #5b5b5b;
+}
+
+.notif_item_date {
+  margin-top: 5px;
+  font-size: 17px;
+  color: #5b5b5b;
+}
+
+.notifs_list_title {
+  font-size: 20px;
+  color: #5b5b5b;
+}
+
+.notif_cont {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: min-content;
+  max-height: 386px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.notif_cont::-webkit-scrollbar-thumb {
+  background-color: #c7c7c7;
+}
+
+.notif_cont::-webkit-scrollbar {
+  width: 10px;
+  background-color: #f2f2f2;
+}
+
+.notif_cont::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+}
+
+.notif_cont::-webkit-scrollbar {
+  width: 10px;
+}
+
+#push_notifs_list {
+  right: 40px;
+  top: 16px;
+  width: 430px;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  cursor: pointer;
+}
+
+.notifs_push {
+  background: #686868;
+  padding: 10px;
+}
+
+.notifs_push .notif_item_title {
+  color: white;
+}
+
+.notifs_push .notif_item_text {
+  color: #cfcfcf;
+}
+
+/* Хлебные крошки */
+.breadcrumb {
+  font-size: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 4px;
+  padding: 10px;
+  margin-left: 50px;
+}
+
+.breadcrumb li {
+  display: inline-block;
+}
+
+.breadcrumb li + li:before {
+  content: "› ";
+  color: #ccc;
+  padding-right: 5px;
+}
+
+.breadcrumb li a {
+  color: #787878;
+  text-decoration: none;
+}
+
+.breadcrumb li.active {
+  color: #000000;
+}
+
+/*# sourceMappingURL=base.css.map */

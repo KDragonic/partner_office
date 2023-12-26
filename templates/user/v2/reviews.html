@@ -1,0 +1,627 @@
+{% extends 'user/v2/base.html' %}
+{% load cards %}
+{% block main_block %}
+
+
+<style>
+    .review_section {
+      margin-top: 20px;
+    }
+
+    .s_block {
+      background: #fff;
+      border-radius: 13px;
+      overflow: hidden;
+      box-shadow: 0px 0px 18px 0px #D9D9D9;
+    }
+
+    .overall_rating {
+      display: flex;
+      flex-direction: row;
+      gap: 18px;
+    }
+
+
+    .overall_rating_1  {
+      padding: 15px;
+      width: 351px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overall_rating_1 .value {
+      display: flex;
+      gap: 12px;
+    }
+
+    .overall_rating_1 .value .number {
+      border-radius: 3px;
+      background: #17A1A1;
+      width: 55px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: #FFF;
+      text-align: center;
+      font-size: 31px;
+      font-weight: 500;
+      line-height: 30px; /* 96.774% */
+    }
+
+    .overall_rating_1 .value .texts {
+      width: 90px;
+    }
+
+    .overall_rating_1 .value .texts .value {
+      color: #292F37;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22.158px; /* 138.488% */
+      display: block;
+    }
+
+    .overall_rating_1 .value .texts .count {
+      color: #85878B;
+      font-size: 10px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 14.772px; /* 147.72% */
+    }
+
+    .overall_rating_1 .add_review {
+      border-radius: 5px;
+      background: #FFF;
+      box-shadow: 0px 0px 18px 0px #D9D9D9;
+      color: #FC7201;
+      text-align: center;
+      font-family: Manrope;
+      font-size: 15px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 19px;
+      text-transform: uppercase;
+      width: 100%;
+      padding: 5px;
+      margin-top: 10px;
+    }
+
+    .overall_rating_1 .add_review:hover {
+      background: #FC7201;
+      color: #FFF;
+    }
+
+
+    .ratings_progress  {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      column-gap: 28px;
+      row-gap: 7px;
+
+      width: 100%;
+      padding: 21px 37px;
+    }
+
+    .ratings_progress .item {
+      display: flex;
+      flex-direction: column;
+      max-width: 251px;
+      width: 100%;
+    }
+
+    .ratings_progress .item .progress {
+      width: 100%;
+      height: 4px;
+      border-radius: 10px;
+      background: #E5E5E5;
+    }
+
+    .ratings_progress .item .progress .value {
+      border-radius: 10px;
+      background: #FC7201;
+      height: 100%;
+    }
+
+    .ratings_progress .item .text{
+      color: #292F37;
+      font-size: 14px;
+      font-weight: 400;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2px;
+    }
+
+    section.sorting {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 14px;
+    }
+
+    section.sorting .title {
+      color: #292F37;
+      font-size: 13px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 15px; /* 150% */
+      margin-left: 17px;
+    }
+
+    section.sorting select {
+      height: 33px;
+      max-width: 210px;
+      width: 100%;
+      border: 1px solid #D2D2D2;
+      border-radius: 11px;
+      padding-left: 7px;
+    }
+  </style>
+
+
+  <style>
+    .review_grupe {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .review_grupe .review_item {
+      display: flex;
+      flex-direction: row;
+      gap: 18px;
+    }
+
+    .review_item .basic_info {
+      width: 264px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .review_item .basic_info .username {
+      padding: 14px 20px;
+    }
+
+    .review_item .basic_info .type_review {
+      margin-left: 15px;
+      color: #292F37;
+      font-size: 10px;
+      font-weight: 400;
+    }
+
+    .review_item .basic_info .date {
+      margin-left: 15px;
+      color: #85878B;
+      font-size: 10px;
+      font-weight: 400;
+    }
+
+    .review_item .basic_info .rcategory {
+      margin-left: 15px;
+      color: #292F37;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .basic_review {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .basic_review .rating_header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+      padding-left: 17px;
+      padding-right: 17px;
+      background: #17A1A1;
+      color: white;
+      height: 52px;
+    }
+
+    .basic_review .rating_header .value {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .basic_review .rating_header .value .number {
+      background: #FC7201;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 23px;
+      border-radius: 3px;
+      width: 52px;
+    }
+    .basic_review .rating_header .value .text {
+      color: #FFF;
+      font-size: 19px;
+      font-style: normal;
+      font-weight: 800;
+    }
+    .basic_review .rating_header .text_rating {
+      display: flex;
+      font-size: 14px;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .basic_review .rating_header .text_rating .item {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+    }
+
+    * {
+      user-select: none;
+    }
+
+    .basic_review .review_long_text {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding: 7px 14px;
+    }
+
+    .basic_review .review_long_text.what_is_good_text .title{
+      color: #1E8F02;
+    }
+
+    .basic_review .review_long_text.what_is_bad_text .title{
+      color: #DD111E;
+    }
+    .basic_review .review_long_text .collapse_the_response{
+      color: #17A1A1;
+      font-size: 19px;
+      cursor: pointer;
+    }
+
+    .basic_review .review_long_text.mini .body_text {
+      height: 64px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .basic_review .review_long_text.mini .body_text:before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      background: linear-gradient(transparent 37%, white 111%);
+    }
+
+
+    .imgs_review {
+      padding: 7px 14px;
+    }
+    .imgs_review .imgs {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .imgs_review .imgs img {
+      width: 49px;
+      height: 37px;
+      border-radius: 7px;
+    }
+
+    .imgs_review .imgs .all_photos {
+      width: 80px;
+      height: 24px;
+      border-radius: 7px;
+      border: 1px solid #D2D2D2;
+      background: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+
+    }
+
+
+    .view_the_hotel_response {
+      border-radius: 5px;
+      background: #17A1A1;
+      padding: 6px 13px;
+      color: white;
+      width: max-content;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .hotel_response .base_hotel_response {
+      padding: 7px 14px;
+    }
+
+    .hotel_response.hide .base_hotel_response {
+      display: none;
+    }
+
+    .hotel_response .add_the_hotel_response{
+      width: 170px;
+      height: 45px;
+      background: rgb(252 114 1);
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 22px;
+      color: rgb(255, 255, 255);
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      margin-left: auto;
+
+      display: none;
+    }
+
+    .hotel_response.empty .view_the_hotel_response,
+    .hotel_response.empty .base_hotel_response
+    {
+      display: none;
+    }
+
+    .hotel_response.empty .add_the_hotel_response {
+      display: flex;
+    }
+
+    @media screen and (max-width: 850px) {
+      .review_grupe .review_item {
+        flex-direction: column;
+      }
+
+
+      .review_item .basic_info {
+        width: 100%;
+        background: #fff;
+        border-radius: 13px;
+        overflow: hidden;
+        box-shadow: 0px 0px 18px 0px #D9D9D9;
+        padding: 10px;
+        height: min-content;
+      }
+
+      .review_item .basic_info .username {
+        padding: 0px;
+        box-shadow: none;
+      }
+
+      .review_item .basic_info .date,
+      .review_item .basic_info .rcategory
+      {
+        padding: 0;
+        margin: 0;
+      }
+    }
+
+  </style>
+
+<div class="section_title" style="  margin-bottom: 28px; ">Мои отзывы</div>
+
+<div class="section" style="gap: 12px; margin-bottom: 25px;">
+    <div class="review_section">
+        <section class="review_grupe">
+
+        </section>
+    </div>
+</div>
+
+
+<script>
+      // Функция для получения отзывов и вывода их на страницу
+  function getReviews() {
+
+    let sorting_review = $("#sorting_review").val()
+
+    $.ajax({
+      type: "GET",
+      url: "{% url 'ajax_profile_v2_get_review' %}",
+      data: {},
+      success: function (response) {
+        // Очищаем контейнер для отзывов
+        $(".review_grupe").empty();
+
+        // Выводим отзывы на страницу
+        for (var i = 0; i < response.results.length; i++) {
+          let review = response.results[i];
+
+          let review_item = $(`<div class="review_item" data-id="${review['id']}">`)
+
+          let basic_info = $(`
+          <section class="basic_info">
+            <div class="s_block username">
+              ${review['username']}
+            </div>
+            <span class="date">
+              ${review['date']}
+            </span>
+            <span class="rcategory">
+            ${review['rcategory']}
+            </span>
+          </section>
+        `)
+
+          let basic_review = $(`<section class="basic_review">`)
+
+          let rating_header = $(`
+          <div class="s_block rating_header">
+            <div class="value">
+              <div class="number">${review['overall_rating']}</div>
+              <div class="text">${review['overall_rating_text']}</div>
+            </div>
+            <div class="text_rating">
+            </div>
+          </div>
+        `)
+
+          if (review["wifi_quality"] != "не пользовались") {
+            $(rating_header).find(".text_rating").append(`
+            <div class="item">
+              <span class="name">Оценка Wi-Fi:</span>
+              <span class="value">${review["wifi_quality"]}</span>
+            </div>
+            `)
+          }
+
+          if (review["hygiene_products"] != "не пользовались") {
+            $(rating_header).find(".text_rating").append(`
+            <div class="item">
+              <span class="name">Средства гигиены:</span>
+              <span class="value">${review["hygiene_products"]}</span>
+            </div>
+            `)
+
+          }
+
+          let ratings_progress = $(`
+            <section class="s_block ratings_progress">
+              <div class="item">
+                <div class="progress purity">
+                  <div class="value" style="width: ${review["purity"] * 10}%;"></div>
+                </div>
+                <div class="text">
+                  <span>Чистота</span>
+                  <span>${review["purity"]}</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="progress location">
+                  <div class="value" style="width: ${review["location"] * 10}%;"></div>
+                </div>
+                <div class="text">
+                  <span>Расположение</span>
+                  <span>${review["location"]}</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="progress food">
+                  <div class="value" style="width: ${review["food"] * 10}%;"></div>
+                </div>
+                <div class="text">
+                  <span>Питание</span>
+                  <span>${review["food"]}</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="progress price_quality_ratio">
+                  <div class="value" style="width: ${review["price_quality_ratio"] * 10}%;"></div>
+                </div>
+                <div class="text">
+                  <span>Цена/качество</span>
+                  <span>${review["price_quality_ratio"]}</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="progress number_quality">
+                  <div class="value" style="width: ${review["number_quality"] * 10}%;"></div>
+                </div>
+                <div class="text">
+                  <span>Номер</span>
+                  <span>${review["number_quality"]}</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="progress service">
+                  <div class="value" style="width: ${review["service"] * 10}%;"></div>
+                </div>
+                <div class="text">
+                  <span>Обслуживание</span>
+                  <span>${review["service"]}</span>
+                </div>
+              </div>
+            </section>
+          `)
+
+
+          // Левый
+          $(review_item).append(basic_info)
+
+
+          // Правый
+          $(basic_review).append(rating_header)
+          $(basic_review).append(ratings_progress)
+
+
+          if (review['what_is_good_text']) {
+            let what_is_good_text = $(`
+            <section class="s_block review_long_text what_is_good_text">
+            <span class="title">Что было хорошо</span>
+            <span class="body_text">${review['what_is_good_text']}</span>
+            </section>
+          `)
+
+            $(basic_review).append(what_is_good_text)
+          }
+
+
+          if (review['what_is_bad_text']) {
+            let what_is_bad_text = $(`
+            <section class="s_block review_long_text what_is_bad_text">
+            <span class="title">Что было плохо</span>
+            <span class="body_text">${review['what_is_bad_text']}</span>
+            </section>
+          `)
+
+            $(basic_review).append(what_is_bad_text)
+          }
+
+          if (review['imgs'].length > 0) {
+            let imgs_review = $(`
+              <section class="s_block imgs_review">
+                <span class="title">Фото от гостя</span>
+                <div class="imgs">
+                </div>
+              </section>
+            `)
+
+            review['imgs'].forEach(img => {
+              $(imgs_review).find(".imgs").append(`<img src="${img}" alt="">`)
+            });
+
+            $(imgs_review).find(".imgs").append(`<button class="all_photos open-popup-review-photos">Все фото</button>`)
+
+            $(basic_review).append(imgs_review)
+          }
+
+
+          if (review['reply']) {
+            let reply_hotel_review = $(`
+            <section class="hotel_response">
+              <div class="s_block base_hotel_response">${review['reply']}</div>
+            </section>
+            `)
+
+            $(basic_review).append(reply_hotel_review)
+          }
+
+
+          $(review_item).append(basic_review)
+
+          // Карточка отзыва
+          $(".review_grupe").append(review_item);
+        }
+
+      }
+    });
+  }
+
+  getReviews()
+
+</script>
+
+{% endblock %}

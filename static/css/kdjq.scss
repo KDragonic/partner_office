@@ -1,0 +1,54 @@
+* {
+  font-family: Manrope;
+}
+
+.kdjq_stat {
+  .kdjq_table {
+
+    border-collapse: separate; /* Способ отображения границы */
+    border-spacing: 5px;
+
+    &--row {
+
+      &--cell {
+        padding: 15px 0;
+        text-align: center;
+        border-radius: 5px;
+        background: #F2F2F2;
+
+        &.not-bg {
+          background: transparent;
+        }
+
+        &[kdjq-cell-detailed] {
+          cursor: pointer;
+          transition: background-color 0.2s;
+
+          &[kdjq-cell-detailed]:not(.open) {
+            &:hover {
+              background: #fc72015e;
+            }
+          }
+
+          &[kdjq-cell-detailed].open {
+            background: #FC7201;
+            color: white;
+
+            &::after {
+
+              content: url(img/arrow-down-white.svg);
+            }
+          }
+
+          &::after {
+            margin-left: 5px;
+            content: url(img/arrow-down-black.svg);
+          }
+
+
+        }
+      }
+    }
+
+  }
+}

@@ -1,0 +1,34 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form %}
+{% block main_block %}
+
+
+<link rel="stylesheet" href="/static/css/upform.css">
+<script src="/static/js/upform.js?v3"></script>
+
+
+<style>
+  #content {
+    align-items: center;
+  }
+</style>
+
+
+
+<div class="form"></div>
+
+
+
+<script>
+  $(document).ready(function () {
+    $(".form").upform()
+    $(".form").upform("render")
+  });
+</script>
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,223 @@
+{% extends 'user/v2/base.html' %}
+{% load cards humanize %}
+{% block main_block %}
+  <div class="section_title" style="  margin-bottom: 28px; ">Информация о бронирование</div>
+
+  <section class="grupe_cards" style="margin-bottom: 25px;">
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Объект</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">Название: </span>
+            <a href="/hotel/{{hotel.id}}/" class="value link">{{ hotel.name }}</a>
+          </div>
+          <div class="item">
+            <span class="name">Адрес: </span>
+            <span class="value">{{ hotel.address }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Тип: </span>
+            <span class="value">{{ hotel.type_hotel }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Бронирование</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">Код:</span>
+            <span class="value">{{ booking.id }}</span>
+          </div>
+
+          <div class="item">
+            <span class="name">Номер: </span>
+            <span class="value">{{ rc.name }}</span>
+          </div>
+
+          <div class="item">
+            <span class="name">Статус:</span>
+            <span class="value">{{ booking.status_text }}</span>
+          </div>
+
+          {% if booking.food_rate %}
+          <div class="item">
+            <span class="name">Еда:</span>
+            <span class="value">{{ booking.food_rate }}</span>
+          </div>
+          {% endif %}
+
+          <div class="item">
+            <span class="name">Дата и время заезда:</span>
+            <span class="value">{{ booking.check_in }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Дата и время отъезда:</span>
+            <span class="value">{{ booking.check_out }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Количество забронированных дней:</span>
+            <span class="value">{{ booking.days_booked }}</span>
+          </div>
+          <div class="item">
+            <span class="name">Количество гостей: </span>
+            <span class="value">{{ booking.adults_count }}</span>
+          </div>
+          {% if booking.children_count > 0 %}
+            <div class="item">
+              <span class="name">Количество детей: </span>
+              <span class="value">{{ booking.children_count }}</span>
+            </div>
+            {% if booking.children_ages %}
+            <div class="item">
+              <span class="name">Возраст детей: </span>
+              <span class="value">{{ booking.children_ages }}</span>
+            </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads">
+      <div class="block_card text">
+        <span class="title">Цены {% if booking.payment_status == "not_paid" and booking.param.paymant_url %}(Не оплачено){% endif %}</span>
+        <div class="text list">
+          <div class="item">
+            <span class="name">Стоимость проживания:</span>
+            <span class="value">{{ booking.accommodation_cost }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Стоимость бронирования:</span>
+            <span class="value" {% if booking.payment_status == "not_paid" and booking.param.paymant_url %}style=" color: #ff2929; font-weight: 700; "{% endif %}>{{ booking.amount_paid }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Доплата при заселении:</span>
+            <span class="value">{{ booking.hotel_price }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Оплачено бонусами:</span>
+            <span class="value">{{ booking.prices.bonus.value }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Оплачено со счета в ЛК:</span>
+            <span class="value">{{ booking.prices.balanc.value }} ₽</span>
+          </div>
+          <div class="item">
+            <span class="name">Оплата картой: </span>
+            <span class="value">{{ booking.prices.card.value }} ₽</span>
+          </div>
+          {% if booking.prices.first_booking_discount %}
+          <div class="item">
+            <span class="name">Скидка при первой брони: </span>
+            <span class="value">{{ booking.prices.first_booking_discount }} ₽</span>
+          </div>
+          {% endif %}
+          {% if booking.prepayment_for_the_room_before_checkin %}
+          <div class="item">
+            <span class="name">Предоплата за номер до заселения: </span>
+            <span class="value">{{ booking.prepayment_for_the_room_before_checkin }} ₽</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads">
+
+
+      {% if booking.payment_status == "not_paid" and booking.param.paymant_url %}
+      <a href="{{booking.param.paymant_url}}" target="_blank" class="block_card text clickable" style="border: 2px solid #fc7201;">
+        <span class="title">Оплатить с карты</span>
+      </a>
+      {% endif %}
+
+      {% if booking.chat_id %}
+      <a href="{% url 'profile_v2_chats' %}?chat_type=booking&chat={{booking.chat_id}}" target="_blank" class="block_card text clickable">
+        <span class="title">Открыть чат</span>
+      </a>
+      {% endif %}
+
+      {% if booking.status == 'new' or booking.status == 'verified' %}
+        {% if not booking.param.paymant_url %}
+        <div class="block_card text clickable" data-button="cancellation_booking">
+          <span class="title">Отменить бронирование</span>
+        </div>
+        {% endif %}
+      {% endif %}
+    </section>
+
+
+    {% if booking.possible_review %}
+    <section class="row_crads">
+      <a href="/hotel/{{hotel.id}}/" class="block_card text clickable" style="background: linear-gradient(90deg, #7BF8F8 1.08%, #F9CCA8 81.21%);">
+        <span class="title">Написать отзыв</span>
+        <span class="text">Получить {{ booking.bonuses_for_writing_a_review }} баллов за написания отзыва для бронирования</span>
+      </a>
+    </section>
+    {% endif %}
+
+
+
+    <section class="row_crads">
+      {% telegram_card %}
+    </section>
+  </section>
+
+  <script>
+    $("[data-button='cancellation_booking']").click(function () {
+
+      if ("{{booking.status}}" != "new") {
+        popup_create('Отмена бронирования', `Для отмены бронирования свяжитесь с техподдержкой.`,
+        [
+          {
+            name: 'Связатся с техподдержкой',
+            type: 'link',
+            param: ["/techsupport/pattern/", 1]
+          }
+        ],
+        []
+        )
+      }
+      else {
+        popup_create('Отмена бронирования', `Вы уверены что хотите отменить это бронироване? <br>Бронь: {{booking.id}}<br>Номер: {{rc.name}}`, [
+          {
+            name: 'Да',
+            type: 'action',
+            fun: ajax_cancellation_booking,
+            param: ['{{booking.id}}']
+          },
+          {
+            name: 'Нет',
+            type: 'close'
+          }
+        ])
+      }
+    })
+
+    function ajax_cancellation_booking(id) {
+      data = {
+        id: id
+      }
+
+      load_start()
+      $.ajax({
+        method: 'POST',
+        data: data,
+        url: "{% url 'cancellation_booking' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function (request) {
+          load_end()
+          location.reload()
+        }
+      })
+    }
+  </script>
+
+
+{% endblock %}

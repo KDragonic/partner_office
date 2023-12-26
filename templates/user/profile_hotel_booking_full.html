@@ -1,0 +1,294 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static cards %}
+{% block main_block %}
+
+<style>
+  .block_card {
+    border: 1px solid #d3d3d3;
+    width: min-content;
+    min-height: 200px;
+    min-width: min-content;
+    max-width: 100%;
+    border-radius: 5px;
+  }
+
+  .block_card .title {
+    font-size: 20px;
+    padding: 10px;
+  }
+
+  .block_card .content {
+    padding: 10px;
+  }
+
+  .block_card .grupe_input {
+    margin-top: -5px;
+    height: 100%;
+    margin-left: 12px;
+    margin-bottom: 14px;
+    gap: 10px;
+    flex: 1 0 200px;
+    flex: 1 0 200px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(322px, 1fr));
+    grid-gap: 20px;
+  }
+
+  .block_card .grupe_input>label {
+    width: auto !important;
+  }
+
+  @media screen and (max-width: 607px) {
+    .block_card .grupe_input {
+      display: flex !important;
+    }
+  }
+
+  @media screen and (max-width: 768px){
+    .block_card {
+      min-width: 100%;
+    }
+  }
+</style>
+
+<a href="{{user_data.chat_url}}"
+  class="button">Открыть чат</a>
+
+<div class="section">
+  <div class="block_card">
+    <div class="title">Информация о бронирование</div>
+    <div class="content">
+      <div class="grupe_input"
+        style="height: 100%; margin-left: 12px; margin-bottom: 14px; gap: 10px;">
+        <label class="text"><span class="name">Код бронирования</span>
+          <input type="text"
+            value="{{booking_data.id}}"
+            readonly></label>
+        <label class="text"><span class="name">Дата и время заезда</span><input type="text"
+            value="{{booking_data.check_in}}"
+            readonly></label>
+        <label class="text"><span class="name">Дата и время отъезда</span><input type="text"
+            value="{{booking_data.check_out}}"
+            readonly></label>
+        <label class="text"><span class="name">Количество забронированных дней</span><input type="text"
+            value="{{booking_data.days_booked}}"
+            readonly></label>
+        <label class="text"><span class="name">Количество взрослых</span><input type="text"
+            value="{{booking_data.count_a}}"
+            readonly></label>
+        <label class="text"><span class="name">Количество детей</span><input type="text"
+            value="{{booking_data.count_c}}"
+            readonly></label>
+        {% if booking_data.children_ages %}
+        <label class="text"><span class="name">Возраст детей</span><input type="text"
+            value="{{booking_data.children_ages}}"
+            readonly></label>
+        {% endif %}
+        <label class="text"><span class="name">Стоимость проживания</span><input type="text"
+            value="{{booking_data.accommodation_cost}}"
+            readonly></label>
+        <label class="text"><span class="name">Сумма, уплаченная за бронирование</span><input type="text"
+            value="{{booking_data.amount_paid}}"
+            readonly></label>
+        <label class="text"><span class="name">Доплата при заселении</span><input type="text"
+            value="{{booking_data.cost_difference}}"
+            readonly></label>
+        <label class="text"><span class="name">Статус</span>
+          <select id="status"
+            style="font-size: 16px;">
+            <option value="new" {% if booking_data.status == 'new' %}selected{% endif %}>Новое</option>
+            <option value="verified" {% if booking_data.status == 'verified' %}selected{% endif %}>Подтверждено</option>
+            <option value="settled" {% if booking_data.status == 'settled' %}selected{% endif %}>Заселен</option>
+            <option value="left" {% if booking_data.status == 'left' %}selected{% endif %}>Выехал</option>
+            <option value="cancelled" {% if booking_data.status == 'cancelled' %}selected{% endif %}>Отменен</option>
+          </select>
+        </label>
+        <label class="text"><span class="name">Дата и время создания брони</span><input type="text"
+            value="{{booking_data.created_at}}"
+            readonly></label>
+        <label class="text"><span class="name">Оплачено за проживание</span>
+          <select id="payment_for_accommodation"
+            style="font-size: 16px;">
+            <option value="yes" {% if booking_data.payment_for_accommodation == True %}selected{% endif %}>Да</option>
+            <option value="no" {% if booking_data.payment_for_accommodation == False %}selected{% endif %}>Нет</option>
+          </select>
+        </label>
+        {% csrf_token %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="block_card">
+    <div class="title">Информация о номере</div>
+    <div class="content">
+      <div class="grupe_input"
+        style="height: 100%; margin-left: 12px; margin-bottom: 14px; gap: 10px;">
+        <label class="text"><span class="name">Название</span>
+          <input type="text"
+            value="{{room_data.name}}"
+            readonly></label>
+        <label class="text"><span class="name">Номер</span>
+          <input type="text"
+            value="{{room_data.room_number}}"
+            readonly></label>
+        <label class="text"><span class="name">Базовая цена за ночь</span>
+          <input type="text"
+            value="{{room_data.price}}"
+            readonly></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if booking_data.status != 'new' and booking_data.status != 'cancelled' %}
+<div class="section">
+  <div class="block_card">
+    <div class="title">Информация о клиенте</div>
+    <div class="content">
+      <div class="grupe_input"
+        style="height: 100%; margin-left: 12px; margin-bottom: 14px; gap: 10px;">
+        <label class="text"><span class="name">Имя</span>
+          <input type="text"
+            value="{{user_data.username}}"
+            readonly></label>
+        <label class="text"><span class="name">Фамилия</span>
+          <input type="text"
+            value="{{user_data.lastname}}"
+            readonly></label>
+        {% if user_data.middle_name %}
+        <label class="text"><span class="name">Отчество</span><input type="text"
+            value="{{user_data.middlename}}"
+            readonly></label>
+        {% endif %}
+        <label class="text"><span class="name">Телефон</span><input type="text"
+            value="{{user_data.phone_1}}"
+            readonly></label>
+        <label class="text"><span class="name">Доп. Телефон</span><input type="text"
+            value="{{user_data.phone_2}}"
+            readonly></label>
+        <label class="text"><span class="name">Почта</span><input type="text"
+            value="{{user_data.email}}"
+            readonly></label>
+        <label class="text"><span class="name">Пол</span><input type="text"
+            value="{{user_data.gender}}"
+            readonly></label>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if booking_data.status != 'new' %}
+{% for companion in companions_data %}
+<div class="section">
+  <div class="block_card">
+    <div class="title">Информация о попутчиков</div>
+    <div class="content">
+      <div class="grupe_input"
+        style="height: 100%; margin-left: 12px; margin-bottom: 14px; gap: 10px;">
+        <label class="text"><span class="name">Имя</span>
+          <input type="text"
+            value="{{companion.username}}"
+            readonly></label>
+        <label class="text"><span class="name">Фамилия</span>
+          <input type="text"
+            value="{{companion.lastname}}"
+            readonly></label>
+        {% if companion.firstname %}
+        <label class="text"><span class="name">Отчество</span><input type="text"
+            value="{{companion.firstname}}"
+            readonly></label>
+        {% endif %}
+        <label class="text"><span class="name">Телефон</span><input type="text"
+            value="{{companion.phone}}"
+            readonly></label>
+        <label class="text"><span class="name">Дата рождения</span><input type="date"
+            value='{{companion.date_of_birth|date:"Y-m-d"}}'
+            readonly></label>
+        <label class="text"><span class="name">Пол</span>
+          <input type="text"
+            value="{{companion.gender}}"
+            readonly>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<script>
+
+  $("select#status").change(function () {
+    date = {
+      "id": "{{booking_data.id}}",
+      "status": $(this).val(),
+    }
+
+    if ("{{booking_data.status}}" != "new") {
+      popup_create('Отмена бронирования', `Для отмены бронирования свяжитесь с тех подершкой.`,
+      [
+        {
+          name: 'Связатся с техподдержкой',
+          type: 'link',
+          param: ["/techsupport/pattern/", 1]
+        }
+      ],
+      []
+      )
+      return;
+    }
+
+    load_start()
+
+    $.ajax({
+      url: '{% url "ajax_booking_edit_status" %}',
+      type: 'POST',
+      data: date,
+      headers: {
+        'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+      },
+      success: function (response) {
+        load_end()
+        block_card = $(".block_card select#status").parents(".block_card")
+        if (response.status == "success") {
+          var originalBG = $(block_card).css('background-color');
+          $(block_card).animate({ backgroundColor: '#80ff80' }, 100).animate({ backgroundColor: originalBG }, 500, function () {
+            location.reload()
+          });
+        }
+      },
+    });
+  })
+
+  $("select#payment_for_accommodation").change(function () {
+    date = {
+      "id": "{{booking_data.id}}",
+      "status": $(this).val(),
+    }
+
+    load_start()
+
+    $.ajax({
+      url: '{% url "ajax_booking_edit_payment_for_accommodation" %}',
+      type: 'POST',
+      data: date,
+      headers: {
+        'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+      },
+      success: function (response) {
+        load_end()
+        block_card = $(".block_card select#payment_for_accommodation").parents(".block_card")
+        if (response.status == "success") {
+          var originalBG = $(block_card).css('background-color');
+          $(block_card).animate({ backgroundColor: '#80ff80' }, 100).animate({ backgroundColor: originalBG }, 500, function() {
+            location.reload()
+          });
+        }
+      },
+    });
+  })
+</script>
+{% endblock main_block %}

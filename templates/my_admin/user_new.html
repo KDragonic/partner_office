@@ -1,0 +1,25 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static sass_tags %}
+{% block main_block %}
+
+<style>
+  .button_new_user, .button_new_user:link {
+    margin-top: 10px;
+    width: 100%;
+  }
+</style>
+
+<div class="section">
+  <span class="title">Искусственные пользователи</span>
+  <div class="discrition">Тут можно быстро создать пользователя по шаблону, и у него сразу будет видно пароль и логин.</div>
+</div>
+<div class="br"></div>
+<div class="section">
+  <span class="title">Для отеля</span>
+  <div class="discrition">Подходит для владельцов отеля.</div>
+  <div class="discrition">Пустые бонусы клиента, сразу есть уведомления для отеля и создан чат где обясняется некоторые вещи.</div>
+  <div class="discrition">Логин примерно такой h123456789, пароль случайные буквы и цифры, случайная временая почта и пустой телефон.</div>
+  <a class="button button_new_user" href="{% url 'admin.ajax.user.new' %}?type=hotel_user">Создать</a>
+</div>
+
+{% endblock main_block %}

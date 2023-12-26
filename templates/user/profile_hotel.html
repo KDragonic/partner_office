@@ -1,0 +1,1043 @@
+
+{% extends "template/base_profile.html" %}
+{% load menu form static %}
+{% block main_block %}
+
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU&apikey=e964d90a-5747-4eb6-ac44-28cbfcca4dab" type="text/javascript"></script>
+
+<style>
+  #label_hservice {
+    width: auto;
+  }
+
+  #hotel_map {
+      max-width: 693px;
+      height: 448px;
+      top: 10px;
+      border-radius: 11px;
+      background: #b1b1b1;
+  }
+</style>
+
+<style>
+  .error_input {
+    border-color: red !important;
+  }
+</style>
+
+<style>
+  .br {
+    border: 1px solid rgba(118, 118, 118, 0.3);
+    width: 100%;
+    height: 1px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+
+  .br_tran {
+    margin-bottom: 20px;
+  }
+
+
+  #content {
+    display: flex;
+  }
+
+  #content .left {
+    width: 473px;
+  }
+
+  #content .right {
+    width: 100%;
+    margin-left: 46px;
+  }
+
+  #bread_crumb {
+    margin-left: 57px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    display: flex;
+  }
+
+  #bread_crumb .item {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: #787878;
+  }
+
+  #bread_crumb .arrow {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: #787878;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  #content .link:hover {
+    color: #000000;
+    text-decoration: underline;
+  }
+
+  #tabs {
+    background: #FFFFFF;
+    border-radius: 13px;
+    margin-left: 57px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 535px;
+    width: 370px;
+  }
+
+  #tabs .username {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 25px;
+
+    color: #000000;
+    margin-bottom: 10px;
+  }
+
+  #tabs .edit_profil {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+
+    color: #024849;
+    margin-bottom: 45px;
+  }
+
+  #main_block {
+    width: 100%;
+    flex-grow: 1;
+    height: 100%;
+    background: #FFFFFF;
+    padding-left: 65px;
+    padding-right: 65px;
+    padding-top: 104px;
+    padding-bottom: 104px;
+  }
+</style>
+
+<style>
+  .flex_row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section .mini_text {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+
+    color: #000000;
+  }
+
+  .section>.title {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 30px;
+
+    color: #000000;
+  }
+
+  .section>.discription {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+
+    color: #000000;
+    margin-top: 20px;
+  }
+
+  .grupe_input {
+    margin-top: 20px;
+    row-gap: 20px;
+    column-gap: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 696px;
+  }
+
+
+  .grupe_input>label {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    width: 328px;
+  }
+
+
+  .grupe_input>label>.name {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+
+    color: #000000;
+  }
+
+  .grupe_input>label input,
+  .grupe_input select,
+  .grupe_input textarea,
+  .grupe_input input:not(.checkradion) {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #D2D2D2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+  }
+
+  .grupe_input .label_input_file .files {
+    display: flex;
+    height: auto;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .grupe_input .label_input_file .files img {
+    width: 159px;
+    height: 159px;
+    object-fit: cover;
+  }
+
+  .grupe_input>label.text input::placeholder {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: #818181;
+  }
+
+  /* .grupe_input .date section {
+    display: flex;
+    gap: 10px;
+  } */
+
+  /* .grupe_input .date section .d {
+    flex: 1 2 100%;
+    min-width: 75px;
+  }
+
+  .grupe_input .date section .m {
+    flex: 2 1 100%;
+  }
+
+  .grupe_input .date section .y {
+    flex: 1 2 100%;
+    min-width: 75px;
+  } */
+
+
+  .grupe_input .checkradion input {
+    width: 18px;
+    height: auto;
+  }
+
+  .button {
+    background: #FC7201;
+    height: 50px;
+    color: white;
+    border-radius: 5px;
+    padding: 14px 32px;
+    width: max-content;
+  }
+
+  .grupe_card {
+    display: flex;
+    margin-top: 20px;
+    gap: 20px;
+  }
+
+  .grupe_card .card {
+    border-radius: 8px;
+    width: 174px;
+    height: 224.32px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .grupe_card .card.active {
+    background: rgba(238, 238, 238, 0.5);
+  }
+
+  .grupe_card .card.add {
+    border: 0.8px solid #07151C;
+  }
+
+  .grupe_card .card .close {
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+  }
+
+  .grupe_card .card .close:before,
+  .grupe_card .card .close:after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 1.5px;
+    background: #747474;
+  }
+
+  .grupe_card .card .close:before {
+    transform: rotate(45deg);
+  }
+
+  .grupe_card .card .close:after {
+    transform: rotate(-45deg);
+  }
+
+  .grupe_card .card .name {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 130%;
+    /* identical to box height, or 19px */
+
+    text-align: center;
+    letter-spacing: 0.1px;
+
+    color: #000000;
+  }
+
+  .grupe_card .card.add .plus {
+    position: relative;
+    left: -15px;
+    margin-bottom: 15px;
+  }
+
+  .grupe_card .card.add .plus:before,
+  .grupe_card .card.add .plus:after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    background: #024849;
+    border-radius: 10px;
+  }
+
+  .grupe_card .card.add .plus:before {
+    transform: rotate(0deg);
+  }
+
+  .grupe_card .card.add .plus:after {
+    transform: rotate(90deg);
+  }
+
+  .grupe_card .card.add .name {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 130%;
+    /* or 16px */
+
+    text-align: center;
+    letter-spacing: 0.1px;
+
+    color: #024849;
+  }
+
+  #detal_hotel {
+    font-size: 21px;
+    text-align: end;
+    flex-grow: 10;
+  }
+
+  #edit_hotel_section {
+    margin-bottom: 18px;
+  }
+</style>
+
+<style>
+  .br_tran {
+    margin-bottom: 20px;
+  }
+
+  .discription {
+    width: 100%;
+  }
+
+  .title_2 {
+    width: 100%;
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  .uniform_flex > * {
+    flex-basis: auto;
+    flex-grow: 1;
+  }
+</style>
+
+{% hotel_shift_tab %}
+
+<style>
+
+  .status_hotel[data-status="Удалён"] {
+    color: red;
+  }
+
+  .status_hotel[data-status="На модерации"] {
+    color: #d0a100;
+  }
+
+  .status_hotel[data-status="Выключен"] {
+    color: gray;
+  }
+
+  .status_hotel[data-status="Активен"] {
+    color: #00d200;
+    font-size: 19px;
+  }
+
+  .uniform_flex {
+    margin: 18px 0;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  @media screen and (max-width: 984px) {
+    .uniform_flex {
+      flex-direction: column !important;
+    }
+  }
+</style>
+
+<span class="title_2">Мой отель</span>
+<div class="section uniform uniform_flex">
+  <span>{{hotel.name}}</span>
+  <span>Звездность: {{hotel.stars}}</span>
+  <span class="status_hotel" data-status="{{hotel.status}}">Статус: {{hotel.status}}</span>
+  <a href="/hotel/{{hotel.id}}/" id="detal_hotel">Смотреть на сайте</a>
+</div>
+
+<div class="section" id="edit_hotel_section">
+  <span class="title_2">Основная информация</span>
+  <div class="grupe_input">
+    {% input_text 'text' 'Название' 'name' hotel.name '' 1 %}
+    {% input_text 'long' 'Описание' 'descriptions' hotel.descriptions '' 0 %}
+
+    <label class="text">
+      <span class="name">Звездность*</span>
+      <select name="stars"
+        required>
+        <option value="0"
+          {% if hotel.stars == 0 %}selected{% endif %}>0</option>
+        <option value="1"
+          {% if hotel.stars == 1 %}selected{% endif %}>1</option>
+        <option value="2"
+          {% if hotel.stars == 2 %}selected{% endif %}>2</option>
+        <option value="3"
+          {% if hotel.stars == 3 %}selected{% endif %}>3</option>
+        <option value="4"
+          {% if hotel.stars == 4 %}selected{% endif %}>4</option>
+        <option value="5"
+          {% if hotel.stars == 5 %}selected{% endif %}>5</option>
+      </select>
+    </label>
+
+    <div class="sect"
+      style="width: 328px;display: flex;gap: 10px;flex-direction: column;">
+      <label class="checkradion">
+        <span class="name">Есть завтрак*</span>
+        <section>
+          <label>
+            <input type="radio"
+              name="breakfast" value="True" {% if hotel.breakfast == True %}checked{% endif %} required>
+          <span class="name">Да</span>
+          </label>
+          <label>
+            <input type="radio"
+              name="breakfast" value="False" {% if hotel.breakfast == False %}checked{% endif %} required>
+            <span class="name">Нет</span>
+          </label>
+        </section>
+      </label>
+      <label class="checkradion">
+        <span class="name">Есть обед*</span>
+        <section>
+          <label>
+            <input type="radio"
+              name="lunch" value="True" {% if hotel.lunch == True %}checked{% endif %} required>
+            <span class="name">Да</span>
+          </label>
+          <label>
+            <input type="radio"
+              name="lunch" value="False" {% if hotel.lunch == False %}checked{% endif %} required>
+            <span class="name">Нет</span>
+          </label>
+        </section>
+      </label>
+      <label class="checkradion">
+        <span class="name">Есть ужин*</span>
+        <section>
+          <label>
+            <input type="radio"
+              name="dinner"
+              value="True" {% if hotel.dinner == True %}checked{% endif %} required>
+            <span class="name">Да</span>
+          </label>
+          <label>
+            <input type="radio"
+              name="dinner"
+              value="False"
+              {% if hotel.dinner == False %}checked{% endif %} required>
+            <span class="name">Нет</span>
+          </label>
+        </section>
+      </label>
+    </div>
+    {% input_file 'many' 'Фото объекта' 'images_hotel' hotel.images 3 40 True True "Перетаскивайте изображения, чтобы изменить порядок" %}
+
+    {% input_text 'time' 'Время заселения' 'check_in_time' hotel.check_in_time '' 1 %}
+    {% input_text 'time' 'Время выезда' 'departure_time' hotel.departure_time '' 1 %}
+
+    {% input_cr 'checkbox_grupe' 'Услуги' 'hservice' choices.hservice checkeds.hservice 0 %}
+
+  </div>
+  <div class="br_tran"></div>
+  <span class="title_2">Адрес</span>
+  <div class="grupe_input">
+    {% csrf_token %}
+    {% input_text 'text' 'Город' 'city' hotel.address.city '' 1 %}
+    {% input_text 'text' 'Район' 'region' hotel.address.region '' 0 %}
+    {% input_text 'text' 'Улица' 'street' hotel.address.street '' 1 %}
+    {% input_text 'text' 'Дом' 'house' hotel.address.house '' 1 %}
+    {% input_text 'text' 'Корпус' 'body' hotel.address.body '' 0 %}
+    {% input_text 'text' 'Этаж' 'floor' hotel.address.floor '' 0 %}
+    {% input_text 'text' 'Квартира' 'apartment' hotel.address.apartment '' 0 %}
+    {% input_text 'text' 'Координаты' 'coordinates' hotel.address.coordinates '' 1 %}
+
+    <label class="text" for="" style="width: 100%;">
+      <span class="name">Поиск координат по адресу</span>
+      <input type="text" placeholder="Москва, проспект Мира 125" name="gs_address" value="" autocomplete="off">
+    </label>
+    <div class="discription" style=" margin-top: -17px; font-size: 15px; color: gray; ">Город/населённый пункт и через запятую улицу. Или найдите дом на карте и поставьте метку.</div>
+
+    <div id="map_coordinate"></div>
+    <div id="gs_address_list"></div>
+  </div>
+  <div class="br_tran"></div>
+  <span class="title_2">Разрешения</span>
+  <div class="grupe_input">
+    <label class="checkradion">
+      <span class="name">Можно с детьми*</span>
+      <section>
+        <label>
+          <input type="radio"
+            name="allowed_child"
+            value="True"
+            {% if hotel.allowed_child == True %}checked{% endif %}
+            required>
+          <span class="name">Да</span>
+        </label>
+        <label>
+          <input type="radio"
+            name="allowed_child"
+            value="False"
+            {% if hotel.allowed_child == False %}checked{% endif %}
+            required>
+          <span class="name">Нет</span>
+        </label>
+      </section>
+    </label>
+
+    <label class="checkradion">
+      <span class="name">Можно с животными*</span>
+      <section>
+        <label>
+          <input type="radio"
+            name="allowed_animal"
+            value="True"
+            {% if hotel.allowed_animal == True %}checked{% endif %}
+            required>
+          <span class="name">Да</span>
+        </label>
+        <label>
+          <input type="radio"
+            name="allowed_animal"
+            value="False"
+            {% if hotel.allowed_animal == False %}checked{% endif %}
+            required>
+          <span class="name">Нет</span>
+        </label>
+      </section>
+    </label>
+
+    <label class="checkradion">
+      <span class="name">Курение разрешено*</span>
+      <section>
+        <label>
+          <input type="radio"
+            name="allowed_smoking"
+            value="True"
+            {% if hotel.allowed_smoking == True %}checked{% endif %}
+            required>
+          <span class="name">Да</span>
+        </label>
+        <label>
+          <input type="radio"
+            name="allowed_smoking"
+            value="False"
+            {% if hotel.allowed_smoking == False %}checked{% endif %}
+            required>
+          <span class="name">Нет</span>
+        </label>
+      </section>
+    </label>
+
+    <label class="checkradion">
+      <span class="name">Вечеринки разрешены*</span>
+      <section>
+        <label>
+          <input type="radio"
+            name="allowed_party"
+            value="True"
+            {% if hotel.allowed_party == True %}checked{% endif %}
+            required>
+          <span class="name">Да</span>
+        </label>
+        <label>
+          <input type="radio"
+            name="allowed_party"
+            value="False"
+            {% if hotel.allowed_party == False %}checked{% endif %}
+            required>
+          <span class="name">Нет</span>
+        </label>
+      </section>
+    </label>
+  </div>
+  <div class="br_tran"></div>
+  <span class="title_2">Бронирование</span>
+  <div class="grupe_input">
+    <label class="text">
+      <span class="name">Процент сайта</span>
+      <select name="percentage"
+        required>
+        <option value="14" {% if hotel.percentage == 14 %}selected{% endif %}>14%</option>
+        <option value="15" {% if hotel.percentage == 15 %}selected{% endif %}>15%</option>
+        <option value="16" {% if hotel.percentage == 16 %}selected{% endif %}>16%</option>
+        <option value="17" {% if hotel.percentage == 17 %}selected{% endif %}>17%</option>
+        <option value="18" {% if hotel.percentage == 18 %}selected{% endif %}>18%</option>
+        <option value="19" {% if hotel.percentage == 19 %}selected{% endif %}>19%</option>
+        <option value="20" {% if hotel.percentage == 20 %}selected{% endif %}>20%</option>
+        <option value="21" {% if hotel.percentage == 21 %}selected{% endif %}>21%</option>
+        <option value="22" {% if hotel.percentage == 22 %}selected{% endif %}>22%</option>
+        <option value="23" {% if hotel.percentage == 23 %}selected{% endif %}>23%</option>
+        <option value="24" {% if hotel.percentage == 24 %}selected{% endif %}>24%</option>
+        <option value="25" {% if hotel.percentage == 25 %}selected{% endif %}>25%</option>
+        <option value="26" {% if hotel.percentage == 26 %}selected{% endif %}>26%</option>
+        <option value="27" {% if hotel.percentage == 27 %}selected{% endif %}>27%</option>
+        <option value="28" {% if hotel.percentage == 28 %}selected{% endif %}>28%</option>
+        <option value="29" {% if hotel.percentage == 29 %}selected{% endif %}>29%</option>
+        <option value="30" {% if hotel.percentage == 30 %}selected{% endif %}>30%</option>
+      </select>
+    </label>
+    <div class="discription">
+      Выберите процент, который вы готовы заплатить сайту. Чем выше процент, тем выше будет показано ваше
+      объявление.
+      Диапазон процентов от 14% до 30%.
+    </div>
+    <label class="text">
+      <!-- # TODO: Измен изменить -->
+      <span class="name">Минимум дней до заселения*</span>
+      <select name="minimum_days_before_arrival"
+        required>
+        <option value="0.25" {% if hotel.minimum_days_before_arrival == 0.25 %}selected{% endif %}>6 часов</option>
+        <option value="0.5" {% if hotel.minimum_days_before_arrival == 0.5 %}selected{% endif %}>12 часов</option>
+        <option value="1" {% if hotel.minimum_days_before_arrival == 1 %}selected{% endif %}>24 часа</option>
+        <option value="2" {% if hotel.minimum_days_before_arrival == 2 %}selected{% endif %}>2 дня</option>
+        <option value="3" {% if hotel.minimum_days_before_arrival == 3 %}selected{% endif %}>3 дня</option>
+        <option value="4" {% if hotel.minimum_days_before_arrival == 4 %}selected{% endif %}>4 дня</option>
+        <option value="5" {% if hotel.minimum_days_before_arrival == 5 %}selected{% endif %}>5 дней</option>
+        <option value="6" {% if hotel.minimum_days_before_arrival == 6 %}selected{% endif %}>6 дней</option>
+        <option value="7" {% if hotel.minimum_days_before_arrival == 7 %}selected{% endif %}>7 дней</option>
+        <option value="8" {% if hotel.minimum_days_before_arrival == 7 %}selected{% endif %}>8 дней</option>
+        <option value="9" {% if hotel.minimum_days_before_arrival == 7 %}selected{% endif %}>9 дней</option>
+        <option value="10" {% if hotel.minimum_days_before_arrival == 7 %}selected{% endif %}>10 дней</option>
+        <option value="11" {% if hotel.minimum_days_before_arrival == 7 %}selected{% endif %}>11 дней</option>
+        <option value="12" {% if hotel.minimum_days_before_arrival == 7 %}selected{% endif %}>12 дней</option>
+      </select>
+    </label>
+
+    <label class="text">
+      <span class="name">Дата начала приема клиентов*</span>
+      <input type="date"
+        name="date_when_you_start_receiving_guests"
+        required
+        value="{{hotel.date_when_you_start_receiving_guests}}">
+    </label>
+
+    <label class="text">
+      <span class="name">Минимум дней пребывания*</span>
+      <input type="text"
+        name="minimum_days_of_stay"
+        required
+        value="{{hotel.minimum_days_of_stay}}">
+    </label>
+
+  </div>
+  <div class="br_tran"></div>
+  <span class="title_2">Скидки и акции</span>
+  <div class="grupe_input">
+    <label class="text">
+      <span class="name">При длительном проживании скидка (₽)*</span>
+      <input type="text"
+        name="for_long_term_stays"
+        required
+        value="{{hotel.for_long_term_stays}}">
+    </label>
+
+    <label class="text">
+      <span class="name">Минимум дней*</span>
+      <input type="text"
+        name="for_long_term_stays_minimum_days_of_stay"
+        required
+        value="{{hotel.for_long_term_stays_minimum_days_of_stay}}">
+    </label>
+
+    <div class="discription">Предложите гостям скидку при длительном проживании или на новый объект, чтобы
+      повысить занятость жилья.
+    </div>
+
+
+    <label class="text">
+      <span class="name">Плата за уборку (₽)*</span>
+      <input type="text"
+        name="cleaning_fee"
+      required
+        value="{{hotel.cleaning_fee}}">
+    </label>
+
+    <div class="discription">Плата за уборку: Включена в стоимость или одельно.</div>
+  </div>
+</div>
+<button class="button" id="save_hotel"
+  onclick="save_an_entry()"
+  style="margin-top: 10px;">Сохранить</button>
+
+<script defer>
+  function save_an_entry() {
+
+    $(".label_input_file").find(".files").removeClass("error_input")
+
+    if (!$(".label_input_file").multifile("valid")) {
+      $(".label_input_file").find(".files").addClass("error_input")
+      return false
+    }
+
+    type_of_addition = $("#type_of_addition").val()
+    $(`label[data-select-type='${type_of_addition}'] select`).val()
+
+
+    if (window.FormData === undefined) {
+      alert('В вашем браузере FormData не поддерживается')
+    } else {
+      form = document.getElementById("form_save_hotel");
+      form_data = new FormData();
+
+      form_data.append('images_hotel[]', $(`.label_input_file[input-file-name="images_hotel"]`).multifile("getlist"));
+
+      var selected_hservice = [];
+      $('input[name="hservice[]"]:checked').each(function () {
+        selected_hservice.push($(this).val());
+      });
+
+      form_data.append("hotel_id", new URLSearchParams(window.location.search).get('hotel_id'))
+
+      form_data.append("hservice[]", selected_hservice)
+
+      form_data.append("name", $("*[name='name']").val())
+      form_data.append("descriptions", $("*[name='descriptions']").val())
+
+      form_data.append("type_hotel", $("*[name='type_hotel']").val())
+      form_data.append("city", $("*[name='city']").val())
+      form_data.append("region", $("*[name='region']").val())
+      form_data.append("street", $("*[name='street']").val())
+      form_data.append("body", $("*[name='body']").val())
+      form_data.append("house", $("*[name='house']").val())
+      form_data.append("floor", $("*[name='floor']").val())
+      form_data.append("apartment", $("*[name='apartment']").val())
+      form_data.append("coordinates", $("*[name='coordinates']").val())
+
+
+      form_data.append("allowed_child", $("*[name='allowed_child']:checked").val())
+      form_data.append("allowed_animal", $("*[name='allowed_animal']:checked").val())
+      form_data.append("allowed_smoking", $("*[name='allowed_smoking']:checked").val())
+      form_data.append("allowed_party", $("*[name='allowed_party']:checked").val())
+      form_data.append("instant_booking", "True")
+      form_data.append("percentage", $("*[name='percentage']").val())
+      form_data.append("minimum_days_before_arrival", $("*[name='minimum_days_before_arrival']").val())
+      form_data.append("minimum_days_of_stay", $("*[name='minimum_days_of_stay']").val())
+      form_data.append("for_long_term_stays", $("*[name='for_long_term_stays']").val())
+      form_data.append("for_long_term_stays_minimum_days_of_stay", $("*[name='for_long_term_stays_minimum_days_of_stay']").val())
+      form_data.append("cleaning_fee", $("*[name='cleaning_fee']").val())
+      form_data.append("date_when_you_start_receiving_guests", $("*[name='date_when_you_start_receiving_guests']").val())
+
+      form_data.append("stars", $("*[name='stars']").val())
+
+      form_data.append("breakfast", $("*[name='breakfast']:checked").val())
+      form_data.append("lunch", $("*[name='lunch']:checked").val())
+      form_data.append("dinner", $("*[name='dinner']:checked").val())
+
+
+      form_data.append("meal[]", Array.from($("*[name='meal[]']:checked"), item => $(item).val()))
+
+      form_data.append("check_in_time", $("*[name='check_in_time']").val())
+      form_data.append("departure_time", $("*[name='departure_time']").val())
+
+
+      load_start()
+      $.ajax({
+        method: "POST",
+        data: form_data,
+        contentType: false,
+        processData: false,
+        url: "{% url 'form_save_hotel' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        },
+        success: function (request) {
+          load_end()
+          $("*[name]").css("border-color", "green")
+          $(".error_input").remove()
+          if (request.result == "save") {
+            getNotifications()
+
+            if (request.moderator == true) {
+              popup_create("Модерация", "Объект размещения отправлен на модерацию",
+                  [
+                      { type: "reload", name: "Закрыть" }
+                  ],
+                  []
+                )
+            }
+            else {
+              location.reload()
+            }
+          }
+          else if (request.result == "error") {
+            for (let key in request.errors) {
+              console.log(key, request.errors[key])
+              $(`*[name='${key}']`).css("border-color", "red")
+              $(`*[name='${key}']`).after(`<span class='error_input'>${request.errors[key]}</span>`)
+            }
+            input_first_error = $(".error_input").first().parents("label")
+            $("html, body").animate({scrollTop: $(input_first_error).offset().top}, 1000);
+
+            popup_create("Ошибка", "Вы не заполнили обязательные поля", [], [], "error")
+          }
+        }
+      });
+    }
+  }
+</script>
+
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+	integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+	crossorigin="" />
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+	integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+	crossorigin=""></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+<style>
+
+  #map_coordinate {
+    height: 521px;
+    width: 100%;
+  }
+
+  #gs_address_list {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  #gs_address_list .item {
+    background: #ffffff;
+    padding: 7px;
+    border-radius: 10px;
+    border: 1px solid gray;
+    cursor: pointer;
+  }
+
+  #gs_address_list .item:hover {
+    border-color: #fc7201;
+    background-color: #fc7201;
+    color:white;
+  }
+</style>
+
+<script defer>
+  map = null
+
+  ymaps.ready(function () {
+    map = new ymaps.Map('map_coordinate', {
+      center: [60.00000, 105.0000],
+      zoom: 1,
+      behaviors: ['default', 'scrollZoom']
+    }, {
+      suppressMapOpenBlock: true,
+    });
+
+    map.controls.remove('trafficControl')
+    map.controls.remove('geolocationControl')
+    map.controls.remove('searchControl')
+
+    let ajax_gs_address_timer = null
+
+    $(`*[name='gs_address']`).change(function () {
+      if (ajax_gs_address_timer) {
+        clearTimeout(ajax_gs_address_timer)
+      }
+
+      ajax_gs_address_timer = setTimeout(() => {
+        ajax_gs_address()
+      }, 200)
+    })
+  });
+
+
+  list_place = {}
+
+  select_id = null
+
+  function ajax_gs_address() {
+    let val = $(`*[name='gs_address']`).val()
+    var myGeocoder = ymaps.geocode(val);
+    myGeocoder.then(function(res) {
+
+      $("#gs_address_list").empty()
+
+      list_place = {}
+
+      map.geoObjects.removeAll()
+
+      res.geoObjects.each(function (el, i) {
+        let name = el.properties.get("text")
+        let coordinates_el = el.geometry._coordinates
+
+        let latlng = `${coordinates_el[0]}, ${coordinates_el[1]}`
+
+        let placemark = new ymaps.Placemark(coordinates_el, {}, { preset: 'islands#blackDotIcon' })
+
+        let metaDataProperty = el.properties.get('metaDataProperty')
+
+        list_place[i] = {
+          "name": name,
+          "latlng": latlng,
+          "coord": coordinates_el,
+          "placemark": placemark,
+          "address": metaDataProperty["GeocoderMetaData"]["Address"]["Components"],
+        }
+
+        placemark.events.add('click', function() { select_place(i) })
+
+
+        let item = $(`<div class="item" data-id="${i}" data-coord-lat="${coordinates_el[0]}" data-coord-lng="${coordinates_el[1]}">${name} (${latlng})</div>`)
+        $("#gs_address_list").append(item)
+
+        map.geoObjects.add(placemark)
+      })
+    });
+  }
+
+  $("#gs_address_list").on("click", '.item', function() {
+    let id = parseFloat($(this).data("id"))
+
+    select_place(id)
+  })
+
+  function select_place(id) {
+    if (select_id != null) {
+      list_place[select_id].placemark.options.set('preset', 'islands#blackDotIcon');
+    }
+    list_place[id].placemark.options.set('preset', 'islands#redDotIcon');
+    select_id = id
+
+
+    $(`[name="city"]`).val("")
+    $(`[name="region"]`).val("")
+    $(`[name="street"]`).val("")
+    $(`[name="house"]`).val("")
+    $(`[name="apartment"]`).val("")
+    $(`[name="floor"]`).val("")
+
+
+    list_place[id]["address"].forEach(function(item) {
+      if (item["kind"] == "locality") {
+        $(`[name="city"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "area") {
+        $(`[name="region"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "street") {
+        $(`[name="street"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "house") {
+        $(`[name="house"]`).val(item["name"])
+      }
+
+      if (item["kind"] == "other") {
+        if (item["name"].startsWith('этаж')) {
+          let name = item["name"].replace("этаж", '').trim();
+          $(`[name="floor"]`).val(name)
+        }
+        if (item["name"].startsWith('кв.')) {
+          let name = item["name"].replace(new RegExp("кв.", 'gi'), '').trim();
+          $(`[name="apartment"]`).val(name)
+        }
+      }
+    })
+
+    $("*[name='coordinates']").val(list_place[id]["latlng"])
+  }
+
+</script>
+
+{% endblock main_block %}

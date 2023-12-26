@@ -1,0 +1,242 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static sass_tags %}
+{% block main_block %}
+
+<link href="{% static 'css/scss/chat.css' %}"
+    rel="stylesheet"
+    type="text/css" />
+
+<div class="section">
+    <div class="chat_list {% if full_chat %}hide{% endif %}">
+        {% for chat in chats %}
+        <a href="{{chat.url}}"
+            class="chat_item {% if full_chat == chat.id %}select{% endif %}"
+            data-chat-id="{{chat.id}}">
+            <div class="chat_image">
+                <img src="{{chat.img}}">
+                <div class="status">{{chat.status}}</div>
+            </div>
+            <div class="chat_info">
+                <span class="chat_date">{{chat.start}} - {{chat.end}}</span>
+                <span class="chat_name">{{chat.hotel}}</span>
+                <span class="chat_name">{{chat.name}}</span>
+                <span class="chat_name">{{chat.url_booking_text}}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% if full_chat %}
+    <div id="chat_max">
+        <div id="messages">
+            <!-- Тут через js делается сообщения -->
+
+            <div class="button_grupe_chat">
+
+            </div>
+
+        </div>
+        <div id="entering_message">
+            <textarea name="text"
+                id="entering_a_message_text"
+                placeholder="Введите сообщение..."
+                required></textarea>
+            <div class="send_messages">Отправить сообщение</div>
+        </div>
+    </div>
+    {% else %}
+    <div class="not_select_chat">
+        Чат не выбран
+    </div>
+    {% endif %}
+</div>
+
+{% if full_chat != None %}
+<script defer>
+    chat = {
+        "isGetMessages": false,
+    }
+
+    get_chat()
+
+    function get_chat() {
+        data = {
+            "chat": "{{full_chat}}",
+        }
+
+        load_start()
+
+        $.ajax({
+            method: "POST",
+            data: data,
+            url: "{% url 'get_chat' %}",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (data) {
+
+                chat["id"] = data["chat"]["id"]
+                chat["date_start"] = data["chat"]["date_start"]
+                chat["user_id"] = data["chat"]["user_id"]
+                $(".button_grupe_chat").append(`<a href="/admin/list/users/?id=${chat["user_id"]}" style="background-color: #27da24;" class="item">Посмотреть статус</a>`)
+                get_messages(false)
+                load_end()
+            }
+        });
+    }
+
+    function get_messages(isRestart) {
+        chat["isGetMessages"] = true
+        data_get = {
+            "chat": chat.id,
+            "isRestart": isRestart,
+        }
+        $.ajax({
+            method: "GET",
+            data: data_get,
+            url: "{% url 'chat_messages' %}",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (data) {
+                chat["isGetMessages"] = false
+                if (data.status && data.status == "not_now_messages") {
+                    console.log("Нету новых сообщений")
+                }
+                else {
+                    add_messages_to_html(data.messages)
+                }
+            }
+        });
+    }
+
+    setInterval(function () {
+        if (chat["isGetMessages"] == false) {
+            get_messages(true);
+        }
+    }, 5000);
+
+    count_mess = 0
+
+    function add_messages_to_html(messages) {
+        if (count_mess >= messages.length) {
+            return
+        }
+
+        count_mess = messages.length
+
+        $("#messages > .media").remove()
+        $("#messages > .title-date-messages").remove()
+        savedDay = null
+
+        messages.forEach(message => {
+            // получаем дату сообщения
+            console.log(message.date)
+            let messageDate = new Date(message.date);
+            // получаем день сообщения
+            let messageDay = messageDate.getDate();
+
+            // сравниваем дни
+            if (messageDay != savedDay) {
+                // добавляем дату перед сообщением
+                let date = messageDate.toLocaleString('ru-RU', { day: 'numeric', month: 'numeric', year: 'numeric' });
+                $("#messages").append(`<p class="title-date-messages text-muted text-center">${date}</p>`)
+                // сохраняем текущий день
+                savedDay = messageDay;
+            }
+
+            if (message.belong == "client") {
+                html = `<div class="media media-his">
+                <div class="media-left media-fix-width">
+                    <img class="media-object img-circle"
+                    src="{% static '/img/av_user.png' %}"
+                style="max-width:75px;">
+                </div>
+                <div class="media-right media-fix-width">
+                </div>
+                <div class="media-body media-body-left">
+                <div class="message-body">
+                    ${message.text}
+                </div>
+                </div>
+                <div class="message-data-right text-muted">
+                ${message.time}
+                </div>
+            </div>`
+            }
+            else if (message.belong == "hotel") {
+                html = `<div class="media media-my">
+            <div class="media-left text-muted">
+                ${message.time}
+            </div>
+                <div class="media-right media-fix-width">
+                <img class="media-object img-circle"
+                src="${message.img}"
+                style="max-width:75px;">
+            </div>
+            <div class="media-body media-body-right">
+                <div class="message-body">
+                ${message.text}
+                </div>
+            </div>
+            </div>`
+            }
+            else if (message.belong == "admin") {
+                html = `<div class="media media-info">
+                <div class="media-body media-body-left">
+                    <div class="message-body">
+                      ${message.text}
+                    </div>
+                </div>
+            </div>`
+            }
+            else if (message.belong == "info") {
+                html = message.text
+            }
+
+            $("#messages").append(html)
+        });
+        $("#messages").append($(".button_grupe_chat"))
+    }
+
+    $(".send_messages").click(function () {
+        sendMessages()
+    });
+
+    setInterval(function () {
+        if (chat["isGetMessages"] == false) {
+            get_messages(true);
+        }
+    }, 1000);
+
+
+    $('textarea').keydown(function (event) {
+        if (event.keyCode === 13) {
+            sendMessages()
+        }
+    });
+
+    function sendMessages() {
+        text = $("#entering_a_message_text").val()
+        if (text != "") {
+            data_post = {
+                "text": text,
+                "chat": chat.id,
+            }
+
+            $.ajax({
+                method: "POST",
+                data: data_post,
+                url: "{% url 'chat_send' %}",
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                },
+                success: function (data) {
+                    text = $("#entering_a_message_text").val("")
+                    get_messages(false)
+                }
+            });
+        }
+    }
+</script>
+{% endif %}
+{% endblock main_block %}

@@ -1,0 +1,560 @@
+{% load static form sass_tags %}
+<link href="{% static 'css/scss/form_search_detal_hotel.css' %}" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+
+<style>
+    #guests_popup {
+        z-index: 99999;
+    }
+
+    #guests_popup .item_room {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    #guests_popup .item_room .header_item_room {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    #guests_popup .item_room .header_item_room .number_room {
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+    #guests_popup .item_room .header_item_room .remove_room {
+        color: red;
+        cursor: pointer;
+    }
+
+    #guests_popup .add_room {
+        color: #fc7201;
+        background: transparent;
+        padding: 5px;
+    }
+
+
+    #guests_popup .сhildren.input {
+        gap: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+
+    #guests_popup .сhildren_tags {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    #guests_popup .сhildren_tags .tag {
+        display: flex;
+        flex-direction: row;
+        background: #ffcea5;
+        padding: 3px 6px;
+        border-radius: 5px;
+    }
+
+    #guests_popup .сhildren_tags .tag .age {
+        color: black;
+    }
+
+    #guests_popup .сhildren_tags .tag .remove {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        left: 12px;
+        top: 6px;
+    }
+
+
+    #guests_popup .сhildren_tags .tag .remove::before,
+    #guests_popup .сhildren_tags .tag .remove::after {
+        position: absolute;
+        content: "";
+        width: 1px;
+        height: 13px;
+        background-color: #000;
+    }
+
+    #guests_popup .сhildren_tags .tag .remove::before {
+        transform: rotate(45deg);
+    }
+
+    #guests_popup .сhildren_tags .tag .remove::after {
+        transform: rotate(-45deg);
+    }
+
+    #guests_popup .tag_c_age_add {
+        padding: 3px 1px;
+        border-radius: 5px;
+        border: 1px solid #D2D2D2;
+    }
+
+</style>
+
+<style>
+	.daterangepicker .available.in-range {
+		background-color: #ffe6d5 !important;
+	}
+
+	.daterangepicker .available.active {
+		background-color: #fc7201 !important;
+	}
+
+	.ui-menu .ui-menu-item:not(.ui-autocomplete-category):hover {
+		margin-right: 10px;
+	}
+</style>
+
+<form class="form_search" action="">
+	<div class="form-search__label form-search__label--date">
+		<input id="date_1" readonly class="form-search__input input-date">
+		<input id="date_2" readonly class="form-search__input input-date">
+        <input type="date" name="" style="display: none;" id="date_range">
+	</div>
+	<div class="form-search__label form-search__label--persons">
+        <span class="guests">
+        </span>
+        <div id="guests_popup">
+            <div class="button add_room">Добавить номер</div>
+        </div>
+    </div>
+	<a class="button form-search__button"
+		type="submit"
+		onclick="go_list(); return false;">Поиск</a>
+</form>
+
+<script>
+
+    function getAgeEnding(age) {
+        if (age % 10 === 1 && age !== 11) {
+            return 'год';
+        } else if (age % 10 >= 2 && age % 10 <= 4 && (age < 10 || age > 20)) {
+            return 'года';
+        } else {
+            return 'лет';
+        }
+    }
+
+    function gen_item_room(id = null) {
+        // Клонируем последнюю комнату
+
+        if (id == null) {
+            roomsData.forEach((obj, index) => {
+                gen_item_room(index)
+            })
+        }
+
+        let roomData = roomsData[id]
+
+        if (roomData) {
+            let adults = roomData['adults']
+
+            $(`.item_room[data-id-room="${id}"]`).remove()
+
+            var newRoom = $(`
+            <div class="item_room"
+                data-id-room="${id}">
+                <div class="header_item_room">
+                    <div class="number_room"><span class="value">${id + 1}</span> номер</div>
+                    <div class="remove_room">Удалить</div>
+                </div>
+                <div class="adults input">
+                    <span class="label">Взрослых</span>
+                    <span class="minus">-</span>
+                    <input type="number"
+                        id=""
+                        placeholder="1"
+                        value="${adults}"
+                        required>
+                    <span class="plus">+</span>
+                </div>
+                <div class="сhildren input">
+                    <span class="label">Детей</span>
+                    <div class="сhildren_tags">
+                        <select class="tag_c_age_add">
+                            <option value="">добавить</option>
+                            <option value="0">0 ${getAgeEnding(0)}</option>
+                            <option value="1">1 ${getAgeEnding(1)}</option>
+                            <option value="2">2 ${getAgeEnding(2)}</option>
+                            <option value="3">3 ${getAgeEnding(3)}</option>
+                            <option value="4">4 ${getAgeEnding(4)}</option>
+                            <option value="5">5 ${getAgeEnding(5)}</option>
+                            <option value="6">6 ${getAgeEnding(6)}</option>
+                            <option value="7">7 ${getAgeEnding(7)}</option>
+                            <option value="8">8 ${getAgeEnding(8)}</option>
+                            <option value="9">9 ${getAgeEnding(9)}</option>
+                            <option value="10">10 ${getAgeEnding(10)}</option>
+                            <option value="11">11 ${getAgeEnding(11)}</option>
+                            <option value="12">12 ${getAgeEnding(12)}</option>
+                            <option value="13">13 ${getAgeEnding(13)}</option>
+                            <option value="14">14 ${getAgeEnding(14)}</option>
+                            <option value="15">15 ${getAgeEnding(15)}</option>
+                            <option value="16">16 ${getAgeEnding(16)}</option>
+                            <option value="17">17 ${getAgeEnding(17)}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            `);
+
+            let childrens_age = roomData['childrens_age']
+
+            tag_c_age_add = $(newRoom).find(".сhildren_tags .tag_c_age_add")
+
+            childrens_age.forEach((age, index) => {
+                age_text = age + " " + getAgeEnding(age)
+                let tag = $(`
+                <div class="tag" data-index="${index}">
+                    <span class="age">${age_text}</span>
+                    <div class="remove"></div>
+                </div>
+                `)
+                $(tag_c_age_add).before(tag)
+            })
+
+
+            // Добавляем новую комнату в конец списка
+            $('#guests_popup .add_room').before(newRoom);
+            get_guests_span()
+        }
+    }
+
+    function get_guests_span() {
+        const totalGuests = roomsData.reduce((total, roomData) => {
+            const numChildren = roomData.childrens_age.filter((age) => {
+                return age != "" && age >= 2
+            }).length;
+            return total + roomData.adults + numChildren;
+        }, 0);
+
+        let guestsString;
+        if (totalGuests === 1) {
+            guestsString = "1 гость";
+        } else if (totalGuests >= 2 && totalGuests <= 4) {
+            guestsString = `${totalGuests} гостя`;
+        } else {
+            guestsString = `${totalGuests} гостей`;
+        }
+
+        const numRooms = roomsData.length;
+
+        let roomsString;
+        if (numRooms === 1) {
+            roomsString = "1 номер";
+        } else if (numRooms >= 2 && numRooms <= 4) {
+            roomsString = `${numRooms} номера`;
+        } else {
+            roomsString = `${numRooms} номеров`;
+        }
+
+        $(".guests").html(`${roomsString} • ${guestsString}`)
+    }
+
+    function get_params_queryString_roomsData() {
+        const params = new URLSearchParams();
+
+        roomsData.forEach((room, index) => {
+            params.append(`a${index}`, room.adults);
+            if (room.childrens_age.length > 0) {
+                params.append(`ca${index}`, room.childrens_age.join(','));
+            }
+        });
+
+        const queryString = params.toString();
+        return queryString
+    }
+
+    function valid_roomsData(lst) {
+        if (lst.length === 0) {
+            return "Список номеров не может быть пустым";
+        }
+
+        for (const item of lst) {
+            if (item.childrens_age.some(age => typeof age !== "number")) {
+                return "Количество возрастов детей не могут быть пустыми и должны содержать числа";
+            }
+        }
+
+        return null;
+    }
+
+    $(document).ready(function() {
+        // Обработчик добавления комнаты
+        $('.add_room').on('click', function() {
+            // Добавляем новую комнату в массив данных
+            roomsData.push({
+                adults: 1,
+                childrens_age: [],
+            });
+
+            let index_room = roomsData.length - 1;
+
+            gen_item_room(index_room)
+
+            // Обновляем количество гостей
+            // showChildrenAge();
+            // updateGuestCount();
+
+            // Показываем кнопку "Удалить" для всех комнат, если их количество больше минимального
+            if (roomsData.length) {
+                $('.item_room .remove_room').show();
+            }
+            else {
+                $('.item_room .remove_room').show();
+            }
+        });
+
+        // Обработчик удаления комнаты
+        $(document).on('click', '.remove_room', function() {
+            // Удаляем комнату из массива данных
+            var roomIndex = $(this).closest('.item_room').index();
+            roomsData.splice(roomIndex, 1);
+
+            // Удаляем комнату из списка
+            $(this).closest('.item_room').remove();
+
+            // Обновляем номера комнат
+            $('.item_room').each(function(index) {
+                $(this).find('.number_room .value').text(index + 1);
+            });
+
+            // Обновляем количество гостей
+            // showChildrenAge();
+            // updateGuestCount();
+
+            // Скрываем кнопку "Удалить", если осталась только одна комната
+            if (roomsData.length <= 1) {
+                $('.remove_room').hide();
+            }
+
+            get_guests_span()
+        });
+
+        $("#guests_popup").on("click", ".adults.input .minus, .adults.input .plus", function() {
+            let id = $(this).parents(".item_room").data('id-room');
+            let type = "adults";
+            let sign = $(this).hasClass("minus") ? -1 : 1;
+            roomsData[id][type] += sign;
+
+            if (roomsData[id][type] < 1) roomsData[id][type] = 1;
+            if (roomsData[id][type] > 99) roomsData[id][type] = 99;
+
+            $(this).parents(".input").find("input").val(roomsData[id][type]);
+            get_guests_span()
+        })
+
+        $("#guests_popup").on("change", ".input input", function() {
+            let id = $(this).parents(".item_room").data('id-room');
+            let type = "adults";
+            let value = parseInt($(this).val());
+
+            if (value < 0 && type === "children") value = 0;
+            if (value > 99) value = 99;
+
+            $(this).val(value)
+
+            roomsData[id][type] = value;
+            get_guests_span(d)
+        })
+
+        $("#guests_popup").on("change", ".input .tag_c_age_add", function() {
+            let item_room = $(this).parents(".item_room")
+            let id = item_room.data('id-room');
+            val = parseInt($(this).val())
+            roomsData[id]["childrens_age"].push(val)
+            $(this).val("")
+
+
+            let childrens_age = roomsData[id]["childrens_age"]
+
+            item_room.find(".сhildren_tags .tag").remove()
+
+            let tag_c_age_add = $(item_room).find(".сhildren_tags .tag_c_age_add")
+
+            childrens_age.forEach((age, index) => {
+                let age_text = age + " " + getAgeEnding(age)
+                let tag = $(`
+                <div class="tag" data-index="${index}">
+                    <span class="age">${age_text}</span>
+                    <div class="remove"></div>
+                </div>
+                `)
+                $(tag_c_age_add).before(tag)
+            })
+        })
+
+        $("#guests_popup").on("click", ".input .сhildren_tags .tag .remove", function() {
+            let item_room = $(this).parents(".item_room")
+            let id = item_room.data('id-room');
+            let index = $(this).parents(".tag").data('index');
+            roomsData[id]["childrens_age"].splice(index, 1);
+
+            let childrens_age = roomsData[id]["childrens_age"]
+            let tag_c_age_add = $(item_room).find(".сhildren_tags .tag_c_age_add")
+
+            item_room.find(".сhildren_tags .tag").remove()
+
+            childrens_age.forEach((age, index) => {
+                let age_text = age + " " + getAgeEnding(age)
+                let tag = $(`
+                <div class="tag" data-index="${index}">
+                    <span class="age">${age_text}</span>
+                    <div class="remove"></div>
+                </div>
+                `)
+                $(tag_c_age_add).before(tag)
+            })
+        })
+
+        {% if search.rooms_data %}
+            roomsData = {{search.rooms_data | safe}};
+            gen_item_room()
+        {% else %}
+            roomsData = [{
+                adults: 1,
+                childrens_age: [],
+            }];
+            gen_item_room(0)
+        {% endif %}
+
+    });
+</script>
+
+<script>
+    function formatDate(date) {
+		var dd = date.getDate();
+		if (dd < 10) dd = '0' + dd;
+		var mm = date.getMonth() + 1;
+		if (mm < 10) mm = '0' + mm;
+		var yyyy = date.getFullYear();
+		return dd + '.' + mm + '.' + yyyy;
+	}
+
+	date_1 = new Date()
+	date_2 = new Date()
+	date_2.setDate(date_1.getDate() + 7);
+	//{% if search.date_1 %}
+	$("#date_1").val("{{search.date_1}}")
+	//{% else %}
+	$("#date_1").val(formatDate(date_1))
+	//{% endif %}
+
+	//{% if search.date_2 %}
+	$("#date_2").val("{{search.date_2}}")
+	//{% else %}
+	$("#date_2").val(formatDate(date_2))
+	//{% endif %}
+
+
+    moment.locale('ru');
+	$('#date_1').daterangepicker({
+
+		"startDate": "{{search.date_1}}",
+		"endDate": "{{search.date_2}}",
+
+		autoUpdateInput: false,
+		locale: {
+			format: 'DD.MM.YYYY',
+			separator: ' - ',
+			applyLabel: 'Применить',
+			cancelLabel: 'Отмена',
+			fromLabel: 'От',
+			toLabel: 'До',
+			customRangeLabel: 'Выбрать диапазон',
+			daysOfWeek: [
+				'Вс',
+				'Пн',
+				'Вт',
+				'Ср',
+				'Чт',
+				'Пт',
+				'Сб'
+			],
+			monthNames: [
+				'Янв',
+				'Фев',
+				'Мар',
+				'Апр',
+				'Май',
+				'Июн',
+				'Июл',
+				'Авг',
+				'Сен',
+				'Окт',
+				'Ноя',
+				'Декь'
+			],
+			firstDay: 1
+		}
+	}, function (start, end, label) {
+		console.log("Выбран период: " + start.format('DD.MM.YYYY') + ' - ' + end.format('DD.MM.YYYY'));
+		$('#date_1').val(start.format('DD.MM.YYYY'));
+		$('#date_2').val(end.format('DD.MM.YYYY'));
+	});
+
+	$('#date_2').click(() => {
+        $('#date_1').click()
+    })
+
+	function go_list() {
+		let error = valid_roomsData(roomsData);
+		if (error) {
+			alert(error);
+			return
+		}
+
+		date_1 = $("#date_1").datepicker("getDate")
+		date_2 = $("#date_2").datepicker("getDate")
+
+		if (date_1 > date_2) {
+			alert("Дата начала бронирования не может быть больше даты конца бронирования")
+			return
+		}
+
+		data = {
+			"date_1": $('#date_1').val(),
+			"date_2": $('#date_2').val(),
+		}
+
+
+		query_string = getQueryString(data)
+		url = location.href
+		url = url.replace(/\\?.*/, "?" + query_string);
+        roomsData_queryString = get_params_queryString_roomsData()
+		location.href = url + "&" + roomsData_queryString
+	}
+
+	function getQueryString(params) {
+		let queryString = '';
+		for (let key in params) {
+			if (params.hasOwnProperty(key)) {
+				if (queryString.length > 0) {
+					queryString += '&';
+				}
+				queryString += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+			}
+		}
+		return queryString;
+	}
+
+	function getQueryParams() {
+		const urlParams = new URLSearchParams(window.location.search);
+		const params = {};
+		for (let [key, value] of urlParams) {
+			params[key] = value;
+		}
+		return params;
+	}
+</script>
+
+{% comment %} <script src="{% static 'js/datepicker-ru.js' %}" defer></script> {% endcomment %}

@@ -1,0 +1,472 @@
+{% extends 'user/v2/base.html' %}
+{% load cards %}
+{% block main_block %}
+  <style>
+    .edit_profile_card .footer_block_card .block_label {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .edit_profile_card .footer_block_card {
+        gap: 40px !important;
+    }
+
+    .edit_profile_card .footer_block_card .block_label .header_block_label {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .edit_profile_card .footer_block_card .block_label .status {
+      color: #fe8787;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .edit_profile_card .footer_block_card .block_label .value {
+      color: #1e1e1e;
+      font-size: 18px;
+    }
+
+    .block_card .input_label {
+      display: flex;
+      flex-direction: column;
+      width: min-content;
+      margin: 0;
+    }
+
+    .block_card .input_label input {
+    }
+  </style>
+
+  <style>
+    @media screen and (max-width: 540px) {
+      .block_label .header_block_label .value span {
+        font-size: 15px;
+      }
+    }
+
+    .edit_profile_card .footer_block_card .block_label {
+      gap: 10px;
+    }
+
+    @media screen and (max-width: 766px) {
+      .more_indentation {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+
+  <div class="section_title" style="  margin-bottom: 28px; ">Личные данные</div>
+
+  <section class="grupe_cards" style="margin-bottom: 25px;">
+    <section class="row_crads">
+      <div class="block_card icontext edit_profile_card">
+        <div class="body_block_card more_indentation">
+          <div class="icon text background-grey">
+            <span>{{user.first_letter_fio}}</span>
+          </div>
+          <div class="title" style="display: flex; gap: 20px">
+            <span>{{user.fio}}</span>
+            <div class="editor_icon" onclick="edit_FIO()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="16" viewBox="0 0 18 16" fill="none">
+                <path d="M16.7981 3.59283C17.151 3.24622 17.151 2.66852 16.7981 2.33967L14.6808 0.259964C14.346 -0.0866546 13.7578 -0.0866546 13.4049 0.259964L11.74 1.8864L15.1332 5.21927M0.773438 12.6671V16H4.16657L14.174 6.16137L10.7809 2.8285L0.773438 12.6671Z" fill="#BDBDCB" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer_block_card" style="flex-wrap: wrap; align-items: flex-start;">
+          <div class="block_label block_label_email">
+            <div class="header_block_label">
+              <span class="title">Email</span>
+              {% if not user.active_email %}
+              <span class="status">Почта не подтверждена</span>
+              {% endif %}
+            </div>
+            <div class="header_block_label">
+              <div class="value" style="display: flex; gap: 20px">
+                {% if user.email %}
+                <span>{{user.email}}</span>
+                {% else %}
+                <span>Не указано</span>
+                {% endif %}
+                <div class="editor_icon" onclick="edit_email()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="16" viewBox="0 0 18 16" fill="none">
+                    <path d="M16.7981 3.59283C17.151 3.24622 17.151 2.66852 16.7981 2.33967L14.6808 0.259964C14.346 -0.0866546 13.7578 -0.0866546 13.4049 0.259964L11.74 1.8864L15.1332 5.21927M0.773438 12.6671V16H4.16657L14.174 6.16137L10.7809 2.8285L0.773438 12.6671Z" fill="#BDBDCB" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            {% if not user.active_email %}
+            <button class="confirm_button_email button">Подтвердить</button>
+            {% endif %}
+          </div>
+
+          <div class="block_label block_label_phone">
+            <div class="header_block_label">
+              <span class="title">Телефон</span>
+              {% if not user.active_phone %}
+              <span class="status">Телефон не подтверждён</span>
+              {% endif %}
+            </div>
+            <div class="header_block_label">
+              <div class="value" style="display: flex; gap: 20px">
+                {% if user.phone %}
+                <span>{{user.phone}}</span>
+                {% else %}
+                <span>Не указано</span>
+                {% endif %}
+                <div class="editor_icon" onclick="edit_phone()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="16" viewBox="0 0 18 16" fill="none">
+                    <path d="M16.7981 3.59283C17.151 3.24622 17.151 2.66852 16.7981 2.33967L14.6808 0.259964C14.346 -0.0866546 13.7578 -0.0866546 13.4049 0.259964L11.74 1.8864L15.1332 5.21927M0.773438 12.6671V16H4.16657L14.174 6.16137L10.7809 2.8285L0.773438 12.6671Z" fill="#BDBDCB" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            {% if not user.active_email %}
+            <button class="confirm_button_phone button">Подтвердить</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads">
+      {% telegram_card %}
+    </section>
+
+    <section class="row_crads">
+      <div class="block_card">
+        <div class="section_title">Смена пароля</div>
+        <div class="grupe_input row " style="align-items: flex-end;">
+          <label class="text col-md-12 col-lg-4" for="">
+            <span class="name">Текущий пароль*</span>
+            {% if user.password %}
+            <input type="text" placeholder="••••••••" name="old_password" value="{{user.password}}" autocomplete="current-password" />
+            {% else %}
+            <input type="text" placeholder="••••••••" name="old_password" autocomplete="current-password" />
+            {% endif %}
+          </label>
+
+          <label class="text col-md-12 col-lg-4" for="">
+            <span class="name">Новый пароль*</span>
+            <input type="text" placeholder="••••••••" name="password_1" autocomplete="new-password" />
+          </label>
+
+          <label class="text col-md-12 col-lg-4" for="">
+            <span class="name">Повторить новый пароль*</span>
+            <input type="text" placeholder="••••••••" name="password_2" autocomplete="new-password" />
+          </label>
+
+          <div class="button" onclick="edit_password_ajax()">Изменить</div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+
+  <div class="col-lg-12" style="margin-bottom: 25px">
+    <a href="{% url 'logout' %}" class="block_card text clickable">
+      <span class="title">Выйти</span>
+    </a>
+  </div>
+
+
+  <script>
+    $(".block_label_phone .status, .confirm_button_phone").click(function () {
+      popup_create(
+        "Подверждение номера телефона",
+        "Для подтверждения вашего телефона, вам позвонят с указанного номера телефона, и вам потребуется ввести последние четыре цифры этого номера. Пожалуйста, не отвечайте на звонок, просто введите последние четыре цифры номера.",
+        [
+          { type: "close", name: "Отмена" },
+          { type: "add", name: "Позвонить", fun: сreating_a_verification_number, param: ["phone_1"] }
+        ],
+      )
+    })
+
+    function сreating_a_verification_number(phone_type) {
+      $.ajax({
+        url: "{% url 'phone_verification_create' %}",
+        type: 'POST',
+        headers: {
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        data: {
+          phone_type: phone_type
+        },
+        success: function (response) {
+          if (!response.error) {
+            popup_create(
+              "Подверждение номера телефона",
+              "Введите последние 4 цифры телефона, с которого вам позвонят",
+              [
+                { type: "close", name: "Отмена" },
+                { type: "send-inputs", name: "Проверить", fun: check_a_verification_number }
+              ],
+              [
+                [
+                  { type: "hidden", name: "phone_type", val: phone_type },
+                  { type: "text", "label": "Код", name: "entered_code", val: "" }
+                ]
+              ]
+            )
+          } else {
+            switch (response.error) {
+              case 'call_was_not_created':
+                // обработка ошибки "Неудачно создан звонок"
+                popup_create(
+                  "Ошибка",
+                  "Неудачно создан звонок для проверки",
+                  [
+                    { type: "close", name: "Закрыть" },
+                  ]
+                )
+                break;
+              case 'invalid_phone_number_type':
+                popup_create(
+                  "Ошибка",
+                  "Неверный тип телефона",
+                  [
+                    { type: "close", name: "Закрыть" },
+                  ]
+                )
+                break;
+            }
+          }
+        }
+      });
+    }
+
+
+    function reset_page(param) {
+      location.reload()
+    }
+
+    function check_a_verification_number(param) {
+      data = {
+        phone_type: param["phone_type"],
+        entered_code: param["entered_code"],
+      }
+
+      console.log(data)
+
+      $.ajax({
+        url: "{% url 'phone_verification_check' %}",
+        type: 'POST',
+        headers: {
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        data: data,
+        success: function (response) {
+          if (!response.error) {
+            popup_create(
+              "Подтвержден!",
+              "Вы подтвердили номер телефона, если вы смените номер телефона в профиле нужно будет подвердить его ещё раз",
+              [
+                { type: "reset", name: "Закрыть", fun: reset_page, param: [] },
+              ]
+            )
+
+            $(`.unverified_phone[data-type="${param['phone_type']}"]`).remove()
+
+          } else {
+            switch (response.error) {
+              case 'invalid_phone_number_type':
+                popup_create(
+                  "Ошибка",
+                  "Неверный тип телефона",
+                  [
+                    { type: "close", name: "Закрыть" },
+                  ]
+                )
+                break;
+              case 'mismatch':
+                popup_create(
+                  "Ошибка",
+                  "Неверный код",
+                  [
+                    { type: "close", name: "Закрыть" },
+                  ]
+                )
+                break;
+              case 'already_active':
+                popup_create(
+                  "Ошибка",
+                  "Номер телефона уже активен",
+                  [
+                    { type: "close", name: "Закрыть" },
+                  ]
+                )
+                break;
+            }
+          }
+        }
+      });
+    }
+  </script>
+
+  <script>
+    function edit_FIO() {
+      popup_create(
+        "Изменение ФИО",
+        "",
+        [
+          { type: "close", name: "Отмена", color: "red" },
+          { type: "use-inputs", fun: edit_FIO_ajax,  name: "Применить", color: "green" }
+        ],
+        [
+          [
+              { type: "text", "label": "Имя", val: "{{user.username}}", name: "username" },
+              { type: "text", "label": "Фамилия", val: "{{user.lastname}}", name: "lastname" },
+              { type: "text", "label": "Отчество", val: "{{user.middlename}}", name: "middlename" },
+          ]
+        ]
+      );
+    }
+
+    function edit_FIO_ajax(param) {
+      // AJAX POST request
+      $.ajax({
+        url: "{% url 'ajax_profile_v2_edit_fio' %}",
+        type: "POST",
+        data: param,
+        headers: {
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        success: function(response) {
+          // Handle success response
+          location.reload()
+        }
+      });
+    }
+
+
+    function edit_email() {
+      popup_create(
+        "Изменение почты",
+        "",
+        [
+          { type: "close", name: "Отмена", color: "red" },
+          { type: "use-inputs", fun: edit_email_ajax,  name: "Применить", color: "green" }
+        ],
+        [
+          [
+              { type: "text", "label": "Почта", val: "{{user.email}}", name: "email" },
+          ]
+        ]
+      );
+    }
+
+    function edit_email_ajax(param) {
+      // AJAX POST request
+      $.ajax({
+        url: "{% url 'ajax_profile_v2_edit_email' %}",
+        type: "POST",
+        data: param,
+        headers: {
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        success: function(response) {
+          if (param.email == "reset") {
+            popup_create(
+              "<span style='color: #10CB0C'>Письмо успешно отправлено</span>",
+              `
+              <span style='color: #FC7201'>Для подтверждения почты нажмите на ссылку подтверждения в полученном электронном письме</span><br><br>
+              <span style='color: #888888'>Проверьте папку со спамом, потому что электронное письмо с подтверждением может оказаться там по ошибке! Добавьте info@turgorodok.ru  в адресную книгу своего почтового ящика , чтобы наши сообщения не попадали в СПАМ.</span>
+              `
+            );
+          }
+          else {
+            location.reload()
+          }
+        }
+      });
+    }
+
+    $(".block_label_email .status, .confirm_button_email").click(function () {
+      confirm_email();
+    })
+
+    function confirm_email() {
+      popup_create(
+        "Подтверждение почты",
+        "Отправить повторно письмо для подтверждения на почту {{user.email}}",
+        [
+          { type: "close", name: "Отмена", color: "red" },
+          { type: "use-inputs", fun: edit_email_ajax,  name: "Отправить", color: "green" }
+        ],
+        [
+          [
+              { type: "hidden", val: "reset", name: "email" },
+          ]
+        ]
+      );
+    }
+
+
+    function edit_phone() {
+      popup_create(
+        "Изменение номера телефона",
+        "",
+        [
+          { type: "close", name: "Отмена", color: "red" },
+          { type: "use-inputs", fun: edit_phone_ajax,  name: "Применить", color: "green" }
+        ],
+        [
+          [
+              { type: "text", "label": "Номер телефона", val: "{{user.phone}}", name: "phone" },
+          ]
+        ]
+      );
+    }
+
+    function edit_phone_ajax(param) {
+      // AJAX POST request
+      $.ajax({
+        url: "{% url 'ajax_profile_v2_edit_phone' %}",
+        type: "POST",
+        data: param,
+        headers: {
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        success: function(response) {
+          // Handle success response
+          location.reload()
+        }
+      });
+    }
+
+
+    function edit_password_ajax() {
+
+      param = {
+        "old_password": $("[name='old_password']").val(),
+        "password_1": $("[name='password_1']").val(),
+        "password_2": $("[name='password_2']").val(),
+      }
+
+      // AJAX POST request
+      $.ajax({
+        url: "{% url 'ajax_profile_v2_edit_password' %}",
+        type: "POST",
+        data: param,
+        headers: {
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        success: function(response) {
+          if (response.result == "ok") {
+            location.reload()
+          }
+          else {
+            popup_create("Ошибка", response.result, [], [], "error");
+          }
+        }
+      });
+    }
+
+
+  </script>
+{% endblock %}

@@ -1,0 +1,1318 @@
+{% extends "main/base.html" %}
+{% load static menu form %}
+{% block content %}
+<style>
+
+	.cross {
+		position: absolute;
+		width: 30px;
+		height: 30px;
+		cursor: pointer;
+		right: 6px;
+		top: 6px;
+	}
+
+	.cross:before,
+	.cross:after {
+		position: absolute;
+		content: "";
+		width: 2px;
+		height: 20px;
+		background-color: red;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.cross:before {
+		transform: translate(-50%, -50%) rotate(45deg);
+	}
+
+	.cross:after {
+		transform: translate(-50%, -50%) rotate(-45deg);
+	}
+
+	#card_section {
+		width: 100%;
+	}
+
+	.ui-slider .ui-slider-handle {
+		background: white;
+		border: 1px solid #FC7201;
+		border-radius: 50%;
+		width: 21px;
+		height: 21px;
+	}
+
+	.ui-slider-horizontal {
+		height: 6px !important;
+	}
+
+	.ui-slider-horizontal .ui-slider-range {
+		background: #FC7201;
+	}
+
+	.ui-slider-horizontal .ui-slider-handle {
+		top: -8px;
+	}
+
+	#balanc_section {
+		max-width: 317px;
+		margin-top: 18px;
+		display: flex;
+		flex-direction: column;
+		gap: 9px;
+	}
+
+	.versatile_text {
+		display: flex;
+		justify-content: space-between;
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 24px;
+		color: #BBBBBB;
+	}
+
+	#balanc_label .versatile_text_value {
+		color: black;
+	}
+
+	.booking-card__img {
+		object-fit: cover;
+		width: 260px;
+		height: 200px;
+	}
+
+	@media screen and (max-width: 1024px) {
+
+		.booking-card__img {
+			object-fit: fill;
+			width: 100%;
+			height: 200px;
+		}
+
+		.mini_width_flex {
+			width: auto !important;
+			flex-direction: column !important;
+		}
+
+		.grupe_input.mini_width_flex label {
+			width: auto !important;
+		}
+
+		.inner-content__sidebar {
+			width: auto;
+			margin-top: 12px;
+		}
+
+		.inner-content__sidebar .sidebar-content {
+			width: auto;
+			-webkit-box-flex: 0;
+			-ms-flex: 0 0 370px;
+			flex: 0 0 370px;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-orient: vertical;
+			-webkit-box-direction: normal;
+			-ms-flex-direction: column;
+			flex-direction: column;
+			gap: 30px;
+			padding: 20px;
+			background: #FFFFFF;
+			border-radius: 13px;
+		}
+	}
+
+	.section .mini_text {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 16px;
+
+		color: #000000;
+	}
+
+	.section>.title {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 500;
+		font-size: 22px;
+		line-height: 30px;
+
+		color: #000000;
+	}
+
+	.section>.discription {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 22px;
+		width: 100%;
+
+		color: #000000;
+		margin-top: 20px;
+	}
+
+	.grupe_input {
+		margin-top: 20px;
+		row-gap: 20px;
+		column-gap: 40px;
+		display: flex;
+		flex-wrap: wrap;
+		width: 696px;
+	}
+
+
+	.grupe_input>label {
+		display: flex;
+		gap: 10px;
+		flex-direction: column;
+		width: 328px;
+	}
+
+
+	.grupe_input>label>.name {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 22px;
+
+		color: #000000;
+	}
+
+	.grupe_input>label.text input,
+	.grupe_input>label.text select,
+	.grupe_input>label.date input {
+		height: 45px;
+		width: 100%;
+		border: 1px solid #D2D2D2;
+		border-radius: 5px;
+		display: flex;
+		align-items: center;
+		padding-left: 14px;
+		padding-right: 14px;
+	}
+
+	.grupe_input>label.text textarea {
+		width: 100%;
+		border: 1px solid #D2D2D2;
+		border-radius: 5px;
+		display: flex;
+		align-items: center;
+		padding-left: 14px;
+		resize: horizontal;
+	}
+
+	.grupe_input>label.text input::placeholder {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 22px;
+		color: #818181;
+	}
+
+	.grupe_input .date_3 section {
+		display: flex;
+		gap: 10px;
+	}
+
+	.grupe_input .date_3 section .d {
+		flex: 1 2 100%;
+		min-width: 75px;
+	}
+
+	.grupe_input .date_3 section .m {
+		flex: 2 1 100%;
+	}
+
+	.grupe_input .date_3 section .y {
+		flex: 1 2 100%;
+		min-width: 75px;
+	}
+
+	.grupe_input .checkradion section>label {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 22px;
+
+		color: #000000;
+		display: flex;
+		gap: 10px;
+		flex-direction: row;
+	}
+
+	.grupe_input input[type="checkbox"]:checked::before {
+		background: #FC7201;
+	}
+
+	.grupe_input .checkradion input {
+		width: 18px;
+	}
+
+	.button {
+		background: #FC7201;
+		height: 50px;
+		color: white;
+		border-radius: 5px;
+		padding: 14px 32px;
+		width: max-content;
+	}
+
+	.grupe_card {
+		display: flex;
+		margin-top: 20px;
+		gap: 20px;
+		cursor: pointer;
+	}
+
+	.grupe_card .card {
+		border-radius: 8px;
+		width: 174px;
+		height: 224.32px;
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		gap: 5px;
+	}
+
+	.grupe_card .card.active {
+		background: rgba(238, 238, 238, 0.5);
+	}
+
+	.grupe_card .card.add {
+		border: 0.8px solid #07151C;
+	}
+
+	.grupe_card .card .close {
+		cursor: pointer;
+		position: absolute;
+		top: 15px;
+		right: 25px;
+	}
+
+	.grupe_card .card .close:before,
+	.grupe_card .card .close:after {
+		content: "";
+		position: absolute;
+		width: 16px;
+		height: 1.5px;
+		background: #747474;
+	}
+
+	.grupe_card .card .close:before {
+		transform: rotate(45deg);
+	}
+
+	.grupe_card .card .close:after {
+		transform: rotate(-45deg);
+	}
+
+	.grupe_card .card .name {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 15px;
+		line-height: 130%;
+		/* identical to box height, or 19px */
+
+		text-align: center;
+		letter-spacing: 0.1px;
+		color: #000000;
+	}
+
+	.grupe_card .card.add .plus {
+		position: relative;
+		left: -15px;
+		margin-bottom: 15px;
+	}
+
+	.grupe_card .card.add .plus:before,
+	.grupe_card .card.add .plus:after {
+		content: "";
+		position: absolute;
+		width: 30px;
+		height: 3px;
+		background: #024849;
+		border-radius: 10px;
+	}
+
+	.grupe_card .card.add .plus:before {
+		transform: rotate(0deg);
+	}
+
+	.grupe_card .card.add .plus:after {
+		transform: rotate(90deg);
+	}
+
+	.grupe_card .card.add .name {
+		font-family: 'Manrope';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 130%;
+		/* or 16px */
+
+		text-align: center;
+		letter-spacing: 0.1px;
+
+		color: #024849;
+	}
+
+	.breadcrumb {
+		margin-left: -10px !important;
+	}
+
+	.booking_popup {
+		gap: 20px;
+		display: flex;
+		flex-direction: column;
+		border: 1px solid #7a7a7a;
+		width: 476px;
+		height: 399px;
+		max-height: 100vh;
+		margin-left: auto;
+		padding: 20px;
+		background-color: #fff;
+		border-radius: 13px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 9999;
+		background-color: #fff;
+		padding: 20px;
+		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+		align-items: center;
+		justify-content: center;
+	}
+
+	.overlay_popup {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		background-color: hwb(0 0% 100% / 0.53);
+		z-index: 9998;
+	}
+
+	.grupe_card .card.select {
+		background: rgb(167 215 147 / 50%);
+	}
+
+	#info_price {
+		width: 100%;
+		display: block;
+		text-align: center;
+		font-size: 20px;
+		margin-top: 21px;
+	}
+
+	.display-mobil {
+		display: none;
+	}
+
+	@media screen and (max-width: 1024px ){
+		.display-mobil {
+			display: flex;
+			margin-bottom: 20px;
+			margin-top: -10px;
+		}
+
+		.display-pc {
+			display: none;
+		}
+
+
+	}
+
+</style>
+
+<style>
+	#guests_popup {
+		position: absolute;
+		background: #fff;
+		padding: 30px 59px 30px 30px;
+		box-sizing: border-box;
+		left: 0;
+		border: 1px solid #d2d2d2;
+		border-radius: 5px;
+		z-index: 999;
+		top: calc(100% + 9px);
+		width: 100%;
+	}
+
+	#guests_popup .input {
+		display: flex;
+		align-items: center
+	}
+
+	#guests_popup .input .label {
+		flex-grow: 1;
+		width: 100%;
+		font-family: Manrope;
+		font-style: normal;
+		font-weight: 600;
+		font-size: 16px;
+		line-height: 22px;
+		color: #07151c
+	}
+
+	#guests_popup .input :is(.plus, .minus) {
+		border: 1px solid #fc7201;
+		color: #fc7201;
+		border-radius: 50%;
+		display: block;
+		width: 30px;
+		height: 30px;
+		min-width: 30px;
+		min-height: 30px;
+		text-align: center;
+		user-select: none;
+		cursor: pointer;
+		font-weight: 600
+	}
+
+	#guests_popup .input input {
+		border: none;
+		outline: 0;
+		text-align: center;
+		width: 40px
+	}
+
+	#guests_popup .item_room {
+		display: flex;
+		flex-direction: column;
+		gap: 7px
+	}
+
+	#guests_popup .item_room .header_item_room {
+		display: flex;
+		align-items: center;
+		justify-content: space-between
+	}
+
+	#guests_popup .item_room .header_item_room .number_room {
+		font-size: 17px;
+		font-weight: 600
+	}
+
+	#guests_popup .item_room .header_item_room .remove_room {
+		color: red;
+		cursor: pointer
+	}
+
+	#guests_popup .add_room {
+		color: #fc7201;
+		background: 0 0;
+		padding: 5px
+	}
+
+	#guests_popup .сhildren.input {
+		gap: 12px;
+		flex-direction: column;
+		align-items: flex-start
+	}
+
+	#guests_popup .сhildren_tags {
+		display: flex;
+		flex-direction: row;
+		gap: 5px;
+		flex-wrap: wrap
+	}
+
+	#guests_popup .сhildren_tags .tag {
+		display: flex;
+		flex-direction: row;
+		background: #ffcea5;
+		padding: 3px 6px;
+		border-radius: 5px
+	}
+
+	#guests_popup .сhildren_tags .tag .age {
+		color: #000
+	}
+
+	#guests_popup .сhildren_tags .tag .remove {
+		position: relative;
+		width: 20px;
+		height: 20px;
+		cursor: pointer;
+		left: 12px;
+		top: 6px
+	}
+
+	#guests_popup .сhildren_tags .tag .remove::after,
+	#guests_popup .сhildren_tags .tag .remove::before {
+		position: absolute;
+		content: "";
+		width: 1px;
+		height: 13px;
+		background-color: #000
+	}
+
+	#guests_popup .сhildren_tags .tag .remove::before {
+		transform: rotate(45deg)
+	}
+
+	#guests_popup .сhildren_tags .tag .remove::after {
+		transform: rotate(-45deg)
+	}
+
+	#guests_popup .tag_c_age_add {
+		padding: 3px 1px;
+		border-radius: 5px;
+		border: 1px solid #d2d2d2
+	}
+</style>
+
+<main class="main">
+	<section class="inner">
+		<div class="container inner__container">
+			{% bread_crumb %}
+			<div class="inner-content js-sticky">
+				<div class="inner-content__main">
+					{% for data in list %}
+					{% for count_index in data.room.counts %}
+					<div class="booking-card" data-id="{{data.room.id}}_{{count_index}}">
+						<img class="booking-card__img" onerror="this.onerror=null;this.src='/static/img/placeholder-image.png';"
+							src="{{data.room.img}}"></img>
+						<div class="booking-card__body">
+							<div class="booking-info" style="display: flex;flex-direction: column;height: 100%;justify-content: space-around; margin-top: 0;">
+								<div class="booking-info__name">{{data.room.name}}</div>
+								<div class="booking-info__text">{{data.room.text}}</div>
+								<div class="booking-info__name guests_in_the_room" style="text-align: center; color: #fc7201; cursor: pointer;">Укажите количество гостей</div>
+							</div>
+						</div>
+
+						<div class="booking-times"
+							style="padding-right: 20px; width: auto;">
+							<div class="booking-times__item"
+								id="datatime_in">
+								<p class="booking-times__label">Заезд с {{data.hotel.time.in}}</p>
+								<p class="booking-times__date"
+									style="white-space: nowrap;">{{data.date_1|date:"d F Y"}}</p>
+							</div>
+							<div class="booking-times__item"
+								id="datatime_out">
+								<p class="booking-times__label">Выезд до {{data.hotel.time.out}}</p>
+								<p class="booking-times__date"
+									style="white-space: nowrap;">{{data.date_2|date:"d F Y"}}</p>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+					{% endfor %}
+
+					<script>
+
+						guests_popup = $(`<div id="guests_popup">
+							<div class="item_room" data-id-room="0">
+								<div class="cross" onclick="$(this).parents('#guests_popup').hide()"></div>
+								<div class="adults input">
+									<span class="label">Взрослых</span>
+									<span class="minus">-</span>
+									<input type="number" id="" placeholder="1" value="1" required="">
+									<span class="plus">+</span>
+								</div>
+								<div class="сhildren input">
+									<span class="label">Детей</span>
+									<div class="сhildren_tags">
+										<select class="tag_c_age_add">
+											<option value="">добавить</option>
+											<option value="0">0 ${getAgeEnding(0)}</option>
+											<option value="1">1 ${getAgeEnding(1)}</option>
+											<option value="2">2 ${getAgeEnding(2)}</option>
+											<option value="3">3 ${getAgeEnding(3)}</option>
+											<option value="4">4 ${getAgeEnding(4)}</option>
+											<option value="5">5 ${getAgeEnding(5)}</option>
+											<option value="6">6 ${getAgeEnding(6)}</option>
+											<option value="7">7 ${getAgeEnding(7)}</option>
+											<option value="8">8 ${getAgeEnding(8)}</option>
+											<option value="9">9 ${getAgeEnding(9)}</option>
+											<option value="10">10 ${getAgeEnding(10)}</option>
+											<option value="11">11 ${getAgeEnding(11)}</option>
+											<option value="12">12 ${getAgeEnding(12)}</option>
+											<option value="13">13 ${getAgeEnding(13)}</option>
+											<option value="14">14 ${getAgeEnding(14)}</option>
+											<option value="15">15 ${getAgeEnding(15)}</option>
+											<option value="16">16 ${getAgeEnding(16)}</option>
+											<option value="17">17 ${getAgeEnding(17)}</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>`);
+
+						guests_popup.find(".cross").click(function () {
+							$(this).parents("#guests_popup").hide()
+						})
+
+						roomsData  = {}
+
+						$(".booking-card").map(function () {
+							let id = $(this).data("id")
+							roomsData[id] = {
+								adults: 1,
+								childrens_age: [],
+							}
+						});
+
+						$("body").on("click", "#guests_popup .adults.input .minus, #guests_popup .adults.input .plus", function() {
+							let id = $(this).parents(".booking-card").data('id');
+							let type = "adults";
+							let sign = $(this).hasClass("minus") ? -1 : 1;
+							roomsData[id][type] += sign;
+
+							if (roomsData[id][type] < 1) roomsData[id][type] = 1;
+							if (roomsData[id][type] > 99) roomsData[id][type] = 99;
+
+							$(this).parents(".input").find("input").val(roomsData[id][type]);
+							get_guests_span(id)
+						})
+
+						$("body").on("change", "#guests_popup .input input", function() {
+							let id = $(this).parents(".booking-card").data('id');
+							let type = "adults";
+							let value = parseInt($(this).val());
+
+							if (value < 0 && type === "children") value = 0;
+							if (value > 99) value = 99;
+
+							$(this).val(value)
+
+							roomsData[id][type] = value;
+							get_guests_span(id)
+						})
+
+						$(".guests_in_the_room").click(function () {
+							let booking_card = $(this).parents(".booking-card")
+
+							if (booking_card.find(`#guests_popup`).length > 0) {
+								booking_card.find(`#guests_popup`).toggle()
+							}
+							else {
+								$(booking_card).append($(guests_popup).clone())
+							}
+						})
+
+						function get_guests_span(id) {
+
+							let totalGuests = roomsData[id].adults + roomsData[id].childrens_age.length;
+
+
+							let guestsString;
+							if (totalGuests === 1) {
+								guestsString = "1 гость";
+							} else if (totalGuests >= 2 && totalGuests <= 4) {
+								guestsString = `${totalGuests} гостя`;
+							} else {
+								guestsString = `${totalGuests} гостей`;
+							}
+
+
+							$(`.booking-card[data-id=${id}] .guests_in_the_room`).html(`${guestsString}`)
+						}
+
+
+						function getAgeEnding(age) {
+							if (age % 10 === 1 && age !== 11) {
+								return 'год';
+							} else if (age % 10 >= 2 && age % 10 <= 4 && (age < 10 || age > 20)) {
+								return 'года';
+							} else {
+								return 'лет';
+							}
+						}
+
+
+						$("body").on("change", "#guests_popup .input .tag_c_age_add", function() {
+							let booking_card = $(this).parents(".booking-card")
+							let id = booking_card.data('id');
+							val = parseInt($(this).val())
+							roomsData[id]["childrens_age"].push(val)
+							$(this).val("")
+
+
+							let childrens_age = roomsData[id]["childrens_age"]
+
+							booking_card.find(".сhildren_tags .tag").remove()
+
+							let tag_c_age_add = $(booking_card).find(".сhildren_tags .tag_c_age_add")
+
+							childrens_age.forEach((age, index) => {
+								let age_text = age + " " + getAgeEnding(age)
+								let tag = $(`
+								<div class="tag" data-index="${index}">
+									<span class="age">${age_text}</span>
+									<div class="remove"></div>
+								</div>
+								`)
+								$(tag_c_age_add).before(tag)
+							})
+
+							get_guests_span(id)
+						})
+
+						$("body").on("click", "#guests_popup .input .сhildren_tags .tag .remove", function() {
+							let booking_card = $(this).parents(".booking-card")
+							let id = booking_card.data('id');
+							let index = $(this).parents(".tag").data('index');
+							roomsData[id]["childrens_age"].splice(index, 1);
+
+							let childrens_age = roomsData[id]["childrens_age"]
+							let tag_c_age_add = $(booking_card).find(".сhildren_tags .tag_c_age_add")
+
+							booking_card.find(".сhildren_tags .tag").remove()
+
+							childrens_age.forEach((age, index) => {
+								let age_text = age + " " + getAgeEnding(age)
+								let tag = $(`
+								<div class="tag" data-index="${index}">
+									<span class="age">${age_text}</span>
+									<div class="remove"></div>
+								</div>
+								`)
+								$(tag_c_age_add).before(tag)
+							})
+
+							get_guests_span(id)
+						})
+
+					</script>
+
+					<aside class="inner-content__sidebar display-mobil">
+						<div class="sidebar-content js-sticky__item">
+							<div class="cost-item">
+								<div class="cost-item__middle">
+									{% if other_data.prices.site > 0 %}
+									<section>
+										<label class="checkradion">
+											<section>
+												<label style=" display: flex; gap: 5px; ">
+													<span class="name">Оплата бонусами</span>
+												</label>
+											</section>
+										</label>
+
+
+
+										<div class="grupe_input"
+											style="margin-top: 0">
+											<label class="text"
+												id="bonuses_input_label">
+												<div class="versatile_text"
+													id="bonuses_label"
+													style="margin-bottom: 10px;">
+													<span class="versatile_text_title">Использовать:</span>
+													<span class="versatile_text_value">0 бонусов</span>
+												</div>
+												<div id="bonus_input_2"></div>
+											</label>
+										</div>
+									</section>
+									{% endif %}
+									<div class="cost-total">
+										<div class="cost-total__name"
+											style="font-size: 16px;">Стоимость проживания</div>
+										<div class="cost-total__price"
+											style="font-size: 15px;">{{other_data.prices.room_full}} ₽</div>
+									</div>
+									{% if other_data.prices.hotel > 0 %}
+									<div class="cost-total">
+										<div class="cost-total__name"
+											style="font-size: 16px;">Доплата отелю</div>
+										<div class="cost-total__price"
+											style="font-size: 15px;">{{other_data.prices.hotel}} ₽</div>
+									</div>
+									{% endif %}
+									{% if other_data.prices.first_booking_discount %}
+									<div class="cost-total">
+										<div class="cost-total__name"
+											style="font-size: 16px;">Скидка первой брони (5%)</div>
+										<div class="cost-total__price"
+											style="font-size: 15px;">{{other_data.prices.first_booking_discount}} ₽</div>
+									</div>
+									{% endif %}
+									{% if other_data.prices.cleaning %}
+									<div class="cost-total">
+										<div class="cost-total__name"
+											style="font-size: 16px;">Цена за уборку (Не включена в стоимость)</div>
+										<div class="cost-total__price"
+											style="font-size: 15px;">{{other_data.prices.cleaning}} ₽</div>
+									</div>
+									{% endif %}
+									{% if other_data.prices.security_deposit %}
+									<div class="cost-total">
+										<div class="cost-total__name"
+											style="font-size: 16px;">Страховой депозит (Не включен в стоимость)</div>
+										<div class="cost-total__price"
+											style="font-size: 15px;">{{other_data.prices.security_deposit}} ₽</div>
+									</div>
+									{% endif %}
+									{% if other_data.prices.prepayment_for_the_room_before_checkin > 0 %}
+									<div class="cost-total">
+										<div class="cost-total__name"
+											style="font-size: 16px;">Предоплата за номер до заселения</div>
+										<div class="cost-total__price prices_site_text"
+											style="font-size: 15px;">{{other_data.prices.prepayment_for_the_room_before_checkin}} ₽</div>
+									</div>
+									{% endif %}
+
+
+									<div class="cost-total">
+										<div class="cost-total__name"
+											style="font-size: 16px; background-color: #d9ffd9; padding: 6px; border-radius: 5px; margin-left: -6px;">Сейчас вы платите</div>
+										<div class="cost-total__price prices_site_text"
+											style="font-size: 15px;">{{other_data.prices.site}} ₽</div>
+									</div>
+								</div>
+								<div class="cost-item__bottom">Из-за сложной эпидемиологической ситуации в мире при регистрации заезда
+									может потребоваться справка, подтверждающая отрицательный результат теста на COVID-19, или сертификат о
+									вакцинации.</div>
+							</div>
+						</div>
+					</aside>
+
+					<div class="guest-contacts"
+						style="padding: 30px;">
+						{% csrf_token %}
+						<div class="section">
+							<span class="title">Контактные данные</span>
+							<div class="grupe_input mini_width_flex">
+								<label class="text">
+									<span class="name">Имя*</span>
+									<input type="text"
+										name="name"
+										value="{{user_data.user.username}}"
+										disabled>
+								</label>
+
+								<label class="text">
+									<span class="name">Фамилия*</span>
+									<input type="text"
+										name="lastname"
+										value="{{user_data.user.lastname}}"
+										disabled>
+								</label>
+
+								<label class="text">
+									<span class="name">Отчество</span>
+									<input type="text"
+										name="middlename"
+										value="{{user_data.user.middlename}}"
+										disabled>
+								</label>
+
+								<label class="text">
+									<span class="name">Почта*</span>
+									<input type="email"
+										name="email"
+										value="{{user_data.user.email}}"
+										disabled>
+								</label>
+
+								<label class="text">
+									<span class="name">Телефон для связи*</span>
+									<input type="tel"
+										name="phone"
+										value="{{user_data.user.phone}}"
+										disabled>
+								</label>
+							</div>
+						</div>
+						<div class="br"></div>
+						<div class="section" {% if other_data.prices.site == 0 %}style="display: none;"{% endif %}>
+							<span class="title" style="display: flex; width: 100%; margin-bottom: 20px; margin-top: 30px;">Варианты оплаты:</span>
+							<div class="grupe_input mini_width_flex"
+								style="flex-direction: column;width: 100%;">
+								<section id="card_section">
+									<label style="    display: flex; gap: 7px; font-family: 'Manrope'; font-style: normal; font-weight: 400; font-size: 22px;">
+										<input type="checkbox"
+											value="True"
+											id="use_card">
+										<span class="name">Оплатить картой</span>
+									</label>
+
+									<section id="add_card_section">
+										<span class="discription">Как только вы нажмёте «Оплатить», с вашей карты будет
+											списана
+											полная стоимость проживания.</span>
+										<div class="mini_width_flex"
+											style="display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 42px;">
+											<div style="margin-top: 20px;">
+												<span class="discription">Мы принимаем</span>
+												<div>
+													<div class="grupe_img flex_row"
+														style="margin-top: 10px; margin-bottom: 20px;">
+														<img src="{% static 'img/cards/cards.png' %}"
+															alt="">
+													</div>
+											</div>
+
+										<div id="total_to_be_paid_by_card">
+											<span>Итого к оплате картой:</span>
+											<span class="value">{{ data.prices.site }} ₽</span>
+										</div>
+									</section>
+								</section>
+								<section>
+									<label
+										style="display: flex; gap: 7px; font-family: 'Manrope'; font-style: normal; font-weight: 400; font-size: 22px;">
+										<input type="checkbox"
+											value="True"
+											id="use_balanc">
+										<span class="name">Оплатить со счета</span>
+									</label>
+									<section id="balanc_section">
+										<div class="versatile_text">
+											<span class="versatile_text_title">На счету:</span>
+											<span class="versatile_text_value">{{user_data.user.balance}} ₽</span>
+										</div>
+
+										<div class="versatile_text"
+											id="balanc_label">
+											<span class="versatile_text_title">Списать:</span>
+											<span class="versatile_text_value">0 ₽</span>
+										</div>
+
+										<div id="balanc_input"></div>
+									</section>
+								</section>
+							</div>
+							<span id="info_price"></span>
+						</div>
+						<div class="guest-bottom"
+							style="padding: 0; margin-top: 15px;">
+							<div class="booking-button button"
+								onclick="post_booking()">Забронировать</div>
+							<div class="privacy">Нажимая «Забронировать», Вы принимаете Правила бронирования.</div>
+						</div>
+					</div>
+				</div>
+				<aside class="inner-content__sidebar display-pc">
+					<div class="sidebar-content js-sticky__item">
+						<div class="cost-item">
+							<div class="cost-item__middle">
+								{% if other_data.prices.site > 0 %}
+								<section>
+									<label class="checkradion">
+										<section>
+											<label style=" display: flex; gap: 5px; ">
+												<span class="name">Оплата бонусами</span>
+											</label>
+										</section>
+									</label>
+
+
+
+									<div class="grupe_input" style="margin-top: 0">
+										<label class="text"
+											id="bonuses_input_label">
+											<div class="versatile_text"
+												id="bonuses_label"
+												style="margin-bottom: 10px;">
+												<span class="versatile_text_title">Использовать:</span>
+												<span class="versatile_text_value">0 бонусов</span>
+											</div>
+											<div id="bonus_input_1"></div>
+										</label>
+									</div>
+								</section>
+								{% endif %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Стоимость проживания</div>
+									<div class="cost-total__price"
+										style="font-size: 15px;">{{other_data.prices.room_full}} ₽</div>
+								</div>
+								{% if other_data.prices.hotel > 0 %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Доплата отелю</div>
+									<div class="cost-total__price"
+										style="font-size: 15px;">{{other_data.prices.hotel}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.first_booking_discount %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Скидка первой брони (5%)</div>
+									<div class="cost-total__price"
+										style="font-size: 15px;">{{other_data.prices.first_booking_discount}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.cleaning %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Цена за уборку (Не включена в стоимость)</div>
+									<div class="cost-total__price"
+										style="font-size: 15px;">{{other_data.prices.cleaning}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.security_deposit %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Страховой депозит (Не включен в стоимость)</div>
+									<div class="cost-total__price"
+										style="font-size: 15px;">{{other_data.prices.security_deposit}} ₽</div>
+								</div>
+								{% endif %}
+								{% if other_data.prices.prepayment_for_the_room_before_checkin > 0 %}
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px;">Предоплата за номер до заселения</div>
+									<div class="cost-total__price prices_site_text"
+										style="font-size: 15px;">{{other_data.prices.prepayment_for_the_room_before_checkin}} ₽</div>
+								</div>
+								{% endif %}
+
+
+								<div class="cost-total">
+									<div class="cost-total__name"
+										style="font-size: 16px; background-color: #d9ffd9; padding: 6px; border-radius: 5px; margin-left: -6px;">Сейчас вы платите</div>
+									<div class="cost-total__price prices_site_text"
+										style="font-size: 15px;">{{other_data.prices.site}} ₽</div>
+								</div>
+							</div>
+							<div class="cost-item__bottom">Из-за сложной эпидемиологической ситуации в мире при регистрации заезда
+								может потребоваться справка, подтверждающая отрицательный результат теста на COVID-19, или сертификат о
+								вакцинации.</div>
+						</div>
+					</div>
+				</aside>
+			</div>
+		</div>
+	</section>
+</main>
+
+<script>
+	$("#grupe_card_travel_companions .card.active").click(function () {
+		$(this).toggleClass("select")
+	})
+</script>
+
+<script defer>
+	$.ajaxSetup({
+		headers: {
+			'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+		}
+	});
+
+	function post_booking() {
+		if (window.FormData === undefined) {
+			alert('В вашем браузере FormData не поддерживается')
+		} else {
+
+			value_use_bonus = bonus_slider_value
+
+			if ($("#use_balanc:checked").is(":checked"))
+				value_use_balanc = balance_slider_value
+			else
+				value_use_balanc = 0
+
+			form_data = new FormData();
+			form_data.append("name", $("*[name='name']").val());
+			form_data.append("lastname", $("*[name='lastname']").val());
+			form_data.append("middlename", $("*[name='middlename']").val());
+			form_data.append("email", $("*[name='email']").val());
+			form_data.append("phone", $("*[name='phone']").val());
+			form_data.append("value_use_bonus", value_use_bonus);
+			form_data.append("value_use_balanc", value_use_balanc);
+
+			form_data.append("rcs", "{{get_param.rcs}}");
+			form_data.append("date_1", "{{get_param.date_1}}");
+			form_data.append("date_2", "{{get_param.date_2}}");
+
+			form_data.append("roomsData", JSON.stringify(roomsData));
+
+			load_start()
+			$.ajax({
+				method: "POST",
+				data: form_data,
+				contentType: false,
+				processData: false,
+				url: "{% url 'hotel_room_booking_add' %}",
+				success: function (response) {
+					load_end()
+					if (response.status == "reload") {
+						location.reload()
+					}
+					else if (response.status == "error") {
+						if (response.error == "the_user_already_exists") {
+							popup_create("Такой пользователь уже есть", `<p>Войти в аккаунт или напишите в техподдержку</p>`, [], [], "error")
+						}
+						else if (response.error == "no_empty_rooms") {
+							popup_create("Нет свободных номеров", `<p>К сожалению, все номера уже заняты, поэтому мы не можем предоставить вам свободный номер.</p>`, [], [], "error")
+						}
+						else if (response.error == "room_data_too_big") {
+							popup_create("Слишком много гостей для номера", response.error_text, [], [], "error")
+						}
+						else if (response.error == "room_data_found_without_a_number") {
+							popup_create("Не верное количество гостей", "Не найдено количество гостей для номера", [], [], "error")
+						}
+					}
+					else if (response["url"] != "") {
+						if (response["url"].indexOf("/profile/chats/") != -1) {
+							// Переход в чат
+							ym(94864675, 'reachGoal', 'went_to_the_chat_booking1')
+						}
+						else {
+							// Переход на оплату картой
+							ym(94864675, 'reachGoal', 'switched_to_payment_booking')
+						}
+
+						location.href = response["url"]
+					}
+				},
+			});
+		}
+	}
+
+	function openPopup(url, button_text) {
+		// Создаем элементы попапа
+		if (button_text == "Оплатить картой") {
+			var popup = $(`<div class="booking_popup_bg">
+			<div class="booking_popup">
+				<span class="title popup-text"
+					style=" font-size: 31px; ">Бронь оформлена</span>
+				<span class="popup-text"
+					style="max-width: 354px;font-size: 20px;text-align: center;">
+					Спасибо за оформление бронирования. Отель получил Ваш запрос. Вы должны доплатить сумму брони через карту, если вы не заплатите в течение 20 минут бронь будет отменена</span>
+				<a href="${url}" style="font-size: 20px;" class="button">${button_text}</a>
+			</div>
+		</div>`);
+		}
+		else {
+			var popup = $(`<div class="booking_popup_bg">
+			<div class="booking_popup">
+				<span class="title popup-text"
+					style=" font-size: 31px; ">Бронь оформлена</span>
+				<span class="popup-text"
+					style="max-width: 354px;font-size: 20px;text-align: center;">
+					Спасибо за оформление бронирования. Отель получил Ваш запрос. Вам ответят в чате и придет уведомление о подтверждении</span>
+				<a href="${url}" style="font-size: 20px;" class="button">${button_text}</a>
+			</div>
+		</div>`);
+		}
+
+		$("body").append(`<div class="overlay_popup"></div>`);
+		$("body").append(popup);
+
+		// Обработчик нажатия на кнопку закрытия
+		closeButton.click(function () {
+			popup.remove();
+		});
+	}
+</script>
+
+<script defer>
+	start_prices_site = {{ other_data.prices.site }}
+	prices_site = {{ other_data.prices.site }}
+	max_bonus = {{ other_data.prices.bonus.discount }}
+	max_balance = {{ user_data.user.balance }}
+
+
+
+	if ($(window).width() < 1024) {
+		slider_element_select = "#bonus_input_2"
+	}
+	else {
+		slider_element_select = "#bonus_input_1"
+	}
+
+
+
+
+	bonus_slider_value = 0
+	bonus_slider = $(slider_element_select).slider({
+		min: 0,
+		max: max_bonus,
+		value: 0,
+		step: 1,
+		range: "min",
+		slide: function (event, ui) {
+			$("#bonuses_label .versatile_text_value").html(`${ui.value} бонусов`);
+			bonus_slider_value = ui.value
+			prices_site = start_prices_site - bonus_slider_value
+			$(".prices_site_text").text(`${prices_site} ₽`)
+			reset_set_price_site()
+			setCardPrice()
+		}
+	});
+
+
+
+	$("#balanc_section").hide()
+	$("#use_balanc").change(function () {
+		if ($(this).is(':checked')) {
+			$("#balanc_section").show()
+		}
+		else {
+			$("#balanc_section").hide()
+		}
+	})
+
+
+
+
+
+	$("#add_card_section").hide()
+	$("#use_card").change(function () {
+		if ($(this).is(':checked')) {
+			$("#add_card_section").show()
+		}
+		else {
+			$("#add_card_section").hide()
+		}
+	})
+
+	balance_slider_max = 0
+	balance_slider_value = 0
+	function reset_set_price_site() {
+		balance_slider_max = prices_site
+
+		if (balance_slider_max >= {{ user_data.user.balance }}) {
+			balance_slider_max = {{ user_data.user.balance }}
+		}
+
+		balance_slider_value = 0
+
+		$("#balanc_label .versatile_text_value").text(`0 ₽`);
+
+		return balance_slider = $("#balanc_input").slider({
+			min: 0,
+			max: balance_slider_max,
+			value: 0,
+			step: 1,
+			range: "min",
+			slide: function (event, ui) {
+				$("#balanc_label .versatile_text_value").text(`${ui.value} ₽`);
+				balance_slider_value = ui.value
+				setCardPrice()
+			}
+		});
+	}
+
+	balance_slider = reset_set_price_site()
+
+	function setCardPrice() {
+		value = prices_site - balance_slider_value
+		$("#total_to_be_paid_by_card .value").text(`${value} ₽`)
+	}
+
+	setCardPrice()
+
+</script>
+
+{% endblock content %}

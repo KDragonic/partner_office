@@ -1,0 +1,82 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static sass_tags %}
+{% block main_block %}
+<style>
+  .grupe_card_admin_app {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card_admin_app {
+    display: flex;
+    width: 300px;
+    height: 300px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card_admin_app:hover {
+    background-color: #f2f2f2;
+  }
+
+  .card_admin_app img {
+    width: 224px;
+  }
+
+  .card_admin_app .name{
+    color: #515151;
+    font-size: 20px;
+  }
+
+  .card_admin_app .notif_count {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 167px;
+    color: #ff5959;
+    font-size: 30px;
+  }
+
+</style>
+
+
+<div class="grupe_card_admin_app">
+  <a href="{% url 'admin.list_user' %}" class="card_admin_app">
+    <!-- <img src="{% static '/img/av_user_ts.png' %}" alt=""> -->
+    <span class="name">Пользователи</span>
+  </a>
+
+  <a href="{% url 'admin.page_ts_chat' %}" class="card_admin_app">
+    <span class="name">Техподдержка</span>
+  </a>
+
+  <a href="{% url 'admin.moderation_hotel_list' %}" class="card_admin_app">
+    <span class="name">Модерация отеля</span>
+    {% if card_admin_app_list.hotel_moderation.count > 0 %}
+    <div class="notif_count">{{card_admin_app_list.hotel_moderation.count}}</div>
+    {% endif %}
+  </a>
+
+  <a href="{% url 'admin.list_bookings' %}" class="card_admin_app">
+    <span class="name">Отмененные брони</span>
+  </a>
+
+  <a href="{% url 'admin.statistics' %}" class="card_admin_app">
+    <span class="name">Статистика</span>
+  </a>
+</div>
+
+{% endblock main_block %}

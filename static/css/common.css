@@ -1,0 +1,148 @@
+.c_point {
+  cursor: pointer;
+}
+
+.info_popup {
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #7a7a7a;
+  max-height: 100vh;
+  /* margin-left: auto; */
+  min-width: 200px;
+  max-width: 600px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 13px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  align-items: center;
+  justify-content: center;
+}
+
+.info_popup .popup_inputss {
+  display: flex;
+  row-gap: 8px;
+  flex-direction: column;
+}
+
+.info_popup .popup_inputss .popup_inputs {
+  display: flex;
+  width: 100%;
+  max-width: 453px;
+  gap: 10px;
+}
+
+.info_popup .popup_inputss .popup_inputs label {
+  flex-grow: 1;
+  width: 100%;
+}
+
+.info_popup .popup_inputss .popup_inputs .input {
+  padding: 5px;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.info_popup .popup_inputss .popup_inputs textarea {
+  resize: vertical;
+  display: block;
+  font-size: 16px;
+  border: 1px solid #D2D2D2;
+}
+
+.info_popup .popup_buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.info_popup .popup_buttons .button:hover {
+  color: black;
+}
+
+.info_popup .popup_buttons [data-popup-button="remove"] {
+  background: #e34343;
+}
+
+.info_popup .popup_buttons [data-popup-button="remove"]:hover {
+  background: #f1a1a1;
+}
+
+.info_popup .popup_buttons [data-popup-button="add"] {
+  background: #57cd7a;
+}
+
+.info_popup .popup_buttons [data-popup-button="add"]:hover {
+  background: #abe6bd;
+}
+
+.info_popup .popup_buttons [data-popup-button="close"] {
+  background: #2d2d2d;
+}
+
+.info_popup .popup_buttons [data-popup-button="close"]:hover {
+  background: #969696;
+}
+
+.info_popup .popup_buttons [data-popup-button="use-inputs"] {
+  background: #564dff;
+}
+
+.info_popup .popup_buttons [data-popup-button="use-inputs"]:hover {
+  background: #aba6ff;
+}
+
+.info_popup .popup_buttons [data-popup-button="send-inputs"] {
+  background: #564dff;
+}
+
+.info_popup .popup_buttons [data-popup-button="send-inputs"]:hover {
+  background: #aba6ff;
+}
+
+.info_popup .popup_loader {
+  width: 100%;
+  height: 50px;
+  border-radius: 6px;
+  background-image: repeating-linear-gradient(-45deg, #ffb87f, #ffb87f, 1rem, #FC7201 1rem, #FC7201 2rem);
+  background-size: 7000% 7000%;
+  animation: gradient 400s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 30px;
+}
+
+@keyframes gradient {
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.overlay_popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: hwb(0 0% 100%/0.53);
+  z-index: 9998;
+}
+
+.grupe_input input[type="checkbox"]:checked::before {
+  background: #FC7201;
+}
+
+.not_scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

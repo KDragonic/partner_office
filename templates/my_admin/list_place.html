@@ -1,0 +1,438 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form static %}
+{% block main_block %}
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU&apikey=e964d90a-5747-4eb6-ac44-28cbfcca4dab" type="text/javascript"></script>
+
+  <style>
+    #content #main_block {
+      min-height: 552px;
+    }
+
+    .places {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .place {
+      display: flex;
+      gap: 5px;
+    }
+
+    .place span {
+      padding: 5px;
+      border-radius: 5px;
+      color: white;
+      display: flex;
+      justify-content: center;
+    }
+
+    .place .type {
+      background: #ff7272;
+    }
+
+    .place .hotel_count {
+      background: #7282ff;
+    }
+
+    .place .name {
+      color: black;
+      background: #dcdcdc;
+    }
+
+    .place .coordinates {
+      background: #75d083;
+    }
+
+    .place .slug {
+      background: #d0c775;
+    }
+
+    .place .go_fillter_page {
+      background: #a157ff;
+      color: white;
+    }
+
+    .place .go_fillter_page a {
+      color: white;
+    }
+
+    .place .unknown_sign {
+      background: rgb(40 40 40);
+    }
+
+    .tab {
+      padding: 5px;
+      border-radius: 0 5px 5px 0;
+      width: 15px;
+      color: white;
+      background: #858585;
+    }
+
+    .tab:nth-child(1) {
+      background: rgb(133 133 133 / 100%);
+    }
+    .tab:nth-child(2) {
+      background: rgb(133 133 133 / 80%);
+    }
+    .tab:nth-child(3) {
+      background: rgb(133 133 133 / 60%);
+    }
+    .tab:nth-child(4) {
+      background: rgb(133 133 133 / 40%);
+    }
+    .tab:nth-child(5) {
+      background: rgb(133 133 133 / 20%);
+    }
+
+    .unknown_places {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 17px;
+    }
+
+    .unknown_places .place {
+      gap: 0;
+    }
+
+    .unknown_places .place .hotel_count {
+      border-radius: 5px 0 0 5px;
+      background: #603ed8;
+      min-width: 29px;
+    }
+
+    .unknown_places .place .name {
+      border-radius: 0 5px 5px 0;
+      background: #414141;
+      color: white
+    }
+
+
+    .place[data-auto-created="True"] .coordinates {
+      background: #f9676e9e;
+    }
+
+    .place[data-active="False"] {
+      opacity: 0.5;
+    }
+
+  </style>
+  <div class="count_hotel" style="padding: 5px; border-radius: 5px; color: white; display: flex; justify-content: center; background: #7355fa; margin-bottom: 5px;">Всего объектов: {{count_hotels_all}}</div>
+  <div class="count_hotel" style=" padding: 5px; border-radius: 5px; color: white; display: flex; justify-content: center; background: #ff4c4c; margin-bottom: 5px; ">Всего объектов (С местами): {{count_hotels}}</div>
+  <div class="count_hotel" style=" padding: 5px; border-radius: 5px; color: white; display: flex; justify-content: center; background: #43b14c; margin-bottom: 20px; ">Объектов без мест: {{count_hotels_no_place}}</div>
+  <div class="places">
+    {% for place in places %}
+      <div class="place" data-level="{{ place.level }}" data-auto-created="{{place.auto_created}}" data-active="{{place.active}}">
+        {% if place.id %}
+          <span title="ID места" class="type">{{ place.id }}</span>
+        {% endif %}
+
+        {% if place.count_hotels > 0 %}
+          <span title="Количество объектов" class="hotel_count">{{ place.count_hotels }}</span>
+        {% endif %}
+
+        <span title="Название" class="name">{{ place.name }}</span>
+
+        {% if place.coordinates %}
+          <span title="Кординаты центра" class="coordinates">{{ place.coordinates }}</span>
+        {% endif %}
+
+        {% if place.slug %}
+          <span title="Slug" class="slug">{{ place.slug }}</span>
+        {% endif %}
+        {% if place.slug %}
+          <span title="Переход на поиск" class="go_fillter_page"><a href="/hotel/search/{{ place.slug }}" target="_blank">🡺</a></span>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <style>
+    .unknown_places .place .coordinates {
+      border-radius: 0 5px 5px 0;
+      background: #c94c4c;
+    }
+
+    .unknown_places .place .name {
+      border-radius: 0;
+    }
+  </style>
+
+  <div class="unknown_places">
+    {% for place in unknown_places %}
+      <div class="place">
+        {% if place.count_hotels > 0 %}
+          <span title="Количество объектов" class="hotel_count">{{ place.count_hotels }}</span>
+        {% endif %}
+        <span title="Название" class="name">{{ place.name }}</span>
+        <span title="Кординаты центра" class="coordinates">{{ place.coord_center.0 }}, {{ place.coord_center.1 }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <style>
+    #map_coordinate {
+      height: 521px;
+      width: 100%;
+    }
+
+    #gs_address_list {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+    }
+
+    #gs_address_list .item {
+      background: #ffffff;
+      padding: 7px;
+      border-radius: 10px;
+      border: 1px solid gray;
+      cursor: pointer;
+    }
+
+    #gs_address_list .item:hover {
+      border-color: #fc7201;
+      background-color: #fc7201;
+      color:white;
+    }
+  </style>
+
+  <section>
+    <div class="section_title" style="font-size: 20px; margin-top: 14px;">Добавить новое место</div>
+    <div class="grupe_input" style="justify-content: flex-end;">
+      <label class="text" style="width: 100%;" for="">
+        <span class="name">Название*</span>
+        <input type="text" placeholder="" name="name" value="" required="" autocomplete="off">
+      </label>
+      <label class="text" style="width: 100%;" for="">
+        <span class="name">Название (латинскими буквами )*</span>
+        <input type="text" placeholder="" name="name_en" value="" required="" autocomplete="off">
+      </label>
+      <label class="text" style="width: 100%;" for="">
+        <span class="name">Slug* (Часть в URL, /hotel/search/<span style="color: #00f921; letter-spacing: 3px; font-size: 19px; ">russia/saint-petersburg</span>/)</span>
+        <input type="text" placeholder="" name="slug" value="" required="" autocomplete="off">
+      </label>
+      <label class="text" style="width: 100%;" for="">
+        <span class="name">Родитель - Кому принадлежит (регион, населенный пункт, не обязательно)</span>
+        <input type="text" placeholder="" name="parent" value="" required="" autocomplete="off">
+      </label>
+
+      <label class="text" style="width: 100%;" for="">
+        <span class="name">Координаты*</span>
+        <input type="text" placeholder="" name="coordinates" value="" required="" autocomplete="off">
+      </label>
+
+      <label class="text col-12" for="" style="width: 100%;">
+        <span class="name">Заполнение по адресу</span>
+        <input type="text" placeholder="Москва, проспект Мира 125" name="gs_address" value="" autocomplete="off" />
+      </label>
+      <div id="map_coordinate"></div>
+      <div id="gs_address_list" style="width: 100%;"></div>
+
+
+      <button class="button" style="width: 100%;" data-button-event="add_place">Добавить</button>
+    </div>
+  </section>
+
+  <script defer>
+    $(document).ready(function () {
+      $('.place').map(function () {
+        var level = parseInt($(this).data('level'))
+        for (let index = 0; index < level; index++) {
+          $(`<div class="tab">`).prependTo(this)
+        }
+      })
+    })
+
+    $(`[data-button-event="add_place"]`).click(function()  {
+        data = {
+          name: $("[name='name']").val(),
+          name_en: $("[name='name_en']").val(),
+          slug: $("[name='slug']").val(),
+          parent: $("[name='parent']").val(),
+          coordinates: $("[name='coordinates']").val(),
+        }
+        $.ajax({
+          url: "{% url 'admin.ajax.list.place.add' %}",
+          type: 'POST',
+          headers: {
+            "X-CSRFToken": getCookie('csrftoken')
+          },
+          data: data,
+          success: function (response) {
+            if (response.error && response.error.length > 0) {
+              popup_create("Ошибка", response.error, [], [], "error")
+            }
+            else if (response.success && response.success.length > 0) {
+              popup_create("Успех", response.success)
+            }
+          }
+        });
+    })
+
+  </script>
+
+  <script defer>
+    map = null
+
+    var myPlacemark;
+
+    ymaps.ready(function () {
+      map = new ymaps.Map('map_coordinate', {
+        center: [58.261628, 80.389013],
+        zoom: 4,
+        behaviors: ['default', 'scrollZoom']
+      }, {
+        suppressMapOpenBlock: true,
+      });
+
+      map.controls.remove('trafficControl')
+      map.controls.remove('geolocationControl')
+      map.controls.remove('searchControl')
+
+      let ajax_gs_address_timer = null
+
+      $(`*[name='gs_address']`).change(function () {
+        if (ajax_gs_address_timer) {
+          clearTimeout(ajax_gs_address_timer)
+        }
+
+        ajax_gs_address_timer = setTimeout(() => {
+          ajax_gs_address()
+        }, 200)
+      })
+
+
+    // Слушаем клик на карте.
+    map.events.add('click', function (e) {
+      var coords = e.get('coords');
+
+      // Если метка уже создана – просто передвигаем ее.
+
+      map.geoObjects.remove(myPlacemark)
+      myPlacemark = createPlacemark(coords);
+      map.geoObjects.add(myPlacemark);
+      // Слушаем событие окончания перетаскивания на метке.
+      myPlacemark.events.add('dragend', function () {
+          getAddress(myPlacemark.geometry.getCoordinates());
+      });
+
+      getAddress(coords);
+    });
+
+    // Создание метки.
+    function createPlacemark(coords) {
+        return new ymaps.Placemark(coords, {}, {
+            preset: 'islands#redDotIcon',
+            draggable: true
+        });
+    }
+
+    // Определяем адрес по координатам (обратное геокодирование).
+    function getAddress(coords) {
+        ymaps.geocode(coords).then(function (res) {
+            let firstGeoObject = res.geoObjects.get(0);
+            let name = firstGeoObject.properties.get("text")
+            let coordinates_el = firstGeoObject.geometry._coordinates
+
+            let latlng = `${coords[0]}, ${coords[1]}`
+
+            let metaDataProperty = firstGeoObject.properties.get('metaDataProperty')
+
+            if (select_id != null) {
+              list_place[select_id].placemark.options.set('preset', 'islands#blackDotIcon');
+            }
+
+            select_id = null
+
+            list_place_one = {
+              "name": name,
+              "latlng": latlng,
+              "coord": coordinates_el,
+              "address": metaDataProperty["GeocoderMetaData"]["Address"]["Components"],
+            }
+
+            list_place_one["address"].forEach(function(item) {
+              if (item["kind"] == "locality") {
+                $(`[name="name"]`).val(item["name"])
+              }
+            })
+
+            $("*[name='coordinates']").val(latlng)
+        });
+    }
+
+    });
+
+
+    list_place = {}
+
+    select_id = null
+
+
+
+
+    function ajax_gs_address() {
+      let val = $(`*[name='gs_address']`).val()
+      var myGeocoder = ymaps.geocode(val);
+      myGeocoder.then(function(res) {
+
+        $("#gs_address_list").empty()
+
+        list_place = {}
+
+        map.geoObjects.removeAll()
+
+        res.geoObjects.each(function (el, i) {
+          let name = el.properties.get("text")
+          let coordinates_el = el.geometry._coordinates
+
+          let latlng = `${coordinates_el[0]}, ${coordinates_el[1]}`
+
+          let placemark = new ymaps.Placemark(coordinates_el, {}, { preset: 'islands#blackDotIcon' })
+
+          let metaDataProperty = el.properties.get('metaDataProperty')
+
+          list_place[i] = {
+            "name": name,
+            "latlng": latlng,
+            "coord": coordinates_el,
+            "placemark": placemark,
+            "address": metaDataProperty["GeocoderMetaData"]["Address"]["Components"],
+          }
+
+          placemark.events.add('click', function() { select_place(i) })
+
+
+          let item = $(`<div class="item" data-id="${i}" data-coord-lat="${coordinates_el[0]}" data-coord-lng="${coordinates_el[1]}">${name} (${latlng})</div>`)
+          $("#gs_address_list").append(item)
+
+          map.geoObjects.add(placemark)
+        })
+      });
+    }
+
+    $("#gs_address_list").on("click", '.item', function() {
+      let id = parseFloat($(this).data("id"))
+
+      select_place(id)
+    })
+
+    function select_place(id) {
+
+      map.geoObjects.remove(myPlacemark)
+
+      if (select_id != null) {
+        list_place[select_id].placemark.options.set('preset', 'islands#blackDotIcon');
+      }
+      list_place[id].placemark.options.set('preset', 'islands#redDotIcon');
+      select_id = id
+
+      $("*[name='coordinates']").val(list_place[id]["latlng"])
+    }
+
+  </script>
+
+
+{% endblock %}

@@ -1,0 +1,252 @@
+{% extends "template/base_profile.html" %}
+{% load form static %}
+{% block main_block %}
+
+<script defer>
+
+    $(document).ready(function () {
+        deleteAllTutorialProgress()
+        switchTutorialActive(true)
+
+        fast_addStep("#main_block",
+            `Вам необходимо указать данные во всех полях<br>
+        ⦁	Тип объекта - укажите тип Вашего объекта (отель или гостевой дом и так далее)<br>
+        ⦁	Название - это наименование будет видно в поиске (обязательно указывайте тип объекта, а также берите в кавычки его название. Например - гостевой дом "Орбита";<br>
+        ⦁	Владелец / представитель - выберите, кем является данное контактное лицо;<br>
+        ⦁	Адрес - на данный момент мы работаем только с объектами, находящимися на территории РФ.<br>
+        ⦁	Координаты* - Укажите координаты объекта.`
+        )
+
+        fast_addStep("#submit_save_hotel",
+            `Заполните все необходимые поля на странице и нажмите кнопку «Создать»`
+        )
+
+        if (!getTutorialProgress()) {
+            tour.start();
+            saveTutorialProgress()
+        }
+    });
+</script>
+
+<div class="section">
+    <span class="title">Регистрация объекта размещения</span>
+    <span class="discription">Нужна помощь? <a href="{% url 'techsupport.pattern' %}?type=register_hotel">Попросить
+            менеджера помочь.</a></span>
+
+</div>
+<div class="section">
+    <span class="title_2">Основная информация</span>
+    <div class="grupe_input">
+        <label class="text">
+            <span class="name">Что сдаёте?</span>
+            <select class="text"
+                name="type_hotel">
+                {% for type_hotel in types_hotel %}
+                <option value="{{type_hotel.code}}">{{type_hotel.name}}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <script defer>
+            $("label[data-select-type]").hide()
+            $("#type_of_addition").change(function () {
+                value = $(this).val()
+                $("label[data-select-type]").hide()
+                $(`label[data-select-type='${value}']`).show()
+            })
+        </script>
+
+        {% input_text 'text' 'Название' 'name' '' '' 1 %}
+    </div>
+</div>
+<div class="br_tran"></div>
+<span class="title_2">Адрес</span>
+<div class="grupe_input">
+    {% csrf_token %}
+    {% input_text 'text' 'Город' 'city' '' '' 1 %}
+    {% input_text 'text' 'Район' 'region' '' '' 0 %}
+    {% input_text 'text' 'Улица' 'street' '' '' 1 %}
+    {% input_text 'text' 'Корпус' 'body' '' '' 0 %}
+    {% input_text 'text' 'Дом' 'house' '' '' 1 %}
+    {% input_text 'text' 'Этаж' 'floor' '' '' 0 %}
+    {% input_text 'text' 'Квартира' 'apartment' '' '' 0 %}
+    {% input_text 'text' 'Координаты' 'coordinates' '' '' 1 %}
+</div>
+<span class="discription">
+    Координаты* - укажите Ваши координаты в формате: 43.042343, 44.63443<br>
+    Получить координаты по адресу можно здесь:<br>
+    <a href="https://clck.ru/Us6Uj"
+        target="_blank">https://clck.ru/Us6Uj</a> или с помощью яндекс-карт<br>
+</span>
+<div class="br_tran"></div>
+<span class="discription">Разрешения</span>
+<div class="grupe_input">
+    {% input_cr 'text' 'Можно с детьми' 'allowed_child' 'yes_no' '' 1 %}
+    {% input_cr 'text' 'Можно с животными' 'allowed_animal' 'yes_no' '' 1 %}
+    {% input_cr 'text' 'Курение разрешено' 'allowed_smoking' 'yes_no' '' 1 %}
+    {% input_cr 'text' 'Вечеринки разрешены' 'allowed_party' 'yes_no' '' 1 %}
+</div>
+<div class="br_tran"></div>
+<span class="title_2">Бронирование</span>
+<div class="grupe_input">
+    <label class="text">
+        <span class="name">Процент сайта</span>
+        <select name="percentage"
+            required>
+            <option value="14">14%</option>
+            <option value="15">15%</option>
+            <option value="16">16%</option>
+            <option value="17">17%</option>
+            <option value="18">18%</option>
+            <option value="19">19%</option>
+            <option value="20">20%</option>
+            <option value="21">21%</option>
+            <option value="22">22%</option>
+            <option value="23">23%</option>
+            <option value="24">24%</option>
+            <option value="25">25%</option>
+            <option value="26">26%</option>
+            <option value="27">27%</option>
+            <option value="28">28%</option>
+            <option value="29">29%</option>
+            <option value="30">30%</option>
+        </select>
+    </label>
+    <div class="discription">
+        Выберите процент, который вы готовы заплатить сайту. Чем выше процент, тем выше будет показано ваше объявление.
+        Диапазон процентов от 14% до 30%.
+    </div>
+    <div class="discription">Указывать в днях</div>
+    <label class="text">
+        <!-- # TODO: Измен изменить -->
+        <span class="name">Минимум времени до заселения*</span>
+        <select name="minimum_days_before_arrival"
+            required>
+            <option value="0.25">6 часов</option>
+            <option value="0.5">12 часов</option>
+            <option value="1">24 часа</option>
+            <option value="2">2 дня</option>
+            <option value="3">3 дня</option>
+            <option value="4">4 дня</option>
+            <option value="5">5 дня</option>
+            <option value="6">6 дня</option>
+            <option value="7">7 дня</option>
+
+        </select>
+    </label>
+    {% input_text 'text' 'Минимум дней пребывания' 'minimum_days_of_stay' '1' '' 1 %}
+    {% input_text 'date' 'Дата когда начинаете принимать гостей' 'dwysrg' '' '01.01.2023' 1 %}
+
+</div>
+<div class="br_tran"></div>
+<span class="title_2">Скидки и акции</span>
+<div class="grupe_input">
+    {% input_text 'text' 'При длительном проживании скидка (₽)' 'for_long_term_stays' '0' '' 1 %}
+    {% input_text 'text' 'Минимум дней' 'for_long_term_stays_minimum_days_of_stay' '0' '' 1 %}
+    <div class="discription">Предложите гостям скидку при длительном проживании или на новый объект, чтобы
+        повысить занятость жилья.
+    </div>
+
+    {% input_text 'text' 'Плата за уборку (₽)' 'cleaning_fee' '0' '' 1 %}
+    <div class="discription">Плата за уборку: Включена в стоимость или одельно.
+    </div>
+</div>
+<div class="br_tran"></div>
+<span class="title_2">Владелец / представитель</span>
+
+<div class="grupe_input">
+    {% input_text 'text' 'ФИО' 'representative_fio' 'Нет' '' 1 %}
+    {% input_text 'text' 'Номер телефона' 'representative_phone' 'Нет' '' 1 %}
+    {% input_text 'text' 'Ченел менедеж' 'channel_manager' 'Нет' '' 1 %}
+</div>
+
+<div class="grupe_input">
+    <button class="button"
+        id="submit_save_hotel"
+        onclick="save_an_entry()">Создать</button>
+</div>
+</div>
+
+<style>
+    .br_tran {
+        margin-bottom: 20px;
+    }
+
+    .discription {
+        width: 100%;
+    }
+
+    .title_2 {
+        width: 100%;
+        font-size: 20px;
+        font-weight: 400;
+    }
+</style>
+
+<script defer>
+    curr_element = null
+    function save_an_entry() {
+        type_of_addition = $("#type_of_addition").val()
+
+        data = {
+            name: $("*[name='name']").val(),
+            type_hotel: $(`*[name="type_hotel"]`).val(),
+            city: $("*[name='city']").val(),
+            region: $("*[name='region']").val(),
+            street: $("*[name='street']").val(),
+            body: $("*[name='body']").val(),
+            house: $("*[name='house']").val(),
+            floor: $("*[name='floor']").val(),
+            apartment: $("*[name='apartment']").val(),
+            allowed_child: $("*[name='allowed_child']").val(),
+            allowed_animal: $("*[name='allowed_animal']").val(),
+            allowed_smoking: $("*[name='allowed_smoking']").val(),
+            allowed_party: $("*[name='allowed_party']").val(),
+            // instant_booking: $("*[name='instant_booking']").val(),
+            instant_booking: "True",
+            percentage: $("*[name='percentage']").val(),
+
+            minimum_days_before_arrival: $("*[name='minimum_days_before_arrival']").val(),
+            minimum_days_of_stay: $("*[name='minimum_days_of_stay']").val(),
+            for_long_term_stays: $("*[name='for_long_term_stays']").val(),
+            for_long_term_stays_minimum_days_of_stay: $("*[name='for_long_term_stays_minimum_days_of_stay']").val(),
+            cleaning_fee: $("*[name='cleaning_fee']").val(),
+            date_when_you_start_receiving_guests: $("*[name='dwysrg']").val(),
+            coordinates: $("*[name='coordinates']").val(),
+
+            representative_fio: $("*[name='representative_fio']").val(),
+            representative_phone: $("*[name='representative_phone']").val(),
+
+            channel_manager: $("*[name='channel_manager']").val(),
+        }
+        load_start()
+        $.ajax({
+            method: "POST",
+            data: data,
+            url: "{% url 'form_register_hotel' %}",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (request) {
+                load_end()
+                $("*[name]").css("border-color", "green")
+                $("#type_of_addition").css("border-color", "green")
+                $(".error_input").remove()
+                if (request.redirect_url) {
+                    location.href = request.redirect_url
+                }
+                else if (request.result == "error") {
+
+                    errors = request.errors
+                    errors_keys = Object.keys(errors);
+                    errors_keys.forEach(key => {
+                        console.log(key, errors[key])
+                        $(`*[name='${key}']`).css("border-color", "red")
+                        $(`*[name='${key}']`).after(`<span class='error_input'>${errors[key]}</span>`)
+                    });
+                    popup_create("Ошибка", "Вы не заполнили обязательные поля", [], [], "error")
+                }
+            }
+        });
+    }
+</script>
+{% endblock main_block %}

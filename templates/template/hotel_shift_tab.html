@@ -1,0 +1,49 @@
+<style>
+	#hotel_shift_tab {
+		display: flex;
+		gap: 10px;
+		flex-wrap: wrap;
+		margin-bottom: 10px;
+	}
+
+	#hotel_shift_tab .item {
+		min-width: 200px;
+		max-width: 600px;
+		flex-grow: 1;
+		flex-shrink: 1;
+		background: #dfdfdf;
+		color: black;
+		height: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 5px;
+	}
+
+	#hotel_shift_tab .item.green {
+		background: #a6e8b4;
+	}
+
+	#hotel_shift_tab .item.green:hover {
+		background: #5aff7c;
+	}
+
+	#hotel_shift_tab .item:hover {
+		background: #41eb65;
+	}
+
+	#hotel_shift_tab .item[data-select="select"] {
+		background: #FC7201;
+		color: white;
+	}
+
+	#hotel_shift_tab .item[data-select="select"]:hover {
+		background: #dc6300;
+	}
+</style>
+
+<div id="hotel_shift_tab">
+	{% for hotel in hotels %}
+	<a href="/ajax/switch_hotel/?hotel={{hotel.id}}&next={{path}}" data-select="{% if hotel.select %}select{% endif %}" class="item">{{hotel.name}}</a>
+	{% endfor %}
+</div>

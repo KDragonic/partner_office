@@ -1,0 +1,349 @@
+body {
+  &.login {
+    display: flex;
+
+    .left {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .left {
+      .logo_turcity {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 33px;
+        line-height: 130%;
+        color: #232D42;
+        display: flex;
+        margin-bottom: 40px;
+
+        &::before {
+          display: block;
+          content: url('/static/img/logo.svg');
+          position: relative;
+          top: 3px;
+        }
+      }
+
+      .span_title_1 {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 600;
+        font-size: 33px;
+        line-height: 130%;
+        color: #000000;
+        margin-bottom: 16px;
+      }
+
+      .span_title_2 {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        color: #8A92A6;
+        margin-bottom: 16px;
+      }
+
+      label {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+
+        .name {
+          font-family: 'Manrope';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 16px;
+          line-height: 175%;
+          color: #8A92A6;
+        }
+      }
+
+      form .forgot_my_password {
+        margin-bottom: 24px;
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        color: #FC7201;
+      }
+
+      label {
+        input {
+          width: 303px;
+          height: 44px;
+          padding: 11px;
+          background: #FFFFFF;
+          border: 1px solid #D2D2D2;
+          border-radius: 4px;
+        }
+
+        textarea {
+          width: 303px;
+          height: 44px;
+          padding: 11px;
+          background: #FFFFFF;
+          border: 1px solid #D2D2D2;
+          border-radius: 4px;
+          height: 350px;
+          width: 436px;
+          position: relative;
+        }
+      }
+
+      form button {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 8px 24px;
+        background: #FC7201;
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        align-items: center;
+        text-align: center;
+        border-radius: 4px;
+        color: #FFFFFF;
+        margin-bottom: 16px;
+      }
+
+      .span_no_account {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        color: #232D42;
+
+        a {
+          color: #3A57E8;
+        }
+      }
+    }
+  }
+
+  &.register {
+    display: flex;
+    flex-direction: row-reverse;
+
+    .left {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .left {
+      .logo_turcity {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 33px;
+        line-height: 130%;
+        color: #232D42;
+        display: flex;
+        margin-bottom: 40px;
+
+        &::before {
+          display: block;
+          content: url('/static/img/logo.svg');
+          position: relative;
+          top: 3px;
+        }
+      }
+
+      .span_title_1 {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 600;
+        font-size: 33px;
+        line-height: 130%;
+        color: #000000;
+        margin-bottom: 16px;
+      }
+
+      .span_title_2 {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        color: #8A92A6;
+        margin-bottom: 16px;
+      }
+
+      .grupe_input {
+        column-count: 2;
+      }
+
+      label {
+        &[for='i_agree_to_the_terms_of_use'] {
+          flex-direction: row;
+
+          input {
+            width: 16px;
+            margin-right: 10px;
+          }
+        }
+
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+
+        .name {
+          font-family: 'Manrope';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 16px;
+          line-height: 175%;
+          color: #8A92A6;
+        }
+      }
+
+      form .forgot_my_password {
+        margin-bottom: 24px;
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        color: #FC7201;
+      }
+
+      label {
+        input, select {
+          width: 303px;
+          height: 44px;
+          padding: 11px;
+          background: #FFFFFF;
+          border: 1px solid #D2D2D2;
+          border-radius: 4px;
+        }
+
+        textarea {
+          width: 303px;
+          height: 44px;
+          padding: 11px;
+          background: #FFFFFF;
+          border: 1px solid #D2D2D2;
+          border-radius: 4px;
+          height: 350px;
+          width: 436px;
+          position: relative;
+        }
+      }
+
+      form button {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 8px 24px;
+        background: #FC7201;
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        align-items: center;
+        text-align: center;
+        border-radius: 4px;
+        color: #FFFFFF;
+        margin-bottom: 16px;
+      }
+
+      .span_no_account {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 175%;
+        color: #232D42;
+
+        a {
+          color: #3A57E8;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  body.login .left .grupe_input {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #i_agree_to_the_terms_of_use span {
+    width: 189px;
+  }
+}
+
+@media (max-width: 1000px) {
+  body.login .right {
+    display: none;
+  }
+}
+
+@media (min-width: 1000px) {
+  body.login .right {
+    width: 100%;
+    background: url('/static/img/bg_login_register.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+}
+
+@media (max-width: 1300px) {
+  body.register .left label {
+    input, select, textarea {
+      width: auto !important;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  body.register .left .grupe_input {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #i_agree_to_the_terms_of_use_span {
+    width: 189px;
+  }
+}
+
+@media (max-width: 1100px) {
+  body.register .right {
+    display: none;
+  }
+}
+
+@media (min-width: 1100px) {
+  body.register .right {
+    width: 100%;
+    background: url('/static/img/bg_login_register.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+}

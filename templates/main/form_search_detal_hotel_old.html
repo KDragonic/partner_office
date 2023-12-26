@@ -1,0 +1,253 @@
+{% load static form sass_tags %}
+<link href="{% static 'css/scss/form_search_detal_hotel.css' %}" rel="stylesheet" type="text/css" />
+<form class="form_search" action="">
+	<div class="form-search__label form-search__label--date">
+		<input id="date_1" readonly class="form-search__input input-date">
+		<input id="date_2" readonly class="form-search__input input-date">
+	</div>
+	<label class="form-search__label form-search__label--persons">
+		<span class="guests">
+			<span>
+				<p class="adults">1</p> взрослых
+			</span>
+			<span>•</span>
+			<span>
+				<p class="сhildren">0</p> детей
+			</span>
+		</span>
+		<div id="guests_popup">
+			<div class="adults input">
+				<span class="label">Взрослых</span>
+				<span class="minus">-</span>
+				<input type="number" name="" id="" placeholder="1" value="1" required>
+				<span class="plus">+</span>
+			</div>
+			<div class="сhildren input">
+				<span class="label">Детей</span>
+				<span class="minus">-</span>
+				<input type="number" name="" id="" placeholder="1" value="0" required>
+				<span class="plus">+</span>
+			</div>
+
+			<span class="children_age_label label">Возраст ребёнка</span>
+			<div class="children_age_group">
+				{% for age in search.age_c %}
+				<input type="number" name="age_c[]" value="{{age}}" placeholder="0-17">
+				{% endfor %}
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+				<input type="number" name="age_c[]" placeholder="0-17" style="display: none;">
+			</div>
+		</div>
+		{% csrf_token %}
+	</label>
+	<script>
+		$(`.children_age_group input`).hide()
+		$(`.children_age_label`).hide()
+		$(".сhildren input").change(function () {
+			index = $(this).val()
+			$(`.children_age_group input`).hide()
+			$(`.children_age_label`).hide()
+			$(`.children_age_group input:nth-child(-n + ${index})`).show()
+			if (index > 0) {
+				$(`.children_age_label`).show()
+			}
+
+			// Удалить значение в тех которые не видны
+			$(`.children_age_group input`).not(`input:nth-child(-n + ${index})`).val("")
+		})
+
+	</script>
+	<a class="button form-search__button"
+		type="submit"
+		onclick="go_list(); return false;">Поиск</a>
+</form>
+
+<script>
+	function formatDate(date) {
+		var dd = date.getDate();
+		if (dd < 10) dd = '0' + dd;
+		var mm = date.getMonth() + 1;
+		if (mm < 10) mm = '0' + mm;
+		var yyyy = date.getFullYear();
+		return dd + '.' + mm + '.' + yyyy;
+	}
+
+	datepicker_2 = $("#date_2").datepicker({
+		dateFormat: `'Выезд' dd M`,
+		minDate: 0,
+		changeMonth: true,
+		open
+	})
+
+	datepicker_1 = $("#date_1").datepicker({
+		dateFormat: `'Заезд' dd M`,
+		minDate: 0,
+		changeMonth: true,
+		onClose: function(date_str, e) {
+
+			let formattedDay = e.currentDay.toString().padStart(2, '0');
+			let formattedMonth = (e.currentMonth + 1).toString().padStart(2, '0');
+			let dateString = e.currentYear + '-' + formattedMonth + '-' + formattedDay;
+
+			let date = new Date(dateString);
+
+			$("#date_2").datepicker("option", "minDate", date)
+
+			console.log($("#date_2").datepicker("option", "minDate"));
+		}
+	})
+
+	setInterval(() => {
+		if ($(".ui-datepicker-div_minimum_days_before_arrival").length == 0) {
+			let elem_minimum_days_before_arrival = $('<span class="ui-datepicker-div_minimum_days_before_arrival" style="display: block;text-align: center;width: 100%;color: red;font-size: 13px;margin-top: -8px;"><span>Мин. время до заезда:</span> <span>{{data.hotel.minimum_days_before_arrival}}</span></.span>')
+			$('#ui-datepicker-div').append(elem_minimum_days_before_arrival);
+		}
+	}, 300)
+
+
+	datepicker_1.datepicker( "setDate", "{{search.date_1}}" );
+
+	datepicker_1.val("Заезд {{search.date_1}}")
+	datepicker_2.val("Выезд {{search.date_2}}")
+	// datepicker_2.datepicker( "setDate", "{{search.date_2}}" );
+
+	$.datepicker.setDefaults($.datepicker.regional["ru"]);
+
+	$("#guests_popup .adults input").change(function () {
+		adults = $(".guests .adults")
+		val = $(this).val()
+		adults.html(val)
+	})
+	$("#guests_popup .adults .minus").click(function () {
+		val = $("#guests_popup .adults input").val()
+		val = val - 1;
+		if (val < 0) val = 0
+		$("#guests_popup .adults input").val(val)
+		$("#guests_popup .adults input").change()
+	})
+	$("#guests_popup .adults .plus").click(function () {
+		val = $("#guests_popup .adults input").val()
+		val = Number(val) + 1;
+		$("#guests_popup .adults input").val(val)
+		$("#guests_popup .adults input").change()
+	})
+
+	$("#guests_popup .сhildren input").change(function () {
+		сhildren = $(".guests .сhildren")
+		val = $(this).val()
+		сhildren.html(val)
+	})
+
+	$("#guests_popup .сhildren .minus").click(function () {
+		val = $("#guests_popup .сhildren input").val()
+		val = val - 1;
+		if (val < 0) val = 0
+		$("#guests_popup .сhildren input").val(val)
+		$("#guests_popup .сhildren input").change()
+	})
+
+	$("#guests_popup .сhildren .plus").click(function () {
+		val = $("#guests_popup .сhildren input").val()
+		val = Number(val) + 1;
+		$("#guests_popup .сhildren input").val(val)
+		$("#guests_popup .сhildren input").change()
+	})
+
+	//{% if search.a %}
+	$("#guests_popup .adults input").val("{{search.a}}")
+	//{% else %}
+	$("#guests_popup .adults input").val(1)
+	//{% endif %}
+
+	//{% if search.c %}
+	$("#guests_popup .сhildren input").val("{{search.c}}")
+	//{% else %}
+	$("#guests_popup .сhildren input").val(0)
+	//{% endif %}
+
+	$(".сhildren input").change()
+	$(".adults input").change()
+
+	function go_list() {
+		childs = Array.from($("*[name='age_c[]']"), item => $(item).val())
+
+		childs_count = $("#guests_popup .сhildren input").val()
+
+		childs_count_int = parseInt(childs_count)
+
+		count_age_c_empty = 0
+		$("*[name='age_c[]']").not('[style="display: none;"]').map(function () {
+			if ($(this).val() == "") {
+				count_age_c_empty++
+			}
+		})
+
+		if (count_age_c_empty > 0) {
+			alert("Укажите возраст всех детей")
+			return
+		}
+
+		date_1 = $("#date_1").datepicker("getDate")
+		date_2 = $("#date_2").datepicker("getDate")
+
+		if (date_1 > date_2) {
+			alert("Дата начала бронирования не может быть больше даты конца бронирования")
+			return
+		}
+
+		childs = childs.filter(child => child !== "");
+
+		data = {
+			"adults": $("#guests_popup .adults input").val(),
+			"date_1": formatDate(date_1),
+			"date_2": formatDate(date_2),
+		}
+
+		if (childs.length > 0) {
+			data["age_c"] = childs.join("-")
+		}
+
+		query_string = getQueryString(data)
+		url = location.href
+		url = url.replace(/\\?.*/, "?" + query_string);
+		location.href = url
+	}
+
+	function getQueryString(params) {
+		let queryString = '';
+		for (let key in params) {
+			if (params.hasOwnProperty(key)) {
+				if (queryString.length > 0) {
+					queryString += '&';
+				}
+				queryString += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+			}
+		}
+		return queryString;
+	}
+
+	function getQueryParams() {
+		const urlParams = new URLSearchParams(window.location.search);
+		const params = {};
+		for (let [key, value] of urlParams) {
+			params[key] = value;
+		}
+		return params;
+	}
+</script>
+
+<script src="{% static 'js/datepicker-ru.js' %}"
+	defer></script>

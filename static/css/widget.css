@@ -1,0 +1,49 @@
+.widget-container[widget-type="directions_for_hotels"] .widget-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.widget-container[widget-type="directions_for_hotels"] .widget-list .widget-list__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: black;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 4px 4px 16px 0px rgba(0, 0, 0, 0.25);
+  flex-shrink: 1;
+  width: calc((100% / 4) - 20px);
+  min-width: 185px;
+  max-width: 290px;
+}
+
+.widget-container[widget-type="directions_for_hotels"] .widget-list .widget-list__item .widget-image {
+  width: 100%;
+}
+
+.widget-container[widget-type="directions_for_hotels"] .widget-list .widget-list__item .widget-image img {
+  width: 100%;
+  height: 180px;
+  -o-object-fit: cover;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+}
+
+.widget-container[widget-type="directions_for_hotels"] .widget-info {
+  padding: 5px 11px;
+  width: 100%;
+}
+
+.widget-container[widget-type="directions_for_hotels"] .widget-info__name {
+  font-size: 16px;
+  line-height: 24px;
+  color: #07151C;
+  font-weight: 600;
+}
+
+.widget-container[widget-type="directions_for_hotels"] .widget-info__count {
+  font-size: 14px;
+  line-height: 20px;
+  color: #5A5A5A;
+}

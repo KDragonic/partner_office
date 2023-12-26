@@ -1,0 +1,410 @@
+{% extends "template/base_profile.html" %}
+{% load humanize menu form static %}
+{% block main_block %}
+
+{% hotel_shift_tab %}
+
+<style>
+  div.greyGridTable {
+    border: 3px solid #FFFFFF;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+
+  .divTable.greyGridTable .divTableCell,
+  .divTable.greyGridTable .divTableHead {
+    border: 1px solid #FFFFFF;
+    padding: 10px;
+  }
+
+  .divTable.greyGridTable .divTableBody .divTableCell {
+    font-size: 14px;
+  }
+
+  .divTable.greyGridTable .divTableHeading {
+    background: #FFFFFF;
+    border-bottom: 2px solid #CDCDCD;
+  }
+
+  .divTable.greyGridTable .divTableHeading .divTableHead {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 2px solid #CDCDCD;
+    text-align: left;
+  }
+
+  .greyGridTable .tableFootStyle {
+    font-size: 14px;
+  }
+
+  /* DivTable.com */
+  .divTable {
+    display: table;
+  }
+
+  .divTableRow {
+    display: table-row;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableCell,
+  .divTableHead {
+    display: table-cell;
+  }
+
+  .divTableHeading {
+    display: table-header-group;
+  }
+
+  .divTableFoot {
+    display: table-footer-group;
+  }
+
+  .divTableBody {
+    display: table-row-group;
+  }
+
+  .plus {
+    position: relative;
+    left: -15px;
+    margin-bottom: 15px;
+  }
+
+  .plus:before,
+  .plus:after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    background: #024849;
+    border-radius: 10px;
+  }
+
+  .plus:before {
+    transform: rotate(0deg);
+  }
+
+  .plus:after {
+    transform: rotate(90deg);
+  }
+</style>
+
+<div class="section"
+  style=" display: flex; flex-direction: row; gap: 43px; flex-wrap: wrap;">
+  <section data-type="common_boost">
+    <div class="time_card"
+      data-datetime="{{common.date}}">
+      <span class="title">Обычное продвижение</span>
+      <div class="two_div"
+        style=" display: flex; justify-content: space-between; ">
+        <span class="value">99:99:99</span>
+        <div class="plus"></div>
+      </div>
+    </div>
+  </section>
+  <section data-type="super_boost">
+    <div class="time_card"
+      data-datetime="{{super.date}}">
+      <span class="title">Усиленное продвижение</span>
+      <div class="two_div"
+        style=" display: flex; justify-content: space-between; ">
+        <span class="value">99:99:99</span>
+        <span class="count">x{{super.count}}</span>
+        <div class="plus"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="section">
+  <div class="divTable greyGridTable">
+    <div class="divTableHeading">
+      <div class="divTableRow">
+        <div class="divTableHead">Дата и время конца</div>
+        <div class="divTableHead">Осталось времени</div>
+      </div>
+    </div>
+    <div class="divTableBody super_list">
+      {% for boost in super_list %}
+      <div class="divTableRow">
+        <div class="divTableCell">{{boost.date}}</div>
+        <div class="divTableCell realtime"
+          data-datetime="{{boost.dateISO}}">99:99:99</div>
+      </div>
+      {% empty %}
+      <div class="divTableRow">
+        У вас нету бонусов
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Находим все элементы с классом .time_card
+  var timeCards = $('.time_card');
+
+  // Обходим каждый элемент и отображаем внутри его атрибут data-datetime с текущим временем в формате ч.м.с
+  timeCards.each(function () {
+    var datetimeAttr = $(this).attr('data-datetime');
+    if (datetimeAttr != 0 || datetimeAttr != "0") {
+      setInterval(function () {
+        var now = new Date();
+        var difference = new Date(datetimeAttr) - now;
+        if (difference < 0) {
+          $(this).find('.value').text("00:00:00");
+          $(this).attr('data-datetime', "0")
+        }
+        var hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        var minutes = Math.floor((difference / (1000 * 60)) % 60);
+        var seconds = Math.floor((difference / 1000) % 60);
+        var formattedTime = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+        $(this).find('.value').text(formattedTime);
+      }.bind(this), 1000);
+    }
+    else {
+      $(this).find('.value').text("00:00:00");
+    }
+  });
+</script>
+
+<script>
+  // Находим все элементы с классом .time_card
+  var super_list_realtime = $('.super_list .realtime');
+
+  // Обходим каждый элемент и отображаем внутри его атрибут data-datetime с текущим временем в формате ч.м.с
+  super_list_realtime.each(function () {
+    var datetimeAttr = $(this).attr('data-datetime');
+    if (datetimeAttr != 0 || datetimeAttr != "0") {
+      setInterval(function () {
+        var now = new Date();
+        var difference = new Date(datetimeAttr) - now;
+
+        if (difference < 0) {
+          location.reload();
+        }
+
+        var hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        var minutes = Math.floor((difference / (1000 * 60)) % 60);
+        var seconds = Math.floor((difference / 1000) % 60);
+        var formattedTime = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+        $(this).text(formattedTime);
+      }.bind(this), 1000);
+    }
+    else {
+      $(this).text("00:00:00");
+    }
+  });
+</script>
+
+
+<script>
+  $(`[data-type='common_boost']`).click(function () {
+    openPopup(
+      "common_boost",
+      "Обновить обычные продвижение",
+      `Вы попытались добавить обычное продвижение отелю. Стоимость данного продвижения составляет 500 бонусов.<br>
+      Обратите внимание, что при добавлении нового продвижения, оно не будет добавлено к уже установленному. Вместо этого, текущее продвижение будет заменено на новое и время его действия будет обновлено.<br>
+      Длительность продвижения составляет 24 часа.`,
+    )
+  });
+  $(`[data-type='super_boost']`).click(function () {
+    openPopup(
+      "super_boost",
+      "Добавить улучшеное продвижение",
+      `Вы попытались добавить улучшеное продвижение отелю. Стоимость данного продвижения составляет 500 рублей.<br>
+      Обратите внимание, что при добавлении нового продвижения, оно будет добавлено как одельный таймер и будет работать одновремено с другими.<br>
+      Длительность продвижения составляет 24 часа.`,
+    )
+  });
+</script>
+
+<script>
+  function openPopup(type, title, text) {
+    // Создаем элементы попапа
+    console.log("openPopup")
+    var popup = $(`
+			<div class="boost_popup">
+				<span class="title popup-text"
+					style=" font-size: 31px; ">${title}</span>
+				<span class="popup-text"
+					style="max-width: 611px;font-size: 20px;text-align: center;">
+					${text}</span>
+				<div style=" gap: 50px; display: flex; ">
+          <a style="font-size: 20px;" class="button ajax">Да</a>
+          <a style="font-size: 20px;" class="button close">Нет</a>
+        </div>
+        <div class="error" style="color: red;"></div>
+      `);
+    $("body").append(`<div class="overlay_popup"></div>`);
+    $("body").append(popup);
+
+    // Обработчик нажатия на кнопку закрытия
+    $(popup).find(".close").click(function () {
+      $(".overlay_popup").remove();
+      $(".boost_popup").remove();
+    });
+
+    if (type == "common_boost") {
+      $(popup).find(".ajax").click(function () {
+        load_start()
+        $.ajax({
+          method: "POST",
+          url: "{% url 'ajax_add_common_boost' %}",
+          beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          },
+          success: function (request) {
+            load_end()
+            if (request.status == true) {
+              location.reload()
+            }
+            else if (request.status == false) {
+              if (request.error == "insufficient_funds") {
+                $(popup).find(".error").text("У вас недостаточно средств")
+              }
+              if (request.error == "too_soon") {
+                $(popup).find(".error").text("К сожалению, вы не можете получить новое продвижение если с прошлого не прошло 5 минут.")
+              }
+            }
+          }
+        });
+      })
+    }
+    if (type == "super_boost") {
+      $(popup).find(".ajax").click(function () {
+        load_start()
+        $.ajax({
+          method: "POST",
+          url: "{% url 'ajax_add_super_boost' %}",
+          beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          },
+          success: function (request) {
+            load_end()
+            if (request.status == true) {
+              location.reload()
+            }
+            else if (request.status == false) {
+              if (request.error == "insufficient_funds") {
+                $(popup).find(".error").text("У вас недостаточно средств")
+              }
+              if (request.error == "too_soon") {
+                $(popup).find(".error").text("К сожалению, вы не можете получить новое продвижение если с прошлого не прошло 5 минут.")
+              }
+            }
+          }
+        });
+      })
+    }
+  }
+</script>
+
+<!-- <div class="section">
+  <div class="divTable greyGridTable">
+    <div class="divTableHeading">
+      <div class="divTableRow">
+        <div class="divTableHead">Сумма</div>
+        <div class="divTableHead">Дата получения</div>
+        <div class="divTableHead">Осталось дней</div>
+      </div>
+    </div>
+    <div class="divTableBody">
+      {% for bonus in bonuses %}
+      <div class="divTableRow">
+        <div class="divTableCell">{{bonus.value|intcomma}} ₽</div>
+        <div class="divTableCell">{{bonus.date|date:"d.m.Y"}}</div>
+        <div class="divTableCell">{{bonus.del_days|intcomma}}</div>
+      </div>
+      {% empty %}
+        <div class="divTableRow">
+          У вас нету бонусов
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div> -->
+
+
+<style>
+  .boost_popup {
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #7a7a7a;
+    width: 725px;
+    max-height: 100vh;
+    margin-left: auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 13px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .overlay_popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: hwb(0 0% 100% / 0.53);
+    z-index: 9998;
+  }
+
+  .popup-text {
+    max-width: 613px;
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .time_card {
+    display: flex;
+    border: 1px solid #959595;
+    width: 200px;
+    padding: 23px;
+    padding-bottom: 33px;
+    padding-right: 35px;
+    flex-direction: column;
+    border-radius: 10px;
+  }
+
+  .time_card .title {
+    color: #bfbfbf;
+  }
+
+  .time_card .two_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .balans .value {
+    font-size: 20px;
+  }
+
+  .balans .card {
+    background: #ebebeb;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+</style>
+
+{% endblock main_block %}

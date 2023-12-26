@@ -1,0 +1,80 @@
+{% extends "main/base.html" %}
+{% load menu sass_tags form static %}
+{% block content %}
+
+<link href="{% static 'css/scss/profile.css' %}"
+	rel="stylesheet"
+	type="text/css" />
+
+
+<div id="content">
+		<div id="main_block">
+			{% block main_block %}
+			{% endblock main_block %}
+		</div>
+</div>
+{% comment %} 
+<style>
+	.t_menu-icon {
+		position: fixed;
+		flex-direction: column;
+		bottom: 10px;
+		right: 10px;
+		z-index: 999;
+		background-color: #FC7201;
+		border-radius: 5px;
+		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+	}
+
+	.t_menu-icon .img_t_menu {
+		width: 100px;
+		height: 100px;
+		cursor: pointer;
+	}
+
+	.t_menu-icon .title_t_menu {
+		display: flex;
+		width: 100%;
+		align-items: center;
+		justify-content: center;
+		font-size: 17px;
+		color: white;
+		cursor: pointer;
+	}
+
+	.t_menu-icon .t_menu {
+		display: none;
+		padding: 0 10px 7px 10px;
+	}
+
+	.t_menu-icon .t_menu li {
+		cursor: pointer;
+		color: white;
+		font-size: 24px;
+	}
+
+	.t_menu-icon .t_menu li:hover {
+		text-decoration-line: underline;
+	}
+
+
+	.t_menu-icon.active .t_menu {
+		display: block;
+	}
+
+	.t_menu-icon.active .img_t_menu {
+		display: none;
+	}
+
+	.t_menu-icon.active .title_t_menu {
+		cursor: default;
+		background-color: #00000066;
+	}
+</style> {% endcomment %}
+
+<script defer>
+	$('.t_menu-icon').not(".active").click(function () {
+		$('.t_menu-icon').addClass('active');
+	});
+</script>
+{% endblock content %}

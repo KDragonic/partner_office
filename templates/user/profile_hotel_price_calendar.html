@@ -1,0 +1,849 @@
+{% extends "template/base_profile.html" %}
+{% load menu form static cards %}
+{% block main_block %}
+
+<style>
+  .button_grupe_days {
+    display: flex !important;
+    flex-direction: row !important;
+    width: min-content;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .button_grupe_days .button {
+    color: #11223e !important;
+    background: #f4f6fa !important;
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  .button_grupe_days .button:hover,
+  .button_grupe_days .button.active {
+    background: #ffb172 !important;
+  }
+
+  #main_block {
+    padding-left: 12px;
+    padding-right: 10px;
+    padding-top: 9px;
+    padding-bottom: 92px;
+  }
+
+  .calendar-table .room_booking td.room_name {
+    background: white;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .calendar-table .rc td {
+    padding-left: 6px;
+    background: rgb(255, 255, 255);
+  }
+</style>
+
+<style>
+  .booking_block {
+    background: #aaf1b0;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-size: 12px;
+    padding: 0 5px;
+  }
+
+  .info_booking {
+    display: flex;
+    flex-direction: column;
+    background: #e4eefa;
+    border: 1px solid #bdd6f2;
+    color: #303030;
+    font-family: sans-serif;
+    font-size: 12px;
+    line-height: 18px;
+    width: auto;
+    padding: 2px 22px 2px 5px;
+    position: absolute;
+    text-align: left;
+    z-index: 105;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+
+
+  .info_field.id .value {
+    /* стилизация текста */
+    text-decoration: underline;
+    /* эффект при наведении */
+    cursor: pointer;
+  }
+
+  .left {
+    text-align: left
+  }
+
+  .width100 {
+    width: 100%
+  }
+
+  .dashed {
+    text-decoration: none;
+    border-bottom: 1px dashed #000
+  }
+
+  .nav {
+    float: left;
+    width: 200px;
+    overflow: hidden;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1
+  }
+
+  .today-info {
+    float: right;
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-top: -20px;
+    border: 1px solid #ececec;
+    background: #f9f9f9;
+    border-radius: 5px;
+    margin-bottom: 10px
+  }
+
+  .today-info .title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 5px
+  }
+
+  .today-info .label {
+    display: inline-block;
+    width: 100px
+  }
+
+  .calendar-nav {
+    background: #fff;
+    padding: 0 0 5px;
+    font-size: 13px
+  }
+
+  .calendar-nav .today {
+    display: inline-block;
+    vertical-align: top
+  }
+
+  .calendar-nav .today a {
+    border-radius: 0 5px 5px 0
+  }
+
+  .table {
+    border-spacing: 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    margin-bottom: 15px
+  }
+
+  .table td,
+  .table th {
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    font-size: 14px;
+    color: black;
+  }
+
+  .table th {
+    padding: 5px;
+    background-color: #efefef;
+    font-weight: 700;
+    font-size: 12px
+  }
+
+  .table td {
+    padding: 5px;
+    line-height: 22px
+  }
+
+  .table .status {
+    padding: 0;
+    white-space: nowrap
+  }
+
+  .table .change_status_link {
+    padding: 5px;
+    position: relative;
+    font-size: 12px;
+    color: #000 !important
+  }
+
+  .table .move {
+    cursor: move
+  }
+
+  .calendar-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    padding: 1px 1px 1px 0;
+    margin-bottom: 10px
+  }
+
+  .calendar-table {
+    margin-bottom: 5px;
+    overflow: hidden;
+    width: 100%
+  }
+
+  .calendar-table th {
+    padding: 3px 0;
+    background: 0 0;
+    white-space: nowrap;
+    min-width: 30px;
+    width: auto
+  }
+
+  .calendar-table td {
+    padding: 0;
+    height: 29px;
+    min-width: 30px;
+    width: auto;
+    max-width: 100%;
+    position: relative;
+    white-space: nowrap
+  }
+
+  .calendar-table .firstcol {
+    white-space: nowrap;
+    padding: 2px 7px;
+    background-clip: padding-box;
+    width: 250px;
+    max-width: 350px
+  }
+
+  .calendar-table .firstcol.cleanmode {
+    padding-right: 45px
+  }
+
+  .calendar-table .room-status {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 45px;
+    text-align: center;
+    padding: 1px 3px 2px 3px;
+    line-height: normal;
+    font-size: 10px
+  }
+
+  .calendar-table .room-status a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    text-decoration: none
+  }
+
+  .room-status.status0 {
+    background: #9f9
+  }
+
+  .room-status.status1 {
+    background: #ff9
+  }
+
+  .room-status.status2 {
+    background: #f99
+  }
+
+  .calendar-table .room-name {
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle
+  }
+
+  @-moz-document url-prefix() {
+    .calendar-table .fixed-column {
+      top: -1px;
+      bottom: -1px
+    }
+  }
+
+  .calendar-table .cat {
+    font-weight: 700;
+    background-color: #eae7f7
+  }
+
+  .calendar-table .cat-name {
+    display: inline-block;
+    position: relative;
+    z-index: 1
+  }
+
+  .calendar-table .cat-name a,
+  .calendar-table .room-name a {
+    border-color: #bababa
+  }
+
+  .calendar-table .month {
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    height: 23px
+  }
+
+  .calendar-table .month-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    line-height: 23px;
+    padding-left: 5px;
+    border-right: solid 5px #fff;
+    text-align: center
+  }
+
+  .calendar-table .dayoff {
+    background: #ffeded
+  }
+
+  .calendar-table thead .dayoff {
+    color: #ce1e1e
+  }
+
+  .calendar-table .today {
+    background: #b5cfe8;
+    position: relative
+  }
+
+  .calendar-table .freeday {
+    cursor: pointer
+  }
+
+  .calendar-table .price {
+    text-align: center;
+    font-size: 10px;
+    color: #000000;
+  }
+
+  .calendar-table .price input {
+    text-align: center;
+    border: none;
+  }
+
+  .calendar-table .price input::placeholder {
+    color: #888;
+  }
+
+  .calendar-table .booking {
+    padding: 0;
+    background-clip: padding-box
+  }
+
+  .calendar-table .dateline {
+    width: 100%;
+    margin: 0 2px;
+    height: 20px;
+    position: absolute;
+    top: 4px;
+    padding: 0 1px 0 1px;
+    z-index: 100
+  }
+
+  .calendar-table .leftoffset0 {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none
+  }
+
+  .calendar-table .status {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #555;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative
+  }
+
+  .calendar-table .status .status-name-wrap {
+    overflow: hidden;
+    margin: 0 3px;
+    height: 100%;
+    position: relative
+  }
+
+  .calendar-table .status .status-name {
+    white-space: nowrap;
+    line-height: 20px;
+    font-size: 12px;
+    height: 100%;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+  }
+
+  .status-color {
+    float: left;
+    margin: 0 10px 10px 0;
+    padding: 2px 5px;
+    border-radius: 5px
+  }
+
+  .calendar-table .line {
+    position: absolute;
+    height: 5000px;
+    width: 0;
+    border-right: 2px solid #b5cfe8;
+    left: 45%;
+    z-index: 1
+  }
+
+  .calendar-table .booking .info {
+    display: none
+  }
+
+  #rooms .room-status {
+    position: relative
+  }
+
+  label a.dashed {
+    font-size: 13px
+  }
+
+  .info {
+    border: 1px solid #ccc;
+    padding: 5px 5px 5px 30px;
+    background: url(/img/info_icon.png) 6px 6px no-repeat #efefef;
+    font-size: 13px;
+    display: inline-block
+  }
+
+  #swap-booking {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    margin-left: -200px;
+    width: 400px;
+    border: 2px solid #bdd6f2;
+    border-top: none;
+    background: #eee;
+    max-height: 100%;
+    overflow: auto;
+    z-index: 300;
+    text-align: center
+  }
+
+  #swap-booking .wrap {
+    margin: 5px 10px 0;
+    overflow: hidden
+  }
+
+  #swap-booking .title {
+    font-weight: 700;
+    margin-bottom: 5px
+  }
+
+  #swap-booking label {
+    text-align: left
+  }
+
+  #move-booking {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    margin-left: -200px;
+    width: 400px;
+    border: 2px solid #bdd6f2;
+    border-top: none;
+    background: #eee;
+    max-height: 100%;
+    overflow: auto;
+    z-index: 300;
+    text-align: center
+  }
+
+  #move-booking .wrap {
+    margin: 5px 10px 0;
+    overflow: hidden
+  }
+
+  #move-booking .title {
+    font-weight: 700;
+    margin-bottom: 5px
+  }
+
+  #move-booking label {
+    text-align: left
+  }
+
+  .link-edit {
+    padding: 2px 0 2px 20px;
+    background: url(/img/admin/edit_icon.png) no-repeat
+  }
+
+  .link-delete {
+    padding: 2px 0 2px 20px;
+    background: url(/img/admin/delete_icon.png) no-repeat
+  }
+
+  .link-copy {
+    padding: 2px 0 2px 20px;
+    background: url(/img/admin/copy_icon.png) no-repeat
+  }
+
+  .link-calendar {
+    padding: 2px 0 2px 20px;
+    background: url(/img/admin/calendar_icon.png) no-repeat
+  }
+
+  .nav-link {
+    margin-bottom: 15px;
+    font-size: 13px
+  }
+
+  .nav-link a {
+    margin-right: 20px;
+    font-size: 13px
+  }
+
+  .booking-info label {
+    width: 150px;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 0
+  }
+
+  .tooltip {
+    background: #e4eefa;
+    border: 1px solid #bdd6f2;
+    color: #303030;
+    font-family: sans-serif;
+    font-size: 12px;
+    line-height: 18px;
+    min-width: 160px;
+    max-width: 400px;
+    width: auto;
+    padding: 2px 22px 2px 5px;
+    position: absolute;
+    text-align: left;
+    z-index: 105;
+    max-height: 400px;
+    overflow-y: auto
+  }
+
+  .tooltip-nav {
+    margin-top: 5px
+  }
+
+  .tooltip-nav a {
+    margin: 0 2px
+  }
+
+  .tooltip .change_label_link,
+  .tooltip .change_status_link {
+    position: relative
+  }
+
+  .room-link {
+    position: absolute;
+    padding: 3px;
+    border: 1px solid #e4e4e4;
+    background: #e5ffe6;
+    white-space: nowrap;
+    z-index: 103
+  }
+
+  .room-link a {
+    font-size: 12px;
+    padding: 2px 0 2px 25px
+  }
+
+  .room-link .edit {
+    background: url(/img/admin/edit_icon.png) no-repeat
+  }
+
+  .room-link .delete {
+    background: url(/img/admin/delete_icon.png) no-repeat
+  }
+
+  @media only screen and (min-width:916px) {
+    .calendar-nav-wrap {
+      height: 44px
+    }
+  }
+
+  @media only screen and (max-width:915px) {
+    .today-info {
+      float: left;
+      clear: left
+    }
+  }
+
+  @media only screen and (max-width:768px) {
+    .nav {
+      float: none;
+      width: auto;
+      overflow: hidden;
+      margin-bottom: 20px
+    }
+  }
+
+  @media only screen and (max-width:600px) {
+    .today-info {
+      float: none;
+      overflow: hidden;
+      margin-top: 10px
+    }
+  }
+
+  @media only screen and (max-width:480px) {
+    body {
+      font-size: 15px
+    }
+
+    .calendar-nav a {
+      font-size: .95em
+    }
+
+    .calendar-table .firstcol {
+      max-width: 200px
+    }
+
+    .today-info {
+      padding: 5px
+    }
+
+    .tooltip {
+      width: 95%;
+      max-height: 95%;
+      overflow: auto;
+      z-index: 210;
+      position: fixed !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%);
+      padding: 10px;
+      font-size: 120%;
+      line-height: 150%
+    }
+
+    .tooltip-nav img {
+      width: 1.2em;
+      height: auto
+    }
+
+    .tooltip-nav a {
+      padding: 7px;
+      margin: 0 5px;
+      background-color: #f5f5f5;
+      display: inline-block;
+      border: 1px solid #efefef;
+      line-height: 16px
+    }
+
+    #move-booking,
+    #swap-booking {
+      max-width: 90%;
+      margin-left: -45%
+    }
+  }
+
+  @media only screen and (max-width:350px) {
+    .booking-info label {
+      width: auto
+    }
+  }
+
+  @media all and (-ms-high-contrast:none),
+  (-ms-high-contrast:active) {
+    * {
+      border-radius: 0 !important
+    }
+  }
+
+  @media print {
+    @page {
+      size: landscape
+    }
+
+    .calendar-nav-wrap,
+    .calendar-table .line,
+    .nav-link,
+    .status-nav,
+    .today-info {
+      display: none !important;
+      visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important
+    }
+
+    .calendar-table thead {
+      display: table-header-group
+    }
+
+    .calendar-table .today {
+      background: inherit;
+      position: inherit
+    }
+
+    .table a {
+      text-decoration: none
+    }
+
+    .table,
+    .table td,
+    .table th {
+      border-color: #000
+    }
+
+    .calendar-wrap {
+      overflow-x: visible;
+      overflow-y: visible
+    }
+
+    .calendar-wrap::after {
+      content: "http://litepms.ru";
+      font-size: 11px;
+      display: block;
+      margin-top: 20px;
+      letter-spacing: 1px
+    }
+  }
+</style>
+
+<style>
+  #calendar-table_parent {
+    width: 76%;
+    overflow: auto;
+  }
+
+  #calendar-table_parent::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background: #c5c5c5;
+  }
+
+  #calendar-table_parent::-webkit-scrollbar-thumb {
+    background-color: #333333;
+    border-radius: 3px;
+  }
+</style>
+
+{% hotel_shift_tab %}
+
+<div id="calendar-table_parent">
+  <table class="table calendar-table"
+    id="calendar">
+    <thead>
+      <tr class="dates">
+        <th class="firstcol"></th>
+        {% for date in dates %}
+        <th class="month"
+          data-month-year="{{date.month}}-{{date.year}}">
+          <div class="month-wrap">{{date.month}} {{date.year}}</div>
+        </th>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td></td>
+        {% for date in dates %}
+        {% if date.day_of_week.0 %}
+        <th style="color: #ce1e1e; background: #ffeded;">{{date.day_of_week.1}}</th>
+        {% else %}
+        <th>{{date.day_of_week.1}}</th>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      <tr class="dates">
+        <td class="rooms firstcol"></td>
+        {% for date in dates %}
+        {% if date.day_of_week.0 %}
+        <th style="color: #ce1e1e; background: #ffeded;">{{date.day}}</th>
+        {% else %}
+        <th>{{date.day}}</th>
+        {% endif %}
+        {% endfor %}
+      </tr>
+    </thead>
+
+    <tbody>
+      {% csrf_token %}
+      {% for rc in rcs %}
+      <tr data-id="{{rc.id}}"
+        class="highlight room_booking">
+        <td class="room_name"><span>{{rc.name}}</span> </td>
+        <div class="curday">{{date.day}}</div>
+        {% for item in rc.items %}
+        <td class="price" data-date="{{item.ymd}}" data-id="{{rc.id}}">
+          <span class="room_count" title="Свободных номеров" style="border-bottom: 1px solid #e8e8e8; font-size: 16px; display: block; width: 100%;">{{item.room_free}}</span>
+          <input class="price_base" title="Цена" style="border-bottom: 1px solid #e8e8e8;" placeholder="{{rc.price_base}}" value="{{item.price}}">
+          <input class="days_min" title="Минимум дней до заселения" placeholder="{{rc.days_min}}" value="{{item.days_min}}">
+        </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(".price").on("change", ".price_base, .days_min", function () {
+    var data_id = $(this).closest(".price").data("id");
+    var data_date = $(this).closest(".price").data("date");
+    var days_min = $(this).closest(".price").find(".days_min").val();
+    var price_base = $(this).closest(".price").find(".price_base").val();
+    $.ajax({
+      url: "{% url 'form_edit_price_calendar' %}",
+      type: "POST",
+      data: {
+        rc: data_id,
+        date: data_date,
+        days_min: days_min,
+        price: price_base,
+        csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+      },
+      success: function (data) {
+        // location.reload()
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        // Handle error
+      }
+    });
+  });
+</script>
+
+
+
+<!-- <script defer>
+  var months = [];
+  $('.month').each(function () {
+    var monthYear = $(this).attr('data-month-year');
+    var index = months.findIndex(m => m.monthYear == monthYear);
+    if (index < 0) {
+      months.push({
+        count: 1,
+        monthYear: monthYear
+      });
+    } else {
+      months[index].count++;
+    }
+  });
+  months.forEach(function (m) {
+    $(`.month[data-month-year='${m["monthYear"]}']`).attr("colspan", m["count"])
+    $(`.month[data-month-year='${m["monthYear"]}']`).slice(1).remove()
+  })
+</script> -->
+
+
+{% endblock main_block %}

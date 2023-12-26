@@ -1,0 +1,21 @@
+<style>
+    @media screen and (max-width: 1024px) {
+        ol.breadcrumb {
+            display: none;
+        }
+    }
+</style>
+
+
+<ol class="breadcrumb">
+{% if isProfile == True %}
+<div id="tabs_mobile_toggle">&#9776;</div>
+{% endif %}
+{% for breadcrumb in breadcrumbs %}
+    {% if breadcrumb.1 %}
+        <li><a href="{{breadcrumb.1}}">{{ breadcrumb.0 }}</a></li>
+    {% else %}
+        <li class="active">{{ breadcrumb.0 }}</li>
+    {% endif %}
+{% endfor %}
+</ol>

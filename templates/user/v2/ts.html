@@ -1,0 +1,54 @@
+{% extends 'user/v2/base.html' %}
+{% load cards %}
+{% block main_block %}
+  <section class="grupe_cards" style="margin-bottom: 25px;">
+    <section class="row_crads">
+      <div class="block_card">
+        <span class="title">Создание нового запроса</span>
+        <div class="grupe_input d-flex flex-column">
+          <label for="" class="text col_1"><input type="text" name="title" id="title" placeholder="Тема запроса" required /></label>
+          <label for="" class="text col_1"><textarea name="text" id="" cols="30" rows="10" required placeholder="Пожалуйста, подробно опишите вашу проблему, укажите, в чем она заключается, и предложите варианты решения. Наши сотрудники проанализируют ваш запрос и предоставят ответ в ближайшее время."></textarea></label>
+          <button onclick="ajax_create_ts()" class="button">Отправить</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads">
+      {% telegram_card %}
+    </section>
+  </section>
+
+  <script>
+    function ajax_create_ts() {
+      param = {
+        title: $(`[name="title"]`).val(),
+        text: $(`[name="text"]`).val()
+      }
+
+      if ($(`[name="title"]`).val() != "") {
+        return
+      }
+
+      if ($(`[name="text"]`).val() != "") {
+        return
+      }
+
+      $(`[name="title"]`).val('')
+      $(`[name="text"]`).val('')
+
+      // AJAX POST request
+      $.ajax({
+        url: "{% url 'techsupport.create_ts' %}",
+        type: 'POST',
+        data: param,
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        success: function (response) {
+          // Handle success response
+          location.href = response.chat_url
+        }
+      })
+    }
+  </script>
+{% endblock %}

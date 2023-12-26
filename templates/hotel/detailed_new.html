@@ -1,0 +1,2283 @@
+{% extends "main/base.html" %}
+{% load static form menu %}
+{% load crispy_forms_tags %}
+{% block content %}
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+	integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+	crossorigin="" />
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+	integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+	crossorigin=""></script>
+
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU&apikey=e964d90a-5747-4eb6-ac44-28cbfcca4dab" type="text/javascript"></script>
+
+<main class="main">
+	<style>
+		.breadcrumb {
+			margin-left: -10px !important;
+
+		.ui-datepicker {
+			z-index: 9999 !important;
+		}
+
+	</style>
+	<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+	<link rel="stylesheet"
+		href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+	<script src="https://cdn.jsdelivr.net/jquery.slick/1.5.0/slick.min.js"></script>
+	<link rel="stylesheet"
+		href="https://cdn.jsdelivr.net/jquery.slick/1.5.0/slick.css">
+	<link rel="stylesheet"
+		href="https://cdn.jsdelivr.net/jquery.slick/1.5.0/slick-theme.css">
+
+	<section class="inner">
+		<div class="container inner__container">
+			{% bread_crumb %}
+			<div class="inner-content">
+				<div class="inner-content__card">
+					<div class="card-inner__top">
+						<div class="hotel-top">
+							<div class="hotel-top__right">
+								<div class="rating">
+									{% if data.hotel.stars >= 1 %} <img src="{% static 'img/star.png' %}"
+										alt="star.png">{% endif %}
+									{% if data.hotel.stars >= 2 %} <img src="{% static 'img/star.png' %}"
+										alt="star.png">{% endif %}
+									{% if data.hotel.stars >= 3 %} <img src="{% static 'img/star.png' %}"
+										alt="star.png">{% endif %}
+									{% if data.hotel.stars >= 4 %} <img src="{% static 'img/star.png' %}"
+										alt="star.png">{% endif %}
+									{% if data.hotel.stars == 5 %} <img src="{% static 'img/star.png' %}"
+										alt="star.png">{% endif %}
+								</div>
+								<h1 class="hotel-top__title hotel-top__title--card">{{data.hotel.name}}</h1>
+								<div class="hotel-top__location">
+									<img src="{% static 'img/sprite/location.svg' %}"
+										alt="location.svg">
+									<h2 class="hotel-top__text address_text">{{data.hotel.address}}.</h2>
+									<p class="hotel-top__text meter_text">{{data.hotel.distance_to_text}}</p>
+								</div>
+							</div>
+							<div class="hotel-top__left no_price_and_select_nubmer">
+								<div class="price">от {{data.min_price}} ₽</div>
+								<button class="hotel-top__button">
+									<a style="color: unset;"href="#grupe_rooms">Выбрать номер</a>
+								</button>
+							</div>
+						</div>
+						<div class="card-main">
+							<div class="card-gallery">
+								<div class="gallery-imgs">
+									{% for img in data.hotel.imgs %}
+									<div class="img_container">
+										<img src="{{img.url}}" style="height: 100%; object-fit: cover;" alt="{{img.url}}">
+									</div>
+									{% endfor %}
+								</div>
+								<div class="dots_to_5">
+									{% for img in data.hotel.imgs %}
+									<div class="item"></div>
+									{% endfor %}
+								</div>
+							</div>
+							<script>
+								$('.gallery-imgs').slick({
+									infinite: true,
+									arrows: true,
+									dots: false,
+								});
+
+								$('.gallery-imgs').on('afterChange', function(event, slick, currentSlide, nextSlide) {
+
+									reset_dots_to_5(currentSlide)
+								})
+
+								reset_dots_to_5(0)
+
+
+								function reset_dots_to_5(currentSlide) {
+									$(".dots_to_5 .item.active").removeClass("active")
+									$(".dots_to_5 .item").eq(currentSlide).addClass("active")
+
+									$(".dots_to_5 .item.active").each(function(index) {
+										$(this)
+											.prevAll(".item").attr("data-index", function(i) {
+												return (index - i - 1);
+											}).end()
+											.nextAll(".item").attr("data-index", function(i) {
+												return index + i + 1;
+											}).end()
+											.attr("data-index", index);
+									});
+								}
+
+							</script>
+
+							<style>
+
+								.dots_to_5 {
+									display: flex;
+									gap: 10px;
+									position: absolute;
+									bottom: 15px;
+									align-items: center;
+									justify-content: center;
+									width: 100%;
+								}
+
+								.dots_to_5 .item {
+									background: white;
+									border-radius: 100%;
+									display: none;
+									transition: all 0.3s ease;
+								}
+
+								.dots_to_5 .item[data-index="0"] {
+									opacity: 1;
+									width: 12px;
+									height: 12px;
+									display: block;
+								}
+
+								.dots_to_5 .item[data-index="-2"], .dots_to_5 .item[data-index="2"] {
+									opacity: 0.5;
+									width: 5px;
+									height: 5px;
+									display: block;
+								}
+
+								.dots_to_5 .item[data-index="-1"], .dots_to_5 .item[data-index="1"] {
+									opacity: 0.7;
+									width: 7px;
+									height: 7px;
+									display: block;
+								}
+
+								.card-gallery {
+									position: relative;;
+								}
+
+								.card-gallery .gallery-imgs img {
+									width: 100%;
+									height: auto;
+									object-fit: contain;
+								}
+
+
+
+								.card-gallery .gallery-imgs.slick-initialized {
+									max-height: 468px;
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .slick-prev, .slick-next {
+									font-size: 0;
+									line-height: 0;
+									position: absolute;
+									top: 50%;
+									display: block;
+									width: 60px;
+									height: 496px;
+									margin-top: -233px;
+									padding: 0;
+									cursor: pointer;
+									color: transparent;
+									border: none;
+									outline: none;
+									background: transparent;
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .img_container {
+									height: 496px;
+									display: flex;
+									align-items: center;
+									background: #767676;
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .slick-prev::before,
+								.card-gallery .gallery-imgs.slick-initialized .slick-next::before {
+									content: url("/static/img/arrow_mini_slider.svg") !important;
+									display: block;
+									opacity: 0;
+									width: min-content;
+								}
+
+								.card-gallery:hover .slick-prev::before {
+									transform: rotate(180deg) scale(2) translateX(-8px);
+									opacity: 1 !important;
+								}
+
+								.card-gallery:hover .slick-next::before {
+									transform: rotate(0deg) scale(2) translateX(10px);
+									opacity: 1 !important;
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .slick-prev:hover {
+									background: linear-gradient(-90deg, transparent, #00000066);
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .slick-next:hover {
+									background: linear-gradient(90deg, transparent, #00000066);
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .slick-prev {
+									left: 0;
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .slick-next {
+									right: 0;
+								}
+
+								.card-gallery .gallery-imgs.slick-initialized .slick-dots {
+									bottom: -25px;
+								}
+
+								@media (max-width: 1000px) {
+									.card-gallery .gallery-imgs.slick-initialized {
+										height: 236px;
+										margin-bottom: 48px;
+										margin-top: 10px;
+									}
+
+									.card-gallery .gallery-imgs.slick-initialized .slick-prev, .slick-next {
+										height: 278px;
+										margin-top: -128px;
+									}
+
+
+									.card-gallery .gallery-imgs.slick-initialized .img_container {
+										height: 278px;
+									}
+
+									.card-gallery .gallery-imgs.slick-initialized .slick-dots {
+										bottom: -45px;
+									}
+								}
+
+							</style>
+
+							<div class="hotel-top__left price_and_select_nubmer">
+								<div class="price">от {{data.min_price}} ₽</div>
+								<button class="hotel-top__button">
+									<a style="color: unset;"href="#grupe_rooms">Выбрать номер</a>
+								</button>
+							</div>
+
+							<div class="card-gallery__info">
+								<div class="tour-review tour-review--card-inner">
+									<div class="tour-review__block tour-review__block--row">
+										<div class="tour-review__left">
+											<div class="tour-review__num">{{data.hotel.rating_stat}}</div>
+											<div class="tour-review__info">
+												<p class="tour-review__info-label">{{data.hotel.rating_stat_text}}</p>
+												<p class="tour-review__info-count">{{data.hotel.reviews_amount}} отзывов</p>
+											</div>
+										</div><a class="tour-review__button"
+											href="#review_list">Смотреть все отзывы</a>
+									</div>
+								</div>
+								<div class="card-gallery__info-text">{{data.hotel.descriptions}}</div>
+								<div class="hotel_servers">
+									<div class="hotel_servers_name">Главные удобства {{data.hotel.type_hotel.servers}}</div>
+									<div class="hotel_servers_grupe">
+										{% for item in data.hotel.services_mini %}
+										<div class="hotel_servers_item сheck_mark_text">
+											<img src="{{item.icon}}" alt="">
+											<span>
+												{{item.name}}
+											</span>
+
+										</div>
+										{% endfor %}
+										<a class="view_all_amenities"
+											href="#hservices_list">Смотреть все удобства объекта</a>
+
+									</div>
+								</div>
+								<div class="card-gallery__info-price">
+									<div class="price">от {{data.min_price}} ₽</div>
+									<button class="hotel-top__button"><a style="color: unset;"
+											href="#grupe_rooms">Показать цены</a></button>
+								</div>
+							</div>
+
+							<style>
+								@media screen and (max-width: 1024px) {
+									.form-search__label.form-search__label--date {
+										display: -webkit-box;
+										width: auto
+									}
+									.card-gallery__info-price .price {
+										display: none !important;
+									}
+
+									.text_select_the_number_of_rooms {
+										font-size: 18px;
+										font-weight: 500;
+									}
+
+									.card-gallery__info-price {
+										display: none !important;
+									}
+
+									.tour-review__button {
+										display: none !important;
+									}
+
+									.calculation_of_the_price_of_a_multi_booking.empty {
+										display: none !important;
+									}
+								}
+
+
+
+								.popup_room_info_services_catalog_item::before {
+									content: "";
+									top: 4px;
+									left: 0;
+									width: 19px;
+									height: 12px;
+									background-repeat: no-repeat;
+								}
+
+
+								.hotel_servers_name {
+									font-family: 'Manrope';
+									font-style: normal;
+									font-weight: 500;
+									font-size: 22px;
+									line-height: 30px;
+									/* identical to box height */
+									color: #000000;
+								}
+
+								.hotel_servers_item {
+									font-family: 'Manrope';
+									font-style: normal;
+									font-weight: 400;
+									font-size: 14px;
+									line-height: 22px;
+									color: #000000;
+								}
+
+								.hotel_servers_grupe {
+									width: 100%;
+									height: 100%;
+									display: flex;
+									flex-direction: column;
+									margin-top: 10px;
+									gap: 10px;
+								}
+
+								.сheck_mark_text {
+									display: flex;
+									align-items: center;
+									gap: 5px;
+								}
+
+								.сheck_mark_text::before {
+									content: "";
+									width: 15px;
+									height: 12px;
+									display: inline-block;
+									margin-right: 5px;
+									background-image: url(/static/img/allow.svg);
+									background-repeat: no-repeat;
+								}
+
+								.view_all_amenities {
+									display: flex;
+									align-items: center;
+									color: #fc7201;
+								}
+							</style>
+						</div>
+					</div>
+
+					<style>
+						.calculation_of_the_price_of_a_multi_booking {
+							width: 100%;
+							display: flex;
+							flex-direction: column;
+							padding: 15px 15px;
+							background: #fff;
+							border-radius: 13px;
+							margin-bottom: 20px;
+							gap: 5px;
+							box-shadow: 0px 0px 5px 0px rgba(255, 135, 0, 0.3);
+						}
+
+						.calculation_of_the_price_of_a_multi_booking > .item {
+							background: #e4e4e4;
+							padding: 5px;
+							border-radius: 10px;
+						}
+
+						.calculation_of_the_price_of_a_multi_booking .final_panel_price {
+							display: flex;
+							width: 100%;
+							align-items: center;
+							justify-content: space-between;
+							font-weight: 600;
+							font-size: 24px;
+							line-height: 33px;
+							color: #07151C;
+						}
+
+						.calculation_of_the_price_of_a_multi_booking .final_panel_price .button {
+							padding: 12px 20px;
+							border-radius: 8px;
+							color: white;
+						}
+
+						#popup_calculation_of_the_price_of_a_multi_booking {
+							display: none;
+						}
+
+						.price_and_select_nubmer {
+							display: none;
+						}
+
+
+						@media screen and (max-width: 1025px) {
+
+
+							.hotel-top__location {
+								flex-wrap: wrap;
+							}
+
+							.hotel-top__location .address_text {
+								width: 92%;
+							}
+
+							.no_price_and_select_nubmer {
+								display: none;
+							}
+
+							.price_and_select_nubmer {
+								display: flex;
+								flex-direction: row;
+								align-items: center;
+								justify-content: space-between;
+								padding: 0 10px;
+								margin-top: -11px;
+							}
+							.price_and_select_nubmer .price {
+								font-size: 18px;
+							}
+
+							.price_and_select_nubmer button {
+								width: 134px;
+								height: 45px;
+								background: #FC7201;
+								border-radius: 5px;
+								font-weight: 600;
+								font-size: 14px;
+								line-height: 22px;
+								color: #FFFFFF;
+							}
+
+							.calculation_of_the_price_of_a_multi_booking > .item > .name > .beds{
+								display: none !important;
+							}
+
+							.calculation_of_the_price_of_a_multi_booking > .item > .name > span{
+								font-size: 16px !important;
+								margin-right: 10px !important;
+							}
+
+							.calculation_of_the_price_of_a_multi_booking > .item {
+								display: flex !important;
+								align-items: flex-start !important;
+								justify-content: space-between !important;
+								flex-direction: column !important;
+							}
+
+							.calculation_of_the_price_of_a_multi_booking > .item > .price {
+								font-size: 16px !important;
+								display: flex;
+								width: 100%;
+								font-weight: 400;
+								justify-content: space-between;
+							}
+
+							.calculation_of_the_price_of_a_multi_booking > .final_panel_price {
+								flex-direction: column !important;
+							}
+
+							.calculation_of_the_price_of_a_multi_booking > .final_panel_price > .count {
+								font-size: 13px !important;
+								line-height: 22px;
+							}
+
+							.calculation_of_the_price_of_a_multi_booking > .final_panel_price > .price {
+								line-height: 30px;
+								font-size: 17px !important;
+							}
+
+							#popup_calculation_of_the_price_of_a_multi_booking {
+								align-items: center;
+								background: #eaeaeae6;
+								bottom: 0;
+								display: flex;
+								flex-direction: row;
+								height: 76px;
+								justify-content: space-between;
+								padding: 10px;
+								position: fixed;
+								width: 100%;
+								z-index: 1040;
+							}
+
+							#popup_calculation_of_the_price_of_a_multi_booking .bulochka_in_popup {
+								height: 40px;
+								width: 107px;
+								border-radius: 5px;
+								color: white;
+							}
+
+							#popup_calculation_of_the_price_of_a_multi_booking .text {
+								display: flex;
+								flex-direction: column;
+								justify-content: center;
+							}
+						}
+
+						.button_select {
+							height: 45px;
+							width: 100%;
+							border: 1px solid #D2D2D2;
+							border-radius: 5px;
+							padding-left: 14px;
+							padding-right: 14px;
+							position: relative;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							font-weight: 400;
+							font-size: 12px;
+							line-height: 17px;
+							text-align: center;
+							text-decoration: none;
+							-webkit-transition: 200ms ease;
+							-o-transition: 200ms ease;
+							transition: 200ms ease;
+							color: #000000;
+							background: #ffffff;
+							cursor: pointer;
+
+							-webkit-appearance: none;
+							-moz-appearance: none;
+							-o-appearance: none;
+							appearance: none;
+						}
+
+						.button_select option {
+							color: black;
+							background-color: white;
+						}
+
+						.button_select::-ms-expand {
+							display: none;
+						}
+					</style>
+
+
+					<div class="card-inner__body">
+						{% include "main/form_search_detal_hotel_dev.html" %}
+
+						<div class="calculation_of_the_price_of_a_multi_booking" id="cotpoamb"></div>
+
+						<script defer>
+							$(document).ready(function () {
+								$("#grupe_rooms").on("change.select_count", "select.count", function () {
+									set_cpmb()
+								});
+								set_cpmb()
+							});
+
+							function set_cpmb() {
+								rooms = []
+								cpmb = $(".calculation_of_the_price_of_a_multi_booking")
+								$(cpmb).html("")
+								sum_count_room = 0
+								rcs_list = []
+								sum_count_price = 0
+
+								$("#grupe_rooms > .filter-result").map(function () {
+									name_room = $(this).find(".filter-result__name").text()
+									count = parseInt($(this).find("select.count").val())
+
+									if (count == 0) {
+										$(this).find("select.count").removeClass("nofirstselect")
+									}
+									else {
+										$(this).find("select.count").addClass("nofirstselect")
+									}
+
+									room_price = parseInt($(this).find(".filter-result__price [data-value]").data("value"))
+									beds = $(this).find(".filter-result__text").text()
+									sum_count_room += count
+									full_price = count * room_price
+									sum_count_price += full_price
+									if (count > 0) {
+										rcs_list.push($(this).data("rc") + "." + count)
+										var elem = $(`
+										<div class="item" style=" display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+											<span class="name" style="display: flex;flex-direction: column; margin-right: 21px;">
+												<span class="name" style="font-size: 18px;font-weight: 600;">${name_room}</span>
+												<span class="beds" style=" color: #7a7a7a; max-width: 334px; ">${beds}</span>
+											</span>
+											<span class="price" style=" font-size: 22px; display: flex; max-width: 676px; width: 100%; justify-content: space-between; ">
+											<span class="room_price">${room_price} ₽</span>
+											<span>*</span>
+											<span class="count">${count}</span>
+											<span>=</span>
+											<span class="full_price">${full_price} ₽</span>
+											</span>
+										</div>
+										`)
+										$(cpmb).append(elem)
+									}
+
+									$("#popup_calculation_of_the_price_of_a_multi_booking").remove()
+
+									if (rcs_list.length) {
+										$("body").append(`
+										<div id="popup_calculation_of_the_price_of_a_multi_booking">
+											<div class="text">
+												<span class="count">Выбрано: ${rcs_list.length}</span>
+												<span class="price">Цена: ${sum_count_price} ₽</span>
+											</div>
+											<a href="#cotpoamb" class="bulochka_in_popup button">Подробнее</a>
+										</div>
+										`)
+									}
+
+								});
+
+								url_to_book = "{% url 'hotel_room_to_book' %}"
+
+								data = {
+									"rcs": rcs_list.join("-")
+								}
+
+								qp = getQueryParams()
+
+								data = { ...data, ...qp };
+								qs = getQueryString(data)
+
+								url_to_book += "?" + qs
+
+								if (sum_count_room == 0) {
+									cpmb.addClass("empty")
+									$(cpmb).append(`
+									<div class="text_center" style="text-align: center; font-size: 22px;">
+										Выберите количество номеров
+									</div>
+									`)
+								}
+								else {
+									cpmb.removeClass("empty")
+									$(cpmb).append(`
+									<div class="final_panel_price">
+										<div class="count">Выбрано: ${sum_count_room}</div>
+										<div class="price">${sum_count_price} ₽</div>
+										<a href="${url_to_book}" class="button">Забронировать</a>
+									</div>
+									`)
+
+									$(".fast_booking_button").attr("href", url_to_book)
+								}
+							}
+						</script>
+
+						<style>
+							#loader_hotels .text {
+								animation: rotate_span 2s ease-in-out infinite;
+								animation-delay: 2s;
+								margin-top: 20px;
+								font-size: 20px;
+							  }
+
+							  @keyframes rotate_span {
+								0% {
+								  transform: rotate(0deg);
+								}
+								10% {
+								  transform: rotate(10deg);
+								}
+								20% {
+								  transform: rotate(0deg);
+								}
+								30% {
+								  transform: rotate(-10deg);
+								}
+								40% {
+								  transform: rotate(0deg);
+								}
+								100% {
+								  transform: rotate(0deg);
+								}
+							  }
+
+							  .spinner {
+								animation: rotate 2s linear infinite;
+								z-index: 2;
+								margin: -25px 0 0 -25px;
+								width: 50px;
+								height: 50px;
+								margin-right: auto;
+								margin-left: auto;
+								margin-top: 25px;
+							  }
+
+							  .spinner .path {
+								stroke: #FC7201;
+								stroke-linecap: round;
+								animation: dash 1.5s ease-in-out infinite;
+							  }
+
+							  @keyframes rotate {
+								100% {
+								  transform: rotate(360deg);
+								}
+							  }
+
+							  @keyframes dash {
+								0% {
+								  stroke-dasharray: 1, 150;
+								  stroke-dashoffset: 0;
+								}
+								50% {
+								  stroke-dasharray: 90, 150;
+								  stroke-dashoffset: -35;
+								}
+								100% {
+								  stroke-dasharray: 90, 150;
+								  stroke-dashoffset: -124;
+								}
+							  }
+						</style>
+
+						<div class="filter-list"
+							id="grupe_rooms">
+						</div>
+						<script defer>
+							grupe_rooms = $("#grupe_rooms")
+
+							function get_hotel_fillter() {
+								data = {
+									"hotel_id": "{{data.hotel.id}}",
+								}
+
+								qp = getQueryParams()
+								data = { ...data, ...qp };
+
+
+								$("#grupe_rooms").html(`
+								<div id="loader_hotels" style=" display: flex; flex-direction: column; align-items: center; ">
+									<svg class="spinner" viewBox="0 0 50 50">
+										<circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+									</svg>
+									<span class="text" style=" font-size: 20px; margin-top: 20px; ">Подбираем свободные варианты</span>
+								<div>
+								`)
+
+								// load_start()
+								$.ajax({
+									method: "GET",
+									data: data,
+									url: "{% url 'hotel_detailed_get_rooms' %}",
+									beforeSend: function (request) {
+										request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+									},
+									success: function (request) {
+										$(grupe_rooms).html("")
+										set_cpmb()
+										$(".hotel-top__left .price").text(`От ${request.min_price} ₽`)
+
+										$(".card-filter__bottom p").html(`${request.count_room} вариантов из ${request.all_count_room} подходят под фильтры`)
+										request.rooms.forEach(element => {
+											elem = $(element["html"])
+											$(grupe_rooms).append(elem)
+
+											slick_elem = $(elem).find('.carousel').slick({
+												dots: true,
+												slidesToScroll: 1,
+												slidesToShow: 1,
+											});
+
+
+											$(elem).find(".favorite_icon").click(function () {
+												$.ajax({
+													method: "POST",
+													data: { "rc": element["data"]["id"] },
+													url: "{% url 'ajax_toggle_favorite_hotel' %}",
+													beforeSend: function (request) {
+														request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+													},
+													success: function (request) {
+
+													}
+												});
+												$(this).toggleClass("active")
+											})
+
+										});
+
+										set_cpmb()
+
+										$(".carousel .slick-next").click()
+									}
+								});
+							}
+							get_hotel_fillter()
+						</script>
+						<div class="parametrs-list">
+							<style>
+								@media (min-width: 681px) and (max-width: 954px) {
+									.zen-roomspage-detailed-amenities-multi-list-wrapper {
+										-webkit-columns: 270px 2;
+										-moz-columns: 270px 2;
+										columns: 270px 2;
+										-webkit-column-gap: 35px;
+										-moz-column-gap: 35px;
+										column-gap: 35px;
+									}
+								}
+
+								@media (min-width: 955px) and (max-width: 1074px) {
+									.zen-roomspage-detailed-amenities-multi-list-wrapper {
+										-webkit-columns: 210px 3;
+										-moz-columns: 210px 3;
+										columns: 210px 3;
+										-webkit-column-gap: 20px;
+										-moz-column-gap: 20px;
+										column-gap: 20px;
+									}
+								}
+
+								@media (min-width: 1075px) {
+									.zen-roomspage-detailed-amenities-multi-list-wrapper {
+										-webkit-columns: 220px 4;
+										-moz-columns: 220px 4;
+										columns: 220px 4;
+										-webkit-column-gap: 20px;
+										-moz-column-gap: 20px;
+										column-gap: 20px;
+									}
+								}
+
+								.zen-roomspage-detailed-amenities-multi-list {
+									list-style: none;
+								}
+
+								[dir=ltr] .zen-roomspage-detailed-amenities-multi-list {
+									padding: 0 0 20px 15px;
+								}
+
+								[dir=rtl] .zen-roomspage-detailed-amenities-multi-list {
+									padding: 0 15px 20px 0;
+								}
+
+								@media (min-width: 681px) {
+									.zen-roomspage-detailed-amenities-multi-list {
+										-webkit-column-break-inside: avoid;
+										page-break-inside: avoid;
+										break-inside: avoid;
+									}
+								}
+
+								@media (max-width: 680px) {
+									.zen-roomspage-detailed-amenities-multi-list {
+										position: relative;
+									}
+
+									[dir] .zen-roomspage-detailed-amenities-multi-list {
+										padding: 0;
+									}
+
+									[dir=ltr] .zen-roomspage-detailed-amenities-multi-list {
+										padding-left: 15px;
+									}
+
+									[dir=rtl] .zen-roomspage-detailed-amenities-multi-list {
+										padding-right: 15px;
+									}
+
+									[dir] .zen-roomspage-detailed-amenities-multi-list:not(:last-child) {
+										margin-bottom: 9px;
+									}
+
+									.zen-roomspage-detailed-amenities-multi-list:not(:first-child)::after {
+										content: '';
+										height: 12px;
+										position: absolute;
+										top: 4px;
+										width: 12px;
+									}
+								}
+							</style>
+
+
+							<div class="zen-roomspage-detailed-amenities-multi-list-wrapper"
+								id="hservices_list">
+								{% for grupe in data.hotel.services %}
+								<ul class="zen-roomspage-detailed-amenities-multi-list">
+									<li class="zen-roomspage-detailed-amenities-multi-list-item">
+										<h3 class="zen-roomspage-detailed-amenities-multi-list-title">{{grupe.section}}</h3>
+									</li>
+									{% for item in grupe.items %}
+									<li id="hservices_item_{{item.id}}"
+										class="zen-roomspage-detailed-amenities-multi-list-item сheck_mark_text">{{item.name}}</li>
+									{% endfor %}
+								</ul>
+								{% endfor %}
+							</div>
+
+
+							<h2>{{data.hotel.type_hotel.map}} на карте</h2>
+							<div id="hotel_map"
+								style="width: 100%; height: 369px; background: #b1b1b1; border-radius: 15px; margin-bottom: 35px; margin-top: 20px;">
+							</div>
+
+							<style>
+								.metro_list {
+									display: flex;
+									flex-direction: column;
+								}
+
+								.metro_list .item {
+									gap: 6px;
+									display: flex;
+									align-items: center;
+								}
+
+								.metro_list .metro_icon {
+									width: 26px;
+								}
+							</style>
+
+							<h2>Что есть рядом</h2>
+							<div class="metro_list">
+								<h3>Метро</h3>
+								{% for metro in data.hotel.metros %}
+								<div class="item">
+									<img class="metro_icon" alt="metro_icon.png"
+										src="{% static 'img/metro_icon.png' %}">
+									<span class="name">{{metro.name}}</span> • <span class="dist">{{metro.distance}}</span>
+								</div>
+								{% endfor %}
+							</div>
+
+							<div class="poi_section">
+								<h3>Точки интереса</h3>
+								<div class="poi_list">
+
+								</div>
+							</div>
+
+
+							<style>
+								.favorite_icon {
+									width: 43px;
+									height: 43px;
+									box-sizing: border-box;
+								}
+
+								.favorite_icon path {
+									fill: #979797;
+									transition: fill 0.4s;
+								}
+
+								.favorite_icon.active path {
+									fill: #ff4b4b;
+								}
+
+								.ui-widget.ui-widget-content {
+									border: 1px solid #ffffff;
+								}
+
+								.ui-slider-horizontal .ui-slider-range-min {
+									background: #fc7201;
+								}
+
+								.ui-slider .ui-slider-handle {
+									height: 16px;
+									position: relative;
+									top: -4px;
+									width: 16px;
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									border: 1px solid #fc7201;
+									background: white;
+									color: white;
+									border-radius: 50%;
+								}
+							</style>
+
+						</div>
+
+
+						<style>
+							.review_section {
+								margin-top: 20px;
+							}
+
+							.s_block {
+								background: #fff;
+								border-radius: 13px;
+								overflow: hidden;
+								box-shadow: 0px 0px 18px 0px #D9D9D9;
+							}
+
+							.overall_rating {
+								display: flex;
+								flex-direction: row;
+								gap: 18px;
+							}
+
+
+							.overall_rating_1  {
+								padding: 15px;
+								width: 351px;
+								display: flex;
+								flex-direction: column;
+								align-items: center;
+								justify-content: center;
+							}
+
+							.overall_rating_1 .value {
+								display: flex;
+								gap: 12px;
+							}
+
+							.overall_rating_1 .value .number {
+								border-radius: 3px;
+								background: #17A1A1;
+								width: 55px;
+								height: 48px;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+
+								color: #FFF;
+								text-align: center;
+								font-size: 31px;
+								font-weight: 500;
+								line-height: 30px; /* 96.774% */
+							}
+
+							.overall_rating_1 .value .texts {
+								width: 90px;
+							}
+
+							.overall_rating_1 .value .texts .value {
+								color: #292F37;
+								font-size: 16px;
+								font-style: normal;
+								font-weight: 400;
+								line-height: 22.158px; /* 138.488% */
+								display: block;
+							}
+
+							.overall_rating_1 .value .texts .count {
+								color: #85878B;
+								font-size: 10px;
+								font-style: normal;
+								font-weight: 400;
+								line-height: 14.772px; /* 147.72% */
+							}
+
+							.overall_rating_1 .add_review {
+								border-radius: 5px;
+								background: #FFF;
+								box-shadow: 0px 0px 18px 0px #D9D9D9;
+								color: #FC7201;
+								text-align: center;
+								font-family: Manrope;
+								font-size: 15px;
+								font-style: normal;
+								font-weight: 700;
+								line-height: 19px;
+								text-transform: uppercase;
+								width: 100%;
+								padding: 5px;
+								margin-top: 10px;
+							}
+
+							.overall_rating_1 .add_review:hover {
+								background: #FC7201;
+								color: #FFF;
+							}
+
+
+							.ratings_progress  {
+								width: 100%;
+								display: flex;
+								flex-direction: row;
+								flex-wrap: wrap;
+								column-gap: 28px;
+								row-gap: 7px;
+
+								width: 100%;
+								padding: 21px 37px;
+							}
+
+							.ratings_progress .item {
+								display: flex;
+								flex-direction: column;
+								max-width: 251px;
+								width: 100%;
+							}
+
+							.ratings_progress .item .progress {
+								width: 100%;
+								height: 4px;
+								border-radius: 10px;
+								background: #E5E5E5;
+							}
+
+							.ratings_progress .item .progress .value {
+								border-radius: 10px;
+								background: #FC7201;
+								height: 100%;
+							}
+
+							.ratings_progress .item .text{
+								color: #292F37;
+								font-size: 14px;
+								font-weight: 400;
+								display: flex;
+								justify-content: space-between;
+								margin-top: 2px;
+							}
+
+							section.sorting {
+								display: flex;
+								flex-direction: column;
+								gap: 5px;
+								margin-top: 14px;
+							}
+
+							section.sorting .title {
+								color: #292F37;
+								font-size: 13px;
+								font-style: normal;
+								font-weight: 400;
+								line-height: 15px; /* 150% */
+								margin-left: 17px;
+							}
+
+							section.sorting select {
+								height: 33px;
+								max-width: 210px;
+								width: 100%;
+								border: 1px solid #D2D2D2;
+								border-radius: 11px;
+								padding-left: 7px;
+							}
+						</style>
+
+						<div class="review_section">
+							<section class="overall_rating">
+								<section class="overall_rating_1 s_block">
+									<div class="value">
+										<div class="number">7</div>
+										<div class="texts">
+											<div class="value">Супер</div>
+											<div class="count">Основано на <span class="count_value">403</span> отзывах гостей</div>
+										</div>
+									</div>
+									{% if review_date.active %}
+									<button class="add_review">Написать отзыв</button>
+									{% endif %}
+								</section>
+								<section class="overall_rating_2 s_block ratings_progress">
+									<div class="item purity">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Чистота</span>
+											<span class="value">0</span>
+										</div>
+									</div>
+									<div class="item location">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Расположение</span>
+											<span  class="value">0</span>
+										</div>
+									</div>
+									<div class="item food">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Питание</span>
+											<span  class="value">0</span>
+										</div>
+									</div>
+									<div class="item price_quality_ratio">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Цена/качество</span>
+											<span  class="value">0</span>
+										</div>
+									</div>
+									<div class="item number_quality">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Номер</span>
+											<span  class="value">0</span>
+										</div>
+									</div>
+									<div class="item service">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Обслуживание</span>
+											<span  class="value">0</span>
+										</div>
+									</div>
+									<div class="item hygiene_products">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Средства гигиены</span>
+											<span  class="value">0</span>
+										</div>
+									</div>
+									<div class="item wifi_quality">
+										<div class="progress">
+											<div class="value" style="width: 0%;"></div>
+										</div>
+										<div class="text">
+											<span>Wi-Fi</span>
+											<span  class="value">0</span>
+										</div>
+									</div>
+								</section>
+							</section>
+
+							<section class="sorting">
+								<span class="title">Сортировка отзывов</span>
+								<select name="" id="sorting_review">
+									<option value="creation_date">По дате создания</option>
+									<option value="low_rating">Низкая оценка</option>
+									<option value="high_rating">Высокая оценка</option>
+								</select>
+							</section>
+
+							<style>
+								.review_grupe {
+									margin-top: 20px;
+									display: flex;
+									flex-direction: column;
+									gap: 10px;
+								}
+
+								.review_grupe .review_item {
+									display: flex;
+									flex-direction: row;
+									gap: 18px;
+								}
+
+								.review_item .basic_info {
+									width: 264px;
+									display: flex;
+									flex-direction: column;
+									flex-shrink: 0;
+								}
+
+								.review_item .basic_info .username {
+									padding: 14px 20px;
+								}
+
+								.review_item .basic_info .type_review {
+									margin-left: 15px;
+									color: #292F37;
+									font-size: 10px;
+									font-weight: 400;
+								}
+
+								.review_item .basic_info .date {
+									margin-left: 15px;
+									color: #85878B;
+									font-size: 10px;
+									font-weight: 400;
+								}
+
+								.review_item .basic_info .rcategory {
+									margin-left: 15px;
+									color: #292F37;
+									font-size: 12px;
+									font-weight: 400;
+								}
+
+								.basic_review {
+									flex-grow: 1;
+									display: flex;
+									flex-direction: column;
+									gap: 12px;
+								}
+
+								.basic_review .rating_header {
+									display: flex;
+									flex-direction: row;
+									justify-content: space-between;
+									width: 100%;
+									align-items: center;
+									padding-left: 17px;
+									padding-right: 17px;
+									background: #17A1A1;
+									color: white;
+									height: 52px;
+								}
+
+								.basic_review .rating_header .value {
+									display: flex;
+									align-items: center;
+									gap: 11px;
+								}
+
+								.basic_review .rating_header .value .number {
+									background: #FC7201;
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									color: white;
+									font-size: 23px;
+									border-radius: 3px;
+									width: 52px;
+								}
+								.basic_review .rating_header .value .text {
+									color: #FFF;
+									font-size: 19px;
+									font-style: normal;
+									font-weight: 800;
+								}
+								.basic_review .rating_header .text_rating {
+									display: flex;
+									font-size: 14px;
+									flex-direction: column;
+									align-items: flex-end;
+								}
+
+								.basic_review .rating_header .text_rating .item {
+									display: flex;
+									flex-direction: row;
+									gap: 5px;
+								}
+							</style>
+
+							<style>
+								* {
+									user-select: none;
+								}
+
+								.basic_review .review_long_text {
+									display: flex;
+									flex-direction: column;
+									gap: 7px;
+									padding: 7px 14px;
+								}
+
+								.basic_review .review_long_text.what_is_good_text .title{
+									color: #1E8F02;
+								}
+
+								.basic_review .review_long_text.what_is_bad_text .title{
+									color: #DD111E;
+								}
+								.basic_review .review_long_text .collapse_the_response{
+									color: #17A1A1;
+									font-size: 19px;
+									cursor: pointer;
+								}
+
+								.basic_review .review_long_text.mini .body_text {
+									height: 64px;
+									overflow: hidden;
+									position: relative;
+								}
+
+								.basic_review .review_long_text.mini .body_text:before {
+									content: "";
+									display: block;
+									width: 100%;
+									height: 100%;
+									position: absolute;
+									background: linear-gradient(transparent 37%, white 111%);
+								}
+
+							</style>
+
+							<style>
+								.imgs_review {
+									padding: 7px 14px;
+								}
+								.imgs_review .imgs {
+									display: flex;
+									gap: 4px;
+									align-items: center;
+								}
+
+								.imgs_review .imgs img {
+									width: 49px;
+									height: 37px;
+									border-radius: 7px;
+								}
+
+								.imgs_review .imgs .all_photos {
+									width: 80px;
+									height: 24px;
+									border-radius: 7px;
+									border: 1px solid #D2D2D2;
+									background: #FFF;
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									font-size: 13px;
+
+								}
+
+							</style>
+
+							<style>
+								.view_the_hotel_response {
+									border-radius: 5px;
+									background: #17A1A1;
+									padding: 6px 13px;
+									color: white;
+									width: max-content;
+									cursor: pointer;
+									user-select: none;
+									z-index: 2;
+									position: relative;
+									display: block;
+								}
+
+								.hotel_response .base_hotel_response {
+									padding: 7px 14px;
+								}
+
+								.hotel_response.hide .base_hotel_response {
+									display: none;
+								}
+
+								.hotel_response .add_the_hotel_response{
+									width: 170px;
+									height: 45px;
+									background: rgb(252 114 1);
+									border-radius: 5px;
+									font-weight: 600;
+									font-size: 16px;
+									line-height: 22px;
+									color: rgb(255, 255, 255);
+									text-align: center;
+									justify-content: center;
+									align-items: center;
+									cursor: pointer;
+									margin-left: auto;
+
+									display: none;
+								}
+
+								.hotel_response.empty .view_the_hotel_response,
+								.hotel_response.empty .base_hotel_response
+								{
+									display: none;
+								}
+
+								.hotel_response.empty .add_the_hotel_response {
+									display: flex;
+								}
+
+							</style>
+
+							<section class="review_grupe">
+							</section>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+	</section>
+
+	<style>
+		.popup-review-photos {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgb(54 54 54);
+			display: none;
+			z-index: 999999;
+		}
+
+		.popup-review-photos__container {
+			width: 100vw;
+			height: 100vh;
+		}
+
+		.popup-review-photos .close {
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: 17px;
+			font-size: 47px;
+			cursor: pointer;
+			font-weight: bold;
+			z-index: 9999;
+			display: block;
+			line-height: 32px;
+			color: #ff4747;
+		}
+
+		.popup-review-photos__container .slide, .popup-review-photos__container img{
+			height: 100vh;
+			object-fit: contain;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.popup-review-photos__container .slick-dots {
+			bottom: 14px;
+		}
+	</style>
+
+	<div class="popup-review-photos">
+		<div class='close'>&#x2716;</div>
+		<div class="popup-review-photos__container">
+			<div class="swiper-container">
+				{% for img in data.hotel.imgs %}
+				<div class="slide">
+					<img src="{{img.url}}">
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$('.review_grupe').on('click', ".open-popup-review-photos", function() {
+			imgs = $(this).parents(".imgs_review").find("img")
+
+			$(".popup-review-photos__container").html("<div class='swiper-container'></div>")
+			imgs.map(function (index, img) {
+				let src = $(img).attr("src")
+				$(".popup-review-photos__container .swiper-container").append(`
+					<div class="slide">
+						<img src="${src}">
+					</div>
+				`)
+			})
+
+			$('.popup-review-photos').show();
+			$('.popup-review-photos .swiper-container').slick({
+				infinite: true,
+				arrows: false,
+				dots: true,
+			});
+		});
+
+		$("body").on('click', ".popup-review-photos .close", function () {
+			$('.popup-review-photos').hide();
+		});
+	</script>
+
+
+	<style>
+		.popup_review_add {
+			display: none;
+			max-width: 650px;
+			width: 100%;
+
+			min-height: 868px;
+			overflow: auto;
+			max-height: 98%;
+
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 9999999;
+			padding: 20px 18px;
+
+			-ms-overflow-style: none; /* IE and Edge */
+			scrollbar-width: none; /* Firefox */
+		}
+
+		.popup_review_add::-webkit-scrollbar {
+			display: none; /* Chrome, Safari and Opera */
+		}
+
+		.popup_review_add .popup_header {
+			display: flex;
+			align-items: center;
+			gap: 7px;
+		}
+
+		.popup_review_add .popup_header .text{
+			background: #17A1A1;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: 7px;
+			color: white;
+			padding: 7px;
+			font-size: 19px;
+		}
+
+		.popup_review_add .popup_header .close {
+			display: flex;
+			height: 54px;
+			align-items: center;
+			cursor: pointer;
+			width: 54px;
+			justify-content: center;
+			transition-duration: 0.3s;
+		}
+
+		.popup_review_add .popup_header .close:hover {
+			background: #f55123;
+		}
+
+		.popup_review_add .popup_header .close:hover path {
+			fill: #fff;
+		}
+
+		.popup_review_add .popup_body {
+			display: flex;
+			flex-direction: column;
+			margin-top: 18px;
+			gap: 12px;
+		}
+
+		.popup_review_add .popup_body > label {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		.popup_review_add .popup_body > label input,
+		.popup_review_add .popup_body > label select,
+		.popup_review_add .popup_body > label textarea {
+			border-radius: 10px;
+			border: 1px solid #D2D2D2;
+			background: #FFF;
+			padding: 5px 9px 5px 9px;
+			background-color: white;
+		}
+
+		.popup_review_add .popup_body > label textarea {
+			height: 100px;
+			min-height: 100px;
+			resize: vertical;
+		}
+
+		.popup_review_add .popup_body > label span {
+			color: #292F37;
+			font-size: 16px;
+			font-weight: 400;
+			display: block;
+		}
+
+		.popup_review_add .popup_body > label select {
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			background: url(/static/img/arrow-select.svg) no-repeat;
+			background-position: calc(100% - 13px) center;
+			padding: 5px 37px 5px 9px;
+		}
+
+		.popup_review_add .popup_body .rating_selection {
+			width: 100%;
+			min-height: 141px;
+		}
+
+		.popup_review_add .popup_body .input_photo_for_review_label {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.popup_review_add .popup_body .input_photo_for_review_label .input_text {
+			cursor: pointer;
+			border-radius: 8px;
+			background: #D9D9D9;
+			padding: 8px 11px;
+		}
+
+		.popup_review_add .popup_body .send_review_button {
+			background: #fc7201;
+			padding: 10px;
+			border-radius: 10px;
+			color: white;
+		}
+	</style>
+
+	<style>
+		.rating_selection.ratings_progress .item .progress {
+			height: 9px;
+		}
+
+		.rating_selection.ratings_progress .item .progress .noUi-connect {
+			background: #fc7201;
+		}
+
+		.rating_selection.ratings_progress .item .progress .noUi-origin:first {
+			display: none !important;
+		}
+
+		.rating_selection.ratings_progress .item .progress .noUi-origin::before,
+		.rating_selection.ratings_progress .item .progress .noUi-origin::after {
+			display: none !important;
+		}
+
+		.rating_selection.ratings_progress .item .progress .noUi-horizontal .noUi-handle {
+			width: 20px !important;
+			height: 20px !important;
+			right: -17px !important;
+			top: -7px !important;
+			border-radius: 100% !important;
+		}
+	</style>
+
+	<div class="popup_review_add s_block">
+		<div class="popup_header">
+			<div class="s_block text">
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+					<circle cx="20" cy="20" r="18.5" stroke="white" stroke-width="3"/>
+					<path d="M15.8 26.039L14.19 27.7696C13.9683 28.0079 13.7145 28.0613 13.4284 27.9299C13.1423 27.7985 12.9995 27.5632 13 27.2241V15.5049C13 15.091 13.1372 14.7366 13.4116 14.4417C13.686 14.1467 14.0155 13.9995 14.4 14H25.6C25.985 14 26.3147 14.1475 26.5891 14.4424C26.8635 14.7374 27.0005 15.0915 27 15.5049V24.5342C27 24.948 26.8628 25.3024 26.5884 25.5974C26.314 25.8923 25.9845 26.0395 25.6 26.039H15.8ZM20 23.7817C20.1983 23.7817 20.3647 23.7095 20.4991 23.565C20.6335 23.4205 20.7005 23.242 20.7 23.0293C20.7 22.8161 20.6328 22.6373 20.4984 22.4928C20.364 22.3483 20.1979 22.2763 20 22.2768C19.8017 22.2768 19.6353 22.3491 19.5009 22.4935C19.3665 22.638 19.2995 22.8166 19.3 23.0293C19.3 23.2425 19.3672 23.4213 19.5016 23.5658C19.636 23.7102 19.8021 23.7822 20 23.7817ZM20 20.772C20.1983 20.772 20.3647 20.6997 20.4991 20.5553C20.6335 20.4108 20.7005 20.2322 20.7 20.0195V17.0098C20.7 16.7966 20.6328 16.6177 20.4984 16.4733C20.364 16.3288 20.1979 16.2568 20 16.2573C19.8017 16.2573 19.6353 16.3296 19.5009 16.474C19.3665 16.6185 19.2995 16.7971 19.3 17.0098V20.0195C19.3 20.2327 19.3672 20.4115 19.5016 20.556C19.636 20.7005 19.8021 20.7725 20 20.772Z" fill="white"/>
+				</svg>
+				<span>Написать отзыв</span>
+			</div>
+			<div class="s_block close">
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+					<path d="M11.2453 9L17.5302 2.71516C17.8285 2.41741 17.9962 2.01336 17.9966 1.59191C17.997 1.17045 17.8299 0.76611 17.5322 0.467833C17.2344 0.169555 16.8304 0.00177586 16.4089 0.00140366C15.9875 0.00103146 15.5831 0.168097 15.2848 0.465848L9 6.75069L2.71516 0.465848C2.41688 0.167571 2.01233 0 1.5905 0C1.16868 0 0.764125 0.167571 0.465848 0.465848C0.167571 0.764125 0 1.16868 0 1.5905C0 2.01233 0.167571 2.41688 0.465848 2.71516L6.75069 9L0.465848 15.2848C0.167571 15.5831 0 15.9877 0 16.4095C0 16.8313 0.167571 17.2359 0.465848 17.5342C0.764125 17.8324 1.16868 18 1.5905 18C2.01233 18 2.41688 17.8324 2.71516 17.5342L9 11.2493L15.2848 17.5342C15.5831 17.8324 15.9877 18 16.4095 18C16.8313 18 17.2359 17.8324 17.5342 17.5342C17.8324 17.2359 18 16.8313 18 16.4095C18 15.9877 17.8324 15.5831 17.5342 15.2848L11.2453 9Z" fill="#F55123"/>
+				</svg>
+			</div>
+		</div>
+		<from class="popup_body">
+			<input type="hidden" name="hotel_id" value="{{ data.hotel.id }}" readonly>
+
+			<label>
+				<span>Выберите бронь:</span>
+				<select name="booking" id="">
+					{% for booking in review_date.bookings %}
+						<option value="{{booking.id}}">{{ booking.name }}</option>
+					{% endfor %}
+				</select>
+			</label>
+
+			<div class="s_block rating_selection ratings_progress">
+				<div class="item purity">
+					<div class="progress">
+					</div>
+					<div class="text">
+						<span>Чистота</span>
+						<span class="value">10</span>
+					</div>
+				</div>
+				<div class="item location">
+					<div class="progress">
+					</div>
+					<div class="text">
+						<span>Расположение</span>
+						<span  class="value">10</span>
+					</div>
+				</div>
+				<div class="item food">
+					<div class="progress">
+					</div>
+					<div class="text">
+						<span>Питание</span>
+						<span  class="value">10</span>
+					</div>
+				</div>
+				<div class="item price_quality_ratio">
+					<div class="progress">
+					</div>
+					<div class="text">
+						<span>Цена/качество</span>
+						<span  class="value">10</span>
+					</div>
+				</div>
+				<div class="item number_quality">
+					<div class="progress">
+					</div>
+					<div class="text">
+						<span>Номер</span>
+						<span  class="value">10</span>
+					</div>
+				</div>
+				<div class="item service">
+					<div class="progress">
+					</div>
+					<div class="text">
+						<span>Обслуживание</span>
+						<span  class="value">10</span>
+					</div>
+				</div>
+			</div>
+
+			<label>
+				<span>Средства гигиены:</span>
+				<select name="hygiene_products" id="">
+					<option value="отличный набор">отличный набор</option>
+					<option value="нормальный набор">нормальный набор</option>
+					<option value="плохой набор">плохой набор</option>
+					<option value="ужасный набор">ужасный набор</option>
+					<option value="не окалазось набора">не окалазось набора</option>
+					<option value="не пользовались">не пользовались</option>
+				</select>
+			</label>
+
+			<label>
+				<span>Качество Wi-Fi:</span>
+				<select name="wifi_quality" id="">
+					<option value="быстрый">быстрый</option>
+					<option value="с перебоями">с перебоями</option>
+					<option value="медленный">медленный</option>
+					<option value="не было">не было</option>
+					<option value="не пользовались">не пользовались</option>
+				</select>
+			</label>
+
+			<label>
+				<span style="color: #1E8F02;">Что было хорошо</span>
+				<textarea name="what_is_good_text" id="" cols="30" rows="10" placeholder="Ваши положительные  впечатления от проживания"></textarea>
+			</label>
+
+			<label>
+				<span style="color: #F55123;">Что было плохо</span>
+				<textarea name="what_is_bad_text" id="" cols="30" rows="10" placeholder="Ваши негативные  впечатления от проживания"></textarea>
+			</label>
+
+			<label for="input_photo_for_review" class="input_photo_for_review_label">
+				<div class="input_text">Загрузить фото</div>
+				<span class="input_hint">Выберите до 10 файлов </span>
+				<input type="file" ccept="image/*" multiple name="input_photo_for_review" id="input_photo_for_review" style="display: none;">
+			</label>
+
+			<button class="send_review_button">Отправить</button>
+		</form>
+	</div>
+
+	<script>
+
+		$(".input_photo_for_review_label .input_text").click(function() {
+			let input = $(this).next("input")
+			input.click()
+		})
+
+		$('.input_photo_for_review_label input').on('change', function() {
+			var countFiles = $(this)[0].files.length;
+			$('.input_photo_for_review_label .input_text').text(`Выбрано: ${countFiles} шт`);
+		});
+
+		$(".popup_review_add .close").click(function() {
+			$(".popup_review_add").hide()
+		})
+
+		$(".review_section .add_review").click(function() {
+			$(".popup_review_add").show()
+		})
+
+
+	</script>
+
+
+
+
+	<style>
+		.popup_room_info_services_catalog {
+			overflow: auto;
+			column-gap: 98px;
+			font-size: 12px;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			margin-left: 19px;
+			flex-grow: 1;
+			height: 100%;
+		}
+
+		.popup_room_info_services_catalog_item {
+			font-size: 14px;
+			height: min-content;
+		}
+
+		.popup_room .close {
+			position: absolute;
+			top: 0;
+			right: 10px;
+			font-size: 30px;
+		}
+
+		.carousel {
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		.slick-next {
+			right: 40px;
+		}
+
+		.slick-prev {
+			left: 20px;
+		}
+
+		.slick-dots li.slick-active button:before {
+			font-size: 15px;
+		}
+
+		.slick-dots li button:before {
+			font-size: 10px;
+			transition: all, .3s;
+		}
+
+		.carousel .item .overlay p.bold {
+			font-weight: bold;
+		}
+
+		.carousel .item .overlay p a {
+			color: #34ace8;
+			text-decoration: none;
+		}
+
+		.carousel .item h3 {
+			font-family: 'roboto slab';
+		}
+
+		.carousel .item {
+			position: relative;
+			width: 100%;
+		}
+
+		.carousel .item .imageContainer {
+			display: block;
+			height: 761px;
+			position: relative;
+			object-fit: contain;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background: #626262;
+		}
+
+		.carousel .item .imageContainer:before {
+			content: "";
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			z-index: 66;
+			width: 100%;
+			height: 100%;
+		}
+
+		.carousel .item img {
+			object-fit: cover;
+		}
+
+		.carousel .item .overlay {
+			z-index: 999;
+			position: absolute;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			color: #fff;
+			padding: 30px 0px 70px 0px;
+
+		}
+
+		.carousel .item .overlay h3 {
+			text-align: center;
+			font-size: 40px;
+			font-weight: 300;
+			padding-bottom: 20px;
+			width: 70%;
+			margin: 0 auto;
+		}
+
+		.carousel .item .overlay p {
+			text-align: center;
+			width: 60%;
+			margin: 0 auto;
+			font-size: 16px;
+			font-weight: 300;
+			line-height: 29px;
+			color: #fff;
+		}
+
+
+		.carousel .slick-dots {
+			position: absolute;
+			bottom: 10px;
+			z-index: 999;
+		}
+
+		.slick-dots li button:before {
+			color: #fff;
+		}
+
+		.slick-dots li.slick-active button:before {
+			color: #fff;
+		}
+
+		.popup_room {
+			background: rgba(0, 0, 0, 0.5);
+			height: 100%;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 1050;
+		}
+
+		.popup_room_main {
+			width: 100%;
+			height: 761px;
+			display: flex;
+			position: relative;
+			background: white;
+		}
+
+		.popup_room_info {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			width: 463px;
+			height: 100%;
+		}
+
+		.popup_room_info_name {
+			font-size: 22px;
+			margin-left: 19px;
+			margin-right: 40px;
+		}
+
+		.popup_room_info_beds {
+			font-size: 15px;
+			margin-left: 19px;
+		}
+
+		.popup_room_info_square {
+			font-size: 20px;
+			margin-left: 19px;
+		}
+
+		.popup_room_room {
+			font-size: 20px;
+		}
+
+		.popup_room_info_price {
+			background: #eaf6df;
+			padding: 10px;
+			width: 100%;
+			font-size: 28px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 42px;
+		}
+
+		.popup_room_info_price_info {
+			line-height: 19px;
+		}
+
+		.valueadds {
+			padding-top: 20px;
+			padding-left: 25px;
+			font-size: 16px;
+			border-top: 3.2px solid #cecece;
+		}
+
+
+		img[alt="Загрузка изображения"]::after {
+			content: ".";
+			animation: dots 1s steps(3) infinite;
+		}
+
+		@keyframes dots {
+
+			0%,
+			40% {
+				content: ".";
+			}
+
+			50%,
+			90% {
+				content: "..";
+			}
+
+			100% {
+				content: "...";
+			}
+		}
+
+		.popup_room_info_price_value {
+			font-size: 28px;
+		}
+
+		@media (max-width: 1000px) {
+			.popup_room .popup_room_info {
+				width: 100%;
+			}
+
+			.popup_room_main {
+				flex-direction: column !important;
+				height: 100% !important;
+			}
+
+			.popup_room_info {
+				height: 69% !important;
+			}
+
+			.slick-slider {
+				margin-bottom: 0;
+			}
+
+			.carousel .item .imageContainer {
+				height: auto;
+			}
+
+			.valueadds {
+				font-size: 13px;
+			}
+
+			.popup_room_info_name {
+				font-size: 20px;
+				margin-left: 19px;
+				font-weight: 600;
+				display: block;
+				line-height: 23px;
+				margin-right: 0px;
+			}
+
+			.popup_room_info_beds {
+				font-size: 15px;
+				margin-left: 19px;
+			}
+
+			.popup_room_info .valueadds {
+				padding-top: 20px;
+				padding-left: 25px;
+				font-size: 13px;
+				border-top: 3.2px solid #cecece;
+			}
+
+			.popup_room_info_square {
+				font-size: 16px;
+				margin-left: 19px;
+				font-weight: 600;
+			}
+
+			.popup_room_info_price_value {
+					font-size: 28px;
+				font-weight: 600;
+			}
+		}
+	</style>
+
+	<script defer>
+		function open_popup(id) {
+			$(`#room_${id}`).show();
+			$('.carousel').find(".slick-next").click()
+		}
+
+
+		var marker_icon = L.icon({
+			iconUrl: '{% static "img/marker.svg" %}',
+			iconSize: [17, 20], // size of the icon
+		});
+
+
+		map = L.map('hotel_map').setView([{{ data.hotel.coordinates }}], 17);
+
+		L.tileLayer('https://tile-a.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		}).addTo(map);
+
+		$(".leaflet-attribution-flag").remove()
+
+		marker = L.marker([{{ data.hotel.coordinates }}], { icon: marker_icon });
+		marker.addTo(map);
+
+	</script>
+
+	<script>
+
+		function distance_cords(coord1, coord2) {
+			const R = 6371; // Радиус Земли в километрах
+			const dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
+			const dLon = (coord2[1] - coord1[1]) * Math.PI / 180;
+			const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+			  Math.cos(coord1[0] * Math.PI / 180) * Math.cos(coord2[0] * Math.PI / 180) *
+			  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+			const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+			const d = R * c; // Расстояние в километрах
+			return d;
+		}
+
+
+		let coordinates = [{{ data.hotel.coordinates }}];
+
+		let lon_coordinates = coordinates[1];
+		let lat_coordinates = coordinates[0];
+
+		$.get(`https://api.opentripmap.com/0.1/ru/places/radius?radius=5000&lon=${lon_coordinates}&lat=${lat_coordinates}&format=json&limit=10&apikey=5ae2e3f221c38a28845f05b6bda7d5b3beb3d838ff53d8a5e91ea48d`, function(data) {
+			let poi_list = $('.poi_list');
+
+			data.forEach(function(poi) {
+				let distance;
+				if (poi.dist < 1000) {
+					distance = poi.dist.toFixed(2) + ' м';
+				} else {
+					distance = (poi.dist / 1000).toFixed(2) + ' км';
+				}
+
+				let name = poi.name;
+				if (name != "") {
+					let $poiItem = $('<div class="item">').text(`${name} • ${distance}`);
+					poi_list.append($poiItem);
+				}
+
+			});
+		});
+	</script>
+
+
+	<script src="/static/js/comment.js"></script>
+
+	<link rel="stylesheet" href="{% static 'noUiSlider/nouislider.min.css' %}">
+	<script src="{% static 'noUiSlider/nouislider.min.js' %}"></script>
+
+	<script src="/static/js/detailed_hotel.js"></script>
+</main>
+{% endblock content %}

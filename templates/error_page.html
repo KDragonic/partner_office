@@ -1,0 +1,21 @@
+{% extends "main/base.html" %}
+{% load static form menu %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div id="message_status"><span class="status">{{ status }}</span>{% if message %}:{{message}}{% endif %}</div>
+
+<div style="display: none;">{{debug_error}}</div>
+
+<style>
+  #message_status {
+    height: 68vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 59px;
+    color: #989898;
+  }
+</style>
+
+{% endblock content %}

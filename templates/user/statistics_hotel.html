@@ -1,0 +1,97 @@
+{% extends "template/base_profile.html" %}
+{% load form static %}
+{% block main_block %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  .info_card {
+    min-height: 100px;
+    min-width: 229px;
+    max-width: 278px;
+    padding: 20px;
+    background: white;
+    border: 3px solid #9a9a9a;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info_card .val {
+    font-size: 23px;
+  }
+
+  .grupe_info_card {
+    gap: 10px;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: row;
+  }
+</style>
+
+
+<div class="section">
+  <span class="title">Краткая статистика отеля</span>
+
+  <div class="grupe_info_card">
+    <div class="info_card">
+      <div class="name">Количество броней</div>
+      <div class="val">235</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section">
+  <span class="title">Диаграммы</span>
+  <canvas id="myChart" style="width: 400px;"></canvas>
+</div>
+
+<script>
+
+  booking_label = [
+    // {% for key in bookings.keys  %}
+    "{{key}}",
+    // {% endfor %}
+  ]
+
+  booking_val = [
+    // {% for val in bookings.values  %}
+    {{ val }},
+    // {% endfor %}
+  ]
+
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: booking_label,
+      datasets: [{
+        label: 'Брони',
+        data: booking_val,
+
+        backgroundColor: [
+          "rgba(85, 211, 156, 0.2)",
+          "rgba(96, 192, 255, 0.2)",
+          "rgba(84, 211, 156, 0.2)",
+          "rgba(179, 186, 196, 0.2)",
+          "rgba(211, 65, 65, 0.2)",
+        ],
+        borderColor: [
+          "rgba(85, 211, 156, 1)",
+          "rgba(96, 192, 255, 1)",
+          "rgba(84, 211, 156, 1)",
+          "rgba(179, 186, 196, 1)",
+          "rgba(211, 65, 65, 1)",
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: false
+    }
+  });
+</script>
+
+
+{% endblock main_block %}

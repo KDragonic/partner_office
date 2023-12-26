@@ -1,0 +1,1103 @@
+{% extends 'user/v2/base.html' %}
+{% load cards menu form %}
+{% block main_block %}
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU&apikey=e964d90a-5747-4eb6-ac44-28cbfcca4dab" type="text/javascript"></script>
+
+  <style>
+    .hotel_mini_card {
+      display: flex;
+      padding: 15px;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media screen and (max-width: 766px) {
+      .block_card .hotel_mini_card .edit_button {
+        flex-grow: 1;
+      }
+    }
+
+    .hotel_mini_card img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .hotel_mini_card .name_hotel {
+      color: #000;
+      font-size: 18px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .hotel_mini_card .status_hotel_label {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .status_hotel_label[data-status='Удалён'] .status_hotel {
+      color: red;
+    }
+
+    .status_hotel_label[data-status='На модерации'] .status_hotel {
+      color: #d0a100;
+    }
+
+    .status_hotel_label[data-status='Выключен'] .status_hotel {
+      color: gray;
+    }
+
+    .status_hotel_label[data-status='Активен'] .status_hotel {
+      color: #00d200;
+      font-size: 19px;
+    }
+
+    .doc_hotel_label {
+      cursor: pointer;
+      color: blue;
+    }
+
+    .doc_hotel_label:hover {
+      color:#9d9dff;
+    }
+  </style>
+
+  <style>
+    .grupe_input label.checkradion_and_text {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-items: center;
+    }
+
+    .grupe_input label.checkradion_and_text .name {
+      text-wrap: nowrap;
+      opacity: 0.5;
+    }
+
+    .grupe_input label.checkradion_and_text .checkbox {
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      box-shadow: 0px 0px 18px 0px #D9D9D9, 0px 4px 4px 0px rgba(0, 0, 0, 0.25);;
+      flex-shrink: 0;
+      border-radius: 5px;
+    }
+
+    .grupe_input label.checkradion_and_text.active .checkbox {
+      background: #fc7201;
+      border: none;
+    }
+
+    .grupe_input label.checkradion_and_text.active .name {
+      opacity: 1;
+    }
+
+
+    .grupe_input label.checkradion_and_text input {
+      opacity: 0.5;
+      pointer-events: none;
+      height: 45px;
+      width: 100%;
+      border: 1px solid #D2D2D2;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .grupe_input label.checkradion_and_text.active input {
+      opacity: 1;
+      pointer-events: initial;
+    }
+
+  </style>
+
+  <style>
+    .button_nav_section .item {
+      padding: 5px;
+      background: #FFF;
+      filter: drop-shadow(0px 0px 18px #D9D9D9);
+      color: #868695;
+      font-family: Manrope;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 19px;
+      border-radius: 5px;
+      text-decoration-line: underline !important;
+    }
+
+    .button_nav_section .item.active {
+      color: #FFF;
+      background: #FC7201;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-12 p-1 d-flex d-lg-none">
+      <div class="block_card icontext" style="background: linear-gradient(90deg, #7BF8F8 1.08%, #F9CCA8 81.21%); padding: 14px; min-height: 0; width: 100%;">
+        <div class="body_block_card" style=" display: flex; flex-direction: row-reverse; justify-content: space-between; ">
+          <div class="icon border-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="39" height="30" viewBox="0 0 39 30" fill="none">
+              <g clip-path="url(#clip0_0_354)">
+                <path d="M36.1187 30H2.98C2.19149 29.9948 1.43674 29.6793 0.87905 29.1218C0.321359 28.5644 0.00556802 27.8098 0 27.0213L0 8.42375C0.0052372 7.63524 0.320711 6.88049 0.878168 6.3228C1.43563 5.76511 2.19024 5.44932 2.97875 5.44375H36.1187C36.9073 5.44899 37.662 5.76446 38.2197 6.32192C38.7774 6.87938 39.0932 7.63399 39.0987 8.4225V27.0238C39.0987 27.4146 39.0218 27.8016 38.8722 28.1627C38.7226 28.5238 38.5034 28.8519 38.227 29.1283C37.9507 29.4046 37.6226 29.6239 37.2615 29.7734C36.9004 29.923 36.5133 30 36.1225 30H36.1187ZM2.98 7.43125H2.97125C2.71034 7.43125 2.46012 7.53489 2.27563 7.71938C2.09114 7.90387 1.9875 8.15409 1.9875 8.415V27.0338C1.9875 27.5775 2.4275 28.0175 2.97125 28.0175H36.1287C36.3897 28.0175 36.6399 27.9139 36.8244 27.7294C37.0089 27.5449 37.1125 27.2947 37.1125 27.0338V8.415C37.1125 8.15409 37.0089 7.90387 36.8244 7.71938C36.6399 7.53489 36.3897 7.43125 36.1287 7.43125H36.1187H2.98ZM28.3312 2.38375V2.38875C28.3312 2.67187 28.2188 2.94339 28.0186 3.14359C27.8184 3.34378 27.5469 3.45625 27.2637 3.45625H11.8375C11.5544 3.45625 11.2829 3.34378 11.0827 3.14359C10.8825 2.94339 10.77 2.67187 10.77 2.38875V2.37875C10.77 1.78875 11.2487 1.31125 11.8375 1.31125H27.2587C27.5391 1.32347 27.8046 1.44022 28.0031 1.6385C28.2016 1.83677 28.3187 2.10346 28.3312 2.38375ZM32.0662 3.17875V3.19625C32.0662 4.08625 31.345 4.8075 30.455 4.8075H30.4362H30.42C30.2084 4.8075 29.9989 4.76582 29.8034 4.68485C29.6079 4.60388 29.4303 4.48519 29.2807 4.33558C29.1311 4.18596 29.0124 4.00833 28.9314 3.81285C28.8504 3.61736 28.8087 3.40784 28.8087 3.19625V3.1775V1.61125C28.8087 0.72125 29.53 0 30.42 0H30.4387H30.455C31.345 0 32.0662 0.72125 32.0662 1.61125V1.63V1.62875V3.17875ZM10.2912 3.17875V3.19625C10.2912 4.08625 9.57 4.8075 8.68 4.8075H8.66125H8.645C8.21767 4.8075 7.80784 4.63774 7.50567 4.33558C7.20351 4.03341 7.03375 3.62358 7.03375 3.19625V3.1775V1.61125C7.03375 0.72125 7.755 0 8.645 0H8.66375H8.6625H8.68C9.57 0 10.2912 0.72125 10.2912 1.61125V1.63V1.62875V3.17875ZM37.2725 2.38375V2.38875C37.2725 2.67187 37.16 2.94339 36.9598 3.14359C36.7596 3.34378 36.4881 3.45625 36.205 3.45625H33.5337C33.2506 3.45625 32.9791 3.34378 32.7789 3.14359C32.5787 2.94339 32.4662 2.67187 32.4662 2.38875V2.37875C32.4662 1.78875 32.945 1.31125 33.5337 1.31125H36.2C36.4803 1.32347 36.7459 1.44022 36.9444 1.6385C37.1429 1.83677 37.26 2.10346 37.2725 2.38375ZM6.59625 2.38375V2.38875C6.59625 2.67187 6.48378 2.94339 6.28359 3.14359C6.08339 3.34378 5.81187 3.45625 5.52875 3.45625H2.89625C2.61313 3.45625 2.34161 3.34378 2.14141 3.14359C1.94122 2.94339 1.82875 2.67187 1.82875 2.38875V2.37875C1.82875 1.78875 2.3075 1.31125 2.89625 1.31125H5.5625C5.83881 1.32492 6.0995 1.44351 6.29137 1.64281C6.48324 1.84211 6.59309 2.10712 6.59625 2.38375Z" fill="#FC7201"></path>
+                <path d="M7.07254 18.1977V20.6977H9.49629V18.1977H10.9663V24.7152H9.49629V21.9727H7.07254V24.7152H5.60254V18.1977H7.07254ZM18.2388 21.379C18.2841 21.8157 18.2372 22.257 18.1012 22.6745C17.9651 23.0919 17.7428 23.4761 17.4488 23.8021C17.1548 24.1282 16.7956 24.3889 16.3944 24.5673C15.9932 24.7457 15.5591 24.8378 15.12 24.8377L15.0138 24.8365H15.0188H14.9825C14.5571 24.8367 14.1363 24.7475 13.7475 24.5746C13.3588 24.4018 13.0106 24.1493 12.7257 23.8333C12.4407 23.5174 12.2253 23.1451 12.0934 22.7406C11.9615 22.3361 11.9161 21.9084 11.96 21.4852L11.9588 21.4977C11.9221 21.0628 11.9761 20.625 12.1174 20.212C12.2587 19.799 12.4841 19.4198 12.7795 19.0985C13.0749 18.7771 13.4338 18.5206 13.8334 18.3451C14.2331 18.1696 14.6648 18.079 15.1013 18.079H15.14H15.1375L15.2138 18.0777C15.6357 18.0777 16.053 18.1657 16.439 18.336C16.825 18.5064 17.1713 18.7554 17.4556 19.0671C17.7399 19.3788 17.9561 19.7465 18.0903 20.1465C18.2245 20.5465 18.2738 20.9701 18.235 21.3902L18.2363 21.379H18.2388ZM13.55 21.4577C13.55 22.7302 14.15 23.6427 15.1388 23.6427C16.1275 23.6427 16.6888 22.689 16.6888 21.4177C16.6888 20.2252 16.1325 19.2327 15.1 19.2327C14.1075 19.2302 13.55 20.1852 13.55 21.4552V21.4577ZM20.225 19.4302H18.4775V18.1977H23.485V19.4302H21.6975V24.7152H20.2275L20.225 19.4302ZM28.1325 21.9327H25.7488V23.4827H28.4488V24.6752H24.2388V18.1977H28.2513V19.3902H25.7088V20.7415H28.0925V21.934L28.1325 21.9327ZM29.4438 18.1977H30.9138V23.4827H33.4963V24.7152H29.4438V18.1977ZM19.55 14.0277L17.4038 15.184L17.8038 12.8002L16.0925 11.084L18.4763 10.7265L19.5488 8.58398L20.6213 10.7302L23.005 11.0877L21.2963 12.7965L21.6963 15.1802L19.55 14.0277ZM26.98 14.304L25.3513 15.1777L25.6688 13.3502L24.3563 12.079L26.1438 11.8415L26.9775 10.1727L27.7725 11.8415L29.6 12.079L28.2888 13.3515L28.5663 15.179L26.98 14.304ZM31.7075 14.6227L30.635 15.179L30.835 13.9865L29.9613 13.1527L31.1538 12.9527L31.71 11.8802L32.2275 12.9527L33.42 13.1527L32.5863 13.9865L32.7863 15.179L31.7075 14.6227ZM12.1588 14.304L13.7475 15.1777L13.43 13.3502L14.7413 12.0777L12.9538 11.8402L12.16 10.1727L11.3263 11.8415L9.53754 12.079L10.8488 13.3515L10.5313 15.179L12.1588 14.304ZM7.39129 14.6227L8.46379 15.179L8.26379 13.9865L9.13754 13.1527L7.94504 12.9527L7.39004 11.8802L6.87254 12.9527L5.68004 13.1527L6.55379 13.9865L6.35379 15.179L7.39129 14.6227Z" fill="#FC7201"></path>
+              </g>
+              <defs>
+                <clipPath id="clip0_0_354">
+                  <rect width="38.75" height="30" fill="white"></rect>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <span class="title">Управление объектом размещения</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="button_nav_section d-flex d-lg-none gap-2 flex-wrap my-2">
+    <a href="{% url 'profile_v2_hotel_edit' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_edit' %}active{% endif %}">Объект</a>
+    <a href="{% url 'profile_v2_hotel_rooms' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_rooms' %}active{% endif %}">Управление номерами</a>
+    <a href="{% url 'profile_v2_hotel_price_calendar' %}" class="item {% if menu_lk_active == 'profile_v2_hotel_price_calendar' %}active{% endif %}">Календарь цен</a>
+  </div>
+
+  <div class="section_title" style="margin-bottom: 28px;">Мои объекты</div>
+
+
+  <script>
+    $("#grupe_cards_hotels")
+  </script>
+
+  <section class="grupe_cards" id="grupe_cards_hotels" style="margin-bottom: 25px;">
+    {% for hotel in hotels %}
+      <section class="row_crads">
+        <div class="block_card hotel_mini_card" data-id="{{ hotel.id }}">
+          <img src="{{ hotel.img }}" alt="" />
+          <span class="name_hotel">{{ hotel.name }}</span>
+
+          <span class="doc_hotel_label" onclick="get_docs({{ hotel.id }}  )">
+            Документы
+          </span>
+
+          <span class="status_hotel_label" data-status="{{ hotel.status }}">
+            Статус:<span class="status_hotel">{{ hotel.status }}</span>
+          </span>
+          <div class="button edit_button">Смотреть</div>
+        </div>
+      </section>
+    {% endfor %}
+
+    <section class="row_crads">
+      <div class="block_card hotel_mini_card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="57" height="57" viewBox="0 0 57 57" fill="none">
+          <circle cx="28.5" cy="28.5" r="27.5" stroke="#DDDDDD" stroke-width="2"/>
+          <g clip-path="url(#clip0_608_10)">
+          <path d="M39.3024 39H17.9226C17.4139 38.9963 16.9269 38.7755 16.5671 38.3853C16.2073 37.9951 16.0036 37.4668 16 36.9149V23.8966C16.0034 23.3447 16.2069 22.8163 16.5666 22.426C16.9262 22.0356 17.4131 21.8145 17.9218 21.8106H39.3024C39.8111 21.8143 40.2981 22.0351 40.6579 22.4253C41.0177 22.8156 41.2214 23.3438 41.225 23.8958V36.9166C41.225 37.1902 41.1753 37.4611 41.0788 37.7139C40.9823 37.9667 40.8409 38.1963 40.6626 38.3898C40.4843 38.5833 40.2726 38.7367 40.0396 38.8414C39.8067 38.9461 39.557 39 39.3048 39H39.3024ZM17.9226 23.2019H17.9169C17.7486 23.2019 17.5872 23.2744 17.4682 23.4036C17.3491 23.5327 17.2823 23.7079 17.2823 23.8905V36.9236C17.2823 37.3043 17.5661 37.6122 17.9169 37.6122H39.3089C39.4772 37.6122 39.6386 37.5397 39.7577 37.4106C39.8767 37.2814 39.9435 37.1063 39.9435 36.9236V23.8905C39.9435 23.7079 39.8767 23.5327 39.7577 23.4036C39.6386 23.2744 39.4772 23.2019 39.3089 23.2019H39.3024H17.9226ZM34.2782 19.6686V19.6721C34.2782 19.8703 34.2057 20.0604 34.0765 20.2005C33.9473 20.3406 33.7722 20.4194 33.5895 20.4194H23.6371C23.4544 20.4194 23.2793 20.3406 23.1501 20.2005C23.0209 20.0604 22.9484 19.8703 22.9484 19.6721V19.6651C22.9484 19.2521 23.2573 18.9179 23.6371 18.9179H33.5863C33.7671 18.9264 33.9385 19.0082 34.0665 19.1469C34.1946 19.2857 34.2701 19.4724 34.2782 19.6686ZM36.6879 20.2251V20.2374C36.6879 20.8604 36.2226 21.3652 35.6484 21.3652H35.6363H35.6258C35.4893 21.3652 35.3541 21.3361 35.228 21.2794C35.1019 21.2227 34.9873 21.1396 34.8908 21.0349C34.7942 20.9302 34.7177 20.8058 34.6654 20.669C34.6132 20.5322 34.5863 20.3855 34.5863 20.2374V20.2243V19.1279C34.5863 18.5049 35.0516 18 35.6258 18H35.6379H35.6484C36.2226 18 36.6879 18.5049 36.6879 19.1279V19.141V19.1401V20.2251ZM22.6395 20.2251V20.2374C22.6395 20.8604 22.1742 21.3652 21.6 21.3652H21.5879H21.5774C21.3017 21.3652 21.0373 21.2464 20.8424 21.0349C20.6474 20.8234 20.5379 20.5365 20.5379 20.2374V20.2243V19.1279C20.5379 18.5049 21.0032 18 21.5774 18H21.5895H21.5887H21.6C22.1742 18 22.6395 18.5049 22.6395 19.1279V19.141V19.1401V20.2251ZM40.0468 19.6686V19.6721C40.0468 19.8703 39.9742 20.0604 39.8451 20.2005C39.7159 20.3406 39.5407 20.4194 39.3581 20.4194H37.6347C37.452 20.4194 37.2768 20.3406 37.1477 20.2005C37.0185 20.0604 36.946 19.8703 36.946 19.6721V19.6651C36.946 19.2521 37.2548 18.9179 37.6347 18.9179H39.3548C39.5357 18.9264 39.707 19.0082 39.8351 19.1469C39.9632 19.2857 40.0387 19.4724 40.0468 19.6686ZM20.2556 19.6686V19.6721C20.2556 19.8703 20.1831 20.0604 20.0539 20.2005C19.9248 20.3406 19.7496 20.4194 19.5669 20.4194H17.8685C17.6859 20.4194 17.5107 20.3406 17.3816 20.2005C17.2524 20.0604 17.1798 19.8703 17.1798 19.6721V19.6651C17.1798 19.2521 17.4887 18.9179 17.8685 18.9179H19.5887C19.767 18.9274 19.9352 19.0105 20.0589 19.15C20.1827 19.2895 20.2536 19.475 20.2556 19.6686Z" fill="#FC7201"/>
+          <path d="M20.5626 30.7374V32.4874H22.1264V30.7374H23.0747V35.2997H22.1264V33.3799H20.5626V35.2997H19.6143V30.7374H20.5626ZM27.7667 32.9643C27.7959 33.27 27.7657 33.5789 27.6779 33.8711C27.5901 34.1633 27.4467 34.4323 27.257 34.6605C27.0673 34.8888 26.8356 35.0712 26.5768 35.1961C26.3179 35.321 26.0378 35.3855 25.7546 35.3854L25.686 35.3846H25.6893H25.6659C25.3914 35.3847 25.1199 35.3222 24.8691 35.2013C24.6183 35.0803 24.3937 34.9035 24.2098 34.6824C24.026 34.4612 23.887 34.2006 23.8019 33.9175C23.7168 33.6343 23.6875 33.3349 23.7159 33.0387L23.7151 33.0474C23.6914 32.743 23.7262 32.4365 23.8174 32.1474C23.9085 31.8583 24.054 31.5929 24.2446 31.368C24.4351 31.143 24.6667 30.9634 24.9245 30.8406C25.1823 30.7178 25.4609 30.6543 25.7425 30.6543H25.7675H25.7659L25.8151 30.6534C26.0873 30.6534 26.3565 30.715 26.6055 30.8342C26.8546 30.9535 27.0779 31.1278 27.2614 31.346C27.4448 31.5642 27.5843 31.8215 27.6709 32.1016C27.7575 32.3816 27.7893 32.6781 27.7643 32.9722L27.7651 32.9643H27.7667ZM24.7417 33.0194C24.7417 33.9102 25.1288 34.5489 25.7667 34.5489C26.4046 34.5489 26.7667 33.8813 26.7667 32.9914C26.7667 32.1567 26.4078 31.4619 25.7417 31.4619C25.1014 31.4602 24.7417 32.1287 24.7417 33.0177V33.0194ZM29.0481 31.6002H27.9207V30.7374H31.1514V31.6002H29.9981V35.2997H29.0497L29.0481 31.6002ZM34.1497 33.3519H32.6118V34.4369H34.3538V35.2717H31.6376V30.7374H34.2264V31.5722H32.586V32.5181H34.1239V33.3528L34.1497 33.3519ZM34.9957 30.7374H35.9441V34.4369H37.6102V35.2997H34.9957V30.7374ZM28.6126 27.8184L27.228 28.6278L27.486 26.9592L26.382 25.7578L27.9199 25.5076L28.6118 24.0078L29.3038 25.5102L30.8417 25.7604L29.7393 26.9566L29.9973 28.6252L28.6126 27.8184ZM33.4062 28.0118L32.3554 28.6234L32.5602 27.3442L31.7135 26.4543L32.8667 26.2881L33.4046 25.1199L33.9175 26.2881L35.0965 26.4543L34.2505 27.3451L34.4296 28.6243L33.4062 28.0118ZM36.4562 28.2349L35.7643 28.6243L35.8933 27.7896L35.3296 27.2059L36.0989 27.0659L36.4578 26.3152L36.7917 27.0659L37.561 27.2059L37.0231 27.7896L37.1522 28.6243L36.4562 28.2349ZM23.8441 28.0118L24.8691 28.6234L24.6643 27.3442L25.5102 26.4534L24.357 26.2872L23.8449 25.1199L23.307 26.2881L22.153 26.4543L22.9989 27.3451L22.7941 28.6243L23.8441 28.0118ZM20.7683 28.2349L21.4602 28.6243L21.3312 27.7896L21.8949 27.2059L21.1255 27.0659L20.7675 26.3152L20.4336 27.0659L19.6643 27.2059L20.228 27.7896L20.0989 28.6243L20.7683 28.2349Z" fill="#FC7201"/>
+          </g>
+          <defs>
+          <clipPath id="clip0_608_10">
+          <rect width="25" height="21" fill="white" transform="translate(16 18)"/>
+          </clipPath>
+          </defs>
+        </svg>
+        <span class="name_hotel" style="flex-grow: 1;">Добавление нового объекта</span>
+        <a a href="/register/placement_object/" target="_blank" class="button" style="background: #42CC36">Добавить</a>
+      </div>
+    </section>
+
+    <section class="row_crads d-none row" data-section="doc_hotel">
+      <div class="block_card form_card col-sm-12 col-md-4">
+        <div class="section_title">Официальный документ, подтверждающий право собственности</div>
+        <div class="grupe_input">
+          <div class="label_input_file doc_file_1"></div>
+        </div>
+        <div class="section_title">Договор аренды(если вы не собственник)</div>
+        <div class="grupe_input">
+          <div class="label_input_file doc_file_2"></div>
+        </div>
+        <div class="section_title">Поспорт разворот главной страницы и разворот страницы с пропиской</div>
+        <div class="grupe_input">
+          <div class="label_input_file doc_file_3"></div>
+        </div>
+        <div class="section_title">Видео, если нет документов (желательно начинать видео с адреса дома и попасть в объект без остановки съемки видео)</div>
+        <div class="grupe_input">
+          <div class="label_input_file doc_file_4"></div>
+        </div>
+        <button class="button" onclick="send_docs()">Отправить на проверку</button>
+      </div>
+    </section>
+
+    <script>
+      docs_select_hotel = 0
+      function get_docs(hotel_id) {
+        $.ajax({
+          method: "GET",
+          data: { "hotel": hotel_id, },
+          url: "{% url 'profile_hotel_documents_get' %}",
+          beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          },
+          success: function (request) {
+            let $label_input_file_1 = $(".label_input_file.doc_file_1")
+            let $label_input_file_2 = $(".label_input_file.doc_file_2")
+            let $label_input_file_3 = $(".label_input_file.doc_file_3")
+            let $label_input_file_4 = $(".label_input_file.doc_file_4")
+
+            $label_input_file_1.betterdoc("reset")
+            $label_input_file_2.betterdoc("reset")
+            $label_input_file_3.betterdoc("reset")
+            $label_input_file_4.betterdoc("reset")
+
+
+            if (Object.keys(request.docs).length > 0) {
+              if ('doc_1' in request.docs)
+                request.docs.doc_1.forEach(item => {
+                  $label_input_file_1.betterdoc("add", item)
+                });
+
+              if ('doc_2' in request.docs)
+                request.docs.doc_2.forEach(item => {
+                  $label_input_file_2.betterdoc("add", item)
+                });
+
+              if ('doc_3' in request.docs)
+                request.docs.doc_3.forEach(item => {
+                  $label_input_file_3.betterdoc("add", item)
+                });
+
+              if ('doc_4' in request.docs)
+                request.docs.doc_4.forEach(item => {
+                  $label_input_file_4.betterdoc("add", item)
+                });
+            }
+
+            docs_select_hotel = hotel_id;
+            $(`.hotel_mini_card[data-id="${docs_select_hotel}"]`).parents(".row_crads").after($(`[data-section="doc_hotel"]`));
+            $(`[data-section="doc_hotel"]`).removeClass("d-none");
+          }
+        });
+      }
+
+
+      function send_docs() {
+
+        if (
+          $(".label_input_file.doc_file_1").betterdoc("valid") &&
+          $(".label_input_file.doc_file_2").betterdoc("valid") &&
+          $(".label_input_file.doc_file_3").betterdoc("valid") &&
+          $(".label_input_file.doc_file_4").betterdoc("valid")
+        ) {
+          data = {
+            "hotel": docs_select_hotel,
+            "docs": {
+              "doc_1": $(".label_input_file.doc_file_1").betterdoc("getlist"),
+              "doc_2": $(".label_input_file.doc_file_2").betterdoc("getlist"),
+              "doc_3": $(".label_input_file.doc_file_3").betterdoc("getlist"),
+              "doc_4": $(".label_input_file.doc_file_4").betterdoc("getlist")
+            }
+          }
+
+          $.ajax({
+            method: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            url: "{% url 'profile_hotel_sending_documents' %}",
+            beforeSend: function (request) {
+              request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function (request) {
+              popup_create("Успех", "Документы отправлены на модерацию")
+            }
+          });
+        }
+        else {
+          popup_create("Ошибка", "Отправьте все документы", [], [], "error")
+        }
+      }
+    </script>
+
+    <section class="row_crads d-none" data-section="edit_hotel">
+      <div class="block_card form_card">
+        <div class="section_title">Основная информация</div>
+        <div class="grupe_input row">
+            <label class="text col-sm-12 col-md-6" for="">
+              <span class="name">Название*</span>
+              <input type="text" placeholder="" name="name" value="" required="" autocomplete="off" />
+            </label>
+
+            <label class="text col-sm-12 col-md-6">
+              <span class="name">Звездность*</span>
+              <select name="stars" required="">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+
+            <label class="text" style="width: 100%;" for="">
+              <span class="name">Описание</span>
+              <textarea name="descriptions" style="height: 100px; padding: 14px; resize: vertical; box-sizing:border-box;" autocomplete="off" placeholder=""></textarea>
+            </label>
+
+            <label class="date col-sm-12 col-md-6">
+              <span class="name">Время заселения*</span>
+              <input type="time" name="check_in_time" value="" autocomplete="off" required="" placeholder="" />
+            </label>
+
+            <label class="date col-sm-12 col-md-6">
+              <span class="name">Время выезда*</span>
+              <input type="time" name="departure_time" value="" autocomplete="off" required="" placeholder="" />
+            </label>
+
+            <label class="text col-sm-12 col-md-6">
+              <div class="name">
+                <span>
+                  Процент сайта
+                </span>
+                <div class="info">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+                    <g clip-path="url(#clip0_0_582)">
+                      <path d="M12.4997 24.1069C18.9102 24.1069 24.1069 18.9102 24.1069 12.4997C24.1069 6.08927 18.9102 0.892578 12.4997 0.892578C6.08927 0.892578 0.892578 6.08927 0.892578 12.4997C0.892578 18.9102 6.08927 24.1069 12.4997 24.1069Z" stroke="#5383E1" stroke-width="2.14286" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M9.82129 9.82115C9.82129 9.29138 9.97838 8.77351 10.2727 8.33302C10.567 7.89253 10.9854 7.54921 11.4748 7.34647C11.9643 7.14374 12.5028 7.09069 13.0224 7.19405C13.542 7.2974 14.0193 7.55251 14.3939 7.92711C14.7685 8.30172 15.0236 8.779 15.127 9.29859C15.2303 9.81818 15.1773 10.3568 14.9745 10.8462C14.7718 11.3356 14.4285 11.754 13.988 12.0483C13.5475 12.3426 13.0296 12.4997 12.4999 12.4997V14.2854" stroke="#5383E1" stroke-width="2.14286" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M12.5004 16.9639C12.2355 16.9639 11.9766 17.0424 11.7564 17.1896C11.5361 17.3367 11.3644 17.5459 11.2631 17.7906C11.1617 18.0354 11.1352 18.3046 11.1869 18.5644C11.2385 18.8242 11.3661 19.0629 11.5534 19.2502C11.7407 19.4375 11.9793 19.565 12.2391 19.6167C12.4989 19.6684 12.7682 19.6419 13.0129 19.5405C13.2577 19.4391 13.4668 19.2675 13.614 19.0472C13.7612 18.827 13.8397 18.568 13.8397 18.3032C13.8351 17.9494 13.6925 17.6114 13.4423 17.3612C13.1922 17.1111 12.8542 16.9685 12.5004 16.9639Z" fill="#5383E1"></path>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_0_582">
+                        <rect width="25" height="25" fill="white"></rect>
+                      </clipPath>
+                    </defs>
+                  </svg>
+
+                  <div class="popup_info_mini">
+                    <div class="text">
+                      Выберите процент, который вы готовы заплатить сайту. Чем выше процент, тем выше будет показано ваше объявление. Диапазон процентов от 14% до 30%.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <select name="percentage" required>
+                {% for perc in choices.percentage %}
+                <option value="{{perc.value}}">{{perc.name}}</option>
+                {% endfor %}
+              </select>
+            </label>
+          </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_hotel">
+      <div class="block_card form_card">
+        <div class="section_title">Фото объекта</div>
+        <div class="grupe_input">
+          {% input_file 'many' '' 'images_hotel' hotel.images 3 40 True True 'Перетаскивайте изображения, чтобы изменить порядок' %}
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_hotel">
+      <div class="block_card form_card">
+        <div class="section_title">Услуги объекта</div>
+        <div class="grupe_input">
+          {% input_cr 'checkbox_grupe' '' 'hservice' choices.hservice '' 0 %}
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_hotel">
+      <div class="block_card form_card">
+        <div class="section_title">Адрес</div>
+        <div class="grupe_input row">
+
+          <label class="text col-12" for="" style="width: 100%;">
+            <span class="name">Заполнение по адресу</span>
+            <input type="text" placeholder="Москва, проспект Мира 125" name="gs_address" value="" autocomplete="off" />
+          </label>
+          <div class="discription" style=" margin-top: -17px; font-size: 15px; color: gray; ">Город/населённый пункт и через запятую улицу. Или найдите дом на карте и поставьте метку.</div>
+
+          <div id="map_coordinate"></div>
+          <div id="gs_address_list" style="width: 100%;"></div>
+
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Город* (населенный пункт)</span>
+            <input type="text" placeholder="" name="city" value="" required="" autocomplete="off">
+          </label>
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Улица*</span>
+            <input type="text" placeholder="" name="street" value="" required="" autocomplete="off">
+          </label>
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Дом*</span>
+            <input type="text" placeholder="" name="house" value="" required="" autocomplete="off">
+          </label>
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Координаты*</span>
+            <input type="text" placeholder="" name="coordinates" value="" required="" autocomplete="off">
+          </label>
+
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Район</span>
+            <input type="text" placeholder="" name="region" value="" autocomplete="off">
+          </label>
+
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Корпус</span>
+            <input type="text" placeholder="" name="body" value="" autocomplete="off">
+          </label>
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Этаж</span>
+            <input type="text" placeholder="" name="floor" value="" autocomplete="off">
+          </label>
+          <label class="text col-sm-12 col-md-6 col-lg-3" for="">
+            <span class="name">Квартира</span>
+            <input type="text" placeholder="" name="apartment" value="" autocomplete="off">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_hotel">
+      <div class="block_card form_card">
+        <div class="section_title">Ограничение</div>
+        <div class="grupe_input row">
+          <label class="checkradion col-sm-12 col-md-6 col-lg-3">
+            <span class="name">Можно с детьми*</span>
+            <section>
+              <label>
+                <input type="radio" name="allowed_child" data-value="True" checked="" required="">
+                <span class="name">Да</span>
+              </label>
+              <label>
+                <input type="radio" name="allowed_child" data-value="False" required="">
+                <span class="name">Нет</span>
+              </label>
+            </section>
+          </label>
+
+          <label class="checkradion col-sm-12 col-md-6 col-lg-3">
+            <span class="name">Можно с животными*</span>
+            <section>
+              <label>
+                <input type="radio" name="allowed_animal" data-value="True" checked="" required="">
+                <span class="name">Да</span>
+              </label>
+              <label>
+                <input type="radio" name="allowed_animal" data-value="False" required="">
+                <span class="name">Нет</span>
+              </label>
+            </section>
+          </label>
+
+          <label class="checkradion col-sm-12 col-md-6 col-lg-3">
+            <span class="name">Курение разрешено*</span>
+            <section>
+              <label>
+                <input type="radio" name="allowed_smoking" data-value="True" checked="" required="">
+                <span class="name">Да</span>
+              </label>
+              <label>
+                <input type="radio" name="allowed_smoking" data-value="False" required="">
+                <span class="name">Нет</span>
+              </label>
+            </section>
+          </label>
+
+          <label class="checkradion col-sm-12 col-md-6 col-lg-3">
+            <span class="name">Вечеринки разрешены*</span>
+            <section>
+              <label>
+                <input type="radio" name="allowed_party" data-value="True" checked="" required="">
+                <span class="name">Да</span>
+              </label>
+              <label>
+                <input type="radio" name="allowed_party" data-value="False" required="">
+                <span class="name">Нет</span>
+              </label>
+            </section>
+          </label>
+
+
+          <label class="text col-sm-12 col-lg-4">
+            <!-- # TODO: Измен изменить -->
+            <span class="name">Минимум дней до заселения*</span>
+            <select name="minimum_days_before_arrival" required="">
+              <option value="0.25" selected="">6 часов</option>
+              <option value="0.5">12 часов</option>
+              <option value="1">24 часа</option>
+              <option value="2">2 дня</option>
+              <option value="3">3 дня</option>
+              <option value="4">4 дня</option>
+              <option value="5">5 дней</option>
+              <option value="6">6 дней</option>
+              <option value="7">7 дней</option>
+              <option value="8">8 дней</option>
+              <option value="9">9 дней</option>
+              <option value="10">10 дней</option>
+              <option value="11">11 дней</option>
+              <option value="12">12 дней</option>
+            </select>
+          </label>
+
+          <label class="text col-sm-12 col-lg-4">
+            <span class="name">Дата начала приема клиентов*</span>
+            <input type="date" name="date_when_you_start_receiving_guests" required="" value="2023-08-10">
+          </label>
+
+          <label class="text col-sm-12 col-lg-4">
+            <span class="name">Минимум дней пребывания*</span>
+            <input type="text" name="minimum_days_of_stay" required="" value="1">
+          </label>
+
+        </div>
+      </div>
+    </section>
+
+
+    <section class="row_crads d-none" data-section="edit_hotel">
+      <div class="block_card form_card">
+        <div class="section_title">Дополнительно</div>
+        <div class="grupe_input row">
+          <label class="text col">
+            <span class="name">
+              Плата за уборку (₽)*
+              <div class="info">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+                  <g clip-path="url(#clip0_0_582)">
+                    <path d="M12.4997 24.1069C18.9102 24.1069 24.1069 18.9102 24.1069 12.4997C24.1069 6.08927 18.9102 0.892578 12.4997 0.892578C6.08927 0.892578 0.892578 6.08927 0.892578 12.4997C0.892578 18.9102 6.08927 24.1069 12.4997 24.1069Z" stroke="#5383E1" stroke-width="2.14286" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M9.82129 9.82115C9.82129 9.29138 9.97838 8.77351 10.2727 8.33302C10.567 7.89253 10.9854 7.54921 11.4748 7.34647C11.9643 7.14374 12.5028 7.09069 13.0224 7.19405C13.542 7.2974 14.0193 7.55251 14.3939 7.92711C14.7685 8.30172 15.0236 8.779 15.127 9.29859C15.2303 9.81818 15.1773 10.3568 14.9745 10.8462C14.7718 11.3356 14.4285 11.754 13.988 12.0483C13.5475 12.3426 13.0296 12.4997 12.4999 12.4997V14.2854" stroke="#5383E1" stroke-width="2.14286" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M12.5004 16.9639C12.2355 16.9639 11.9766 17.0424 11.7564 17.1896C11.5361 17.3367 11.3644 17.5459 11.2631 17.7906C11.1617 18.0354 11.1352 18.3046 11.1869 18.5644C11.2385 18.8242 11.3661 19.0629 11.5534 19.2502C11.7407 19.4375 11.9793 19.565 12.2391 19.6167C12.4989 19.6684 12.7682 19.6419 13.0129 19.5405C13.2577 19.4391 13.4668 19.2675 13.614 19.0472C13.7612 18.827 13.8397 18.568 13.8397 18.3032C13.8351 17.9494 13.6925 17.6114 13.4423 17.3612C13.1922 17.1111 12.8542 16.9685 12.5004 16.9639Z" fill="#5383E1"></path>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_0_582">
+                      <rect width="25" height="25" fill="white"></rect>
+                    </clipPath>
+                  </defs>
+                </svg>
+
+                <div class="popup_info_mini">
+                  <div class="text">
+                    Не входит в стоимость бронирования, имеет информативный характер
+                  </div>
+                </div>
+              </div>
+
+            </span>
+            <input type="text" name="cleaning_fee" required="" value="0">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="row_crads d-none" data-section="edit_hotel">
+      <div class="block_card text clickable" onclick="save_an_entry()" style="background: linear-gradient(134deg, #9af87b 1.08%, #43d8ff 81.21%);">
+        <span class="title">Сохранить</span>
+        <span class="text">Сохранить объект размещения, при изменение "Название", "Описание", "Адрес" объект отправится на модерацию после сохранения</span>
+      </div>
+      <a href="" target="_blank" class="block_card text clickable" id="button_open_hotel">
+        <span class="title">Открыть</span>
+        <span class="text">Просмотреть детальную страницу объекта</span>
+      </a>
+    </section>
+
+    <section class="row_crads">
+      {% telegram_card %}
+    </section>
+  </section>
+
+
+
+  <style>
+    #map_coordinate {
+      height: 521px;
+      width: 100%;
+    }
+
+    #gs_address_list {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+    }
+
+    #gs_address_list .item {
+      background: #ffffff;
+      padding: 7px;
+      border-radius: 10px;
+      border: 1px solid gray;
+      cursor: pointer;
+    }
+
+    #gs_address_list .item:hover {
+      border-color: #fc7201;
+      background-color: #fc7201;
+      color:white;
+    }
+  </style>
+
+  <script defer>
+
+    $(".edit_button").click(function() {
+      let id = $(this).parents(".hotel_mini_card").data("id")
+      let newParams = new URLSearchParams(window.location.search);
+      newParams.set('hotel', id);
+      let newUrl = `${window.location.pathname}?${newParams.toString()}`;
+      window.history.pushState({}, '', newUrl);
+
+      get_hotel_ajax()
+    })
+
+    select_hotel_id = null
+
+    function get_hotel_ajax() {
+
+      let urlParams = new URLSearchParams(window.location.search);
+      let id_hotel = urlParams.get('hotel');
+      if (!id_hotel) {
+        return
+      }
+
+      data = {
+        "hotel": id_hotel,
+      }
+
+      $.ajax({
+        method: "GET",
+        data: data,
+        url: "{% url 'ajax_profile_v2_hotel_edit_get' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        },
+        success: function (request) {
+          Object.entries(request).forEach(([key, value]) => {
+            $(`[name="${key}"]`).val(value)
+          });
+
+          request.hservice.forEach((value) => {
+            $(`[name="hservice[]"][value="${value}"]`).prop("checked", true)
+          });
+
+
+          $("#label_input_file_images_hotel").multifile("reset")
+
+          files_jq = $("#label_input_file_images_hotel").find(".files")
+          request.images.forEach(item => {
+            item_a = $(`<div class="img_elem" data-id="${item.id}"><img src="${item.url}"><div class="remove">✖</div></div>`)
+
+            $(files_jq).find(".img_add").before(item_a)
+          });
+
+
+
+
+          if (request.allowed_animal) {
+            $(`[name="allowed_animal"][data-value="True"]`).prop("checked", true)
+            $(`[name="allowed_animal"][data-value="False"]`).prop("checked", false)
+          }
+          else {
+            $(`[name="allowed_animal"][data-value="True"]`).prop("checked", false)
+            $(`[name="allowed_animal"][data-value="False"]`).prop("checked", true)
+          }
+
+          if (request.allowed_child) {
+            $(`[name="allowed_child"][data-value="True"]`).prop("checked", true)
+            $(`[name="allowed_child"][data-value="False"]`).prop("checked", false)
+          }
+          else {
+            $(`[name="allowed_child"][data-value="True"]`).prop("checked", false)
+            $(`[name="allowed_child"][data-value="False"]`).prop("checked", true)
+          }
+
+          if (request.allowed_party) {
+            $(`[name="allowed_party"][data-value="True"]`).prop("checked", true)
+            $(`[name="allowed_party"][data-value="False"]`).prop("checked", false)
+          }
+          else {
+            $(`[name="allowed_party"][data-value="True"]`).prop("checked", false)
+            $(`[name="allowed_party"][data-value="False"]`).prop("checked", true)
+          }
+
+          if (request.allowed_smoking) {
+            $(`[name="allowed_smoking"][data-value="True"]`).prop("checked", true)
+            $(`[name="allowed_smoking"][data-value="False"]`).prop("checked", false)
+          }
+          else {
+            $(`[name="allowed_smoking"][data-value="True"]`).prop("checked", false)
+            $(`[name="allowed_smoking"][data-value="False"]`).prop("checked", true)
+          }
+
+
+          $("#label_input_file_images_hotel").multifile("check_the_pictures")
+
+          $("#button_open_hotel").attr("href", `/hotel/${request.id}/`)
+
+          select_hotel_id = request.id
+
+          $(`.hotel_mini_card[data-id="${select_hotel_id}"]`).parents(".row_crads").after($(`[data-section="edit_hotel"]`));
+
+          $(`[data-section="edit_hotel"]`).removeClass("d-none");
+        }
+      });
+    }
+
+    function save_an_entry() {
+
+      $(".label_input_file").find(".files").removeClass("error_input")
+
+      if (!$(".label_input_file").multifile("valid")) {
+        $(".label_input_file").find(".files").addClass("error_input")
+        return false
+      }
+
+      type_of_addition = $("#type_of_addition").val()
+      $(`label[data-select-type='${type_of_addition}'] select`).val()
+
+
+      if (window.FormData === undefined) {
+        alert('В вашем браузере FormData не поддерживается')
+      } else {
+        form = document.getElementById("form_save_hotel");
+        form_data = new FormData();
+
+        form_data.append('images_hotel[]', $(`.label_input_file[input-file-name="images_hotel"]`).multifile("getlist"));
+
+        var selected_hservice = [];
+        $('input[name="hservice[]"]:checked').each(function () {
+          selected_hservice.push($(this).val());
+        });
+
+        form_data.append("hotel_id", select_hotel_id)
+
+        form_data.append("hservice[]", selected_hservice)
+
+        form_data.append("name", $("*[name='name']").val())
+        form_data.append("descriptions", $("*[name='descriptions']").val())
+
+        form_data.append("type_hotel", $("*[name='type_hotel']").val())
+        form_data.append("city", $("*[name='city']").val())
+        form_data.append("region", $("*[name='region']").val())
+        form_data.append("street", $("*[name='street']").val())
+        form_data.append("body", $("*[name='body']").val())
+        form_data.append("house", $("*[name='house']").val())
+        form_data.append("floor", $("*[name='floor']").val())
+        form_data.append("apartment", $("*[name='apartment']").val())
+        form_data.append("coordinates", $("*[name='coordinates']").val())
+
+
+        allowed_child = $('[name="allowed_child"]:checked').attr("data-value") == 'True';
+        allowed_animal = $('[name="allowed_animal"]:checked').attr("data-value") == 'True';
+        allowed_smoking = $('[name="allowed_smoking"]:checked').attr("data-value") == 'True';
+        allowed_party = $('[name="allowed_party"]:checked').attr("data-value") == 'True';
+
+        form_data.append("allowed_child", allowed_child)
+        form_data.append("allowed_animal", allowed_animal)
+        form_data.append("allowed_smoking", allowed_smoking)
+        form_data.append("allowed_party", allowed_party)
+        form_data.append("instant_booking", "True")
+        form_data.append("percentage", $("*[name='percentage']").val())
+        form_data.append("minimum_days_before_arrival", $("*[name='minimum_days_before_arrival']").val())
+        form_data.append("minimum_days_of_stay", $("*[name='minimum_days_of_stay']").val())
+        form_data.append("cleaning_fee", $("*[name='cleaning_fee']").val())
+        form_data.append("date_when_you_start_receiving_guests", $("*[name='date_when_you_start_receiving_guests']").val())
+        form_data.append("stars", $("*[name='stars']").val())
+        form_data.append("check_in_time", $("*[name='check_in_time']").val())
+        form_data.append("departure_time", $("*[name='departure_time']").val())
+
+
+        load_start()
+        $.ajax({
+          method: "POST",
+          data: form_data,
+          contentType: false,
+          processData: false,
+          url: "{% url 'ajax_profile_v2_hotel_edit_save' %}",
+          beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          },
+          success: function (request) {
+            load_end()
+            $("*[name]").css("border-color", "green")
+            $(".error_input").remove()
+            if (request.result == "save") {
+              getNotifications()
+
+              if (request.moderator == true) {
+                popup_create("Модерация", "Объект размещения отправлен на модерацию",
+                    [
+                        { type: "reload", name: "Закрыть" }
+                    ],
+                    []
+                  )
+              }
+              else {
+                {% comment %} location.reload() {% endcomment %}
+              }
+            }
+            else if (request.result == "error") {
+              for (let key in request.errors) {
+                console.log(key, request.errors[key])
+                $(`*[name='${key}']`).css("border-color", "red")
+                $(`*[name='${key}']`).after(`<span class='error_input'>${request.errors[key]}</span>`)
+              }
+              input_first_error = $(".error_input").first().parents("label")
+              $("html, body").animate({scrollTop: $(input_first_error).offset().top}, 1000);
+
+              popup_create("Ошибка", "Вы не заполнили обязательные поля", [], [], "error")
+            }
+          }
+        });
+      }
+    }
+  </script>
+
+  <script defer>
+    map = null
+
+    var myPlacemark;
+
+    ymaps.ready(function () {
+      map = new ymaps.Map('map_coordinate', {
+        center: [58.261628, 80.389013],
+        zoom: 4,
+        behaviors: ['default', 'scrollZoom']
+      }, {
+        suppressMapOpenBlock: true,
+      });
+
+      map.controls.remove('trafficControl')
+      map.controls.remove('geolocationControl')
+      map.controls.remove('searchControl')
+
+      let ajax_gs_address_timer = null
+
+      $(`*[name='gs_address']`).change(function () {
+        if (ajax_gs_address_timer) {
+          clearTimeout(ajax_gs_address_timer)
+        }
+
+        ajax_gs_address_timer = setTimeout(() => {
+          ajax_gs_address()
+        }, 200)
+      })
+
+
+    // Слушаем клик на карте.
+    map.events.add('click', function (e) {
+      var coords = e.get('coords');
+
+      // Если метка уже создана – просто передвигаем ее.
+
+      map.geoObjects.remove(myPlacemark)
+      myPlacemark = createPlacemark(coords);
+      map.geoObjects.add(myPlacemark);
+      // Слушаем событие окончания перетаскивания на метке.
+      myPlacemark.events.add('dragend', function () {
+          getAddress(myPlacemark.geometry.getCoordinates());
+      });
+
+      getAddress(coords);
+    });
+
+    // Создание метки.
+    function createPlacemark(coords) {
+        return new ymaps.Placemark(coords, {}, {
+            preset: 'islands#redDotIcon',
+            draggable: true
+        });
+    }
+
+    // Определяем адрес по координатам (обратное геокодирование).
+    function getAddress(coords) {
+        ymaps.geocode(coords).then(function (res) {
+            let firstGeoObject = res.geoObjects.get(0);
+            let name = firstGeoObject.properties.get("text")
+            let coordinates_el = firstGeoObject.geometry._coordinates
+
+            let latlng = `${coords[0]}, ${coords[1]}`
+
+            let metaDataProperty = firstGeoObject.properties.get('metaDataProperty')
+
+            if (select_id != null) {
+              list_place[select_id].placemark.options.set('preset', 'islands#blackDotIcon');
+            }
+
+            select_id = null
+
+            list_place_one = {
+              "name": name,
+              "latlng": latlng,
+              "coord": coordinates_el,
+              "address": metaDataProperty["GeocoderMetaData"]["Address"]["Components"],
+            }
+
+            $(`[name="city"]`).val("")
+            $(`[name="region"]`).val("")
+            $(`[name="street"]`).val("")
+            $(`[name="house"]`).val("")
+            $(`[name="apartment"]`).val("")
+            $(`[name="floor"]`).val("")
+
+            list_place_one["address"].forEach(function(item) {
+              if (item["kind"] == "locality") {
+                $(`[name="city"]`).val(item["name"])
+              }
+
+              if (item["kind"] == "area") {
+                $(`[name="region"]`).val(item["name"])
+              }
+
+              if (item["kind"] == "street") {
+                $(`[name="street"]`).val(item["name"])
+              }
+
+              if (item["kind"] == "house") {
+                $(`[name="house"]`).val(item["name"])
+              }
+
+              if (item["kind"] == "other") {
+                if (item["name"].startsWith('этаж')) {
+                  let name = item["name"].replace("этаж", '').trim();
+                  $(`[name="floor"]`).val(name)
+                }
+                if (item["name"].startsWith('кв.')) {
+                  let name = item["name"].replace(new RegExp("кв.", 'gi'), '').trim();
+                  $(`[name="apartment"]`).val(name)
+                }
+              }
+            })
+
+            $("*[name='coordinates']").val(latlng)
+        });
+    }
+
+    });
+
+
+    list_place = {}
+
+    select_id = null
+
+
+
+
+    function ajax_gs_address() {
+      let val = $(`*[name='gs_address']`).val()
+      var myGeocoder = ymaps.geocode(val);
+      myGeocoder.then(function(res) {
+
+        $("#gs_address_list").empty()
+
+        list_place = {}
+
+        map.geoObjects.removeAll()
+
+        res.geoObjects.each(function (el, i) {
+          let name = el.properties.get("text")
+          let coordinates_el = el.geometry._coordinates
+
+          let latlng = `${coordinates_el[0]}, ${coordinates_el[1]}`
+
+          let placemark = new ymaps.Placemark(coordinates_el, {}, { preset: 'islands#blackDotIcon' })
+
+          let metaDataProperty = el.properties.get('metaDataProperty')
+
+          list_place[i] = {
+            "name": name,
+            "latlng": latlng,
+            "coord": coordinates_el,
+            "placemark": placemark,
+            "address": metaDataProperty["GeocoderMetaData"]["Address"]["Components"],
+          }
+
+          placemark.events.add('click', function() { select_place(i) })
+
+
+          let item = $(`<div class="item" data-id="${i}" data-coord-lat="${coordinates_el[0]}" data-coord-lng="${coordinates_el[1]}">${name} (${latlng})</div>`)
+          $("#gs_address_list").append(item)
+
+          map.geoObjects.add(placemark)
+        })
+      });
+    }
+
+    $("#gs_address_list").on("click", '.item', function() {
+      let id = parseFloat($(this).data("id"))
+
+      select_place(id)
+    })
+
+    function select_place(id) {
+
+      map.geoObjects.remove(myPlacemark)
+
+      if (select_id != null) {
+        list_place[select_id].placemark.options.set('preset', 'islands#blackDotIcon');
+      }
+      list_place[id].placemark.options.set('preset', 'islands#redDotIcon');
+      select_id = id
+
+
+      $(`[name="city"]`).val("")
+      $(`[name="region"]`).val("")
+      $(`[name="street"]`).val("")
+      $(`[name="house"]`).val("")
+      $(`[name="apartment"]`).val("")
+      $(`[name="floor"]`).val("")
+
+
+      list_place[id]["address"].forEach(function(item) {
+        if (item["kind"] == "locality") {
+          $(`[name="city"]`).val(item["name"])
+        }
+
+        if (item["kind"] == "area") {
+          $(`[name="region"]`).val(item["name"])
+        }
+
+        if (item["kind"] == "street") {
+          $(`[name="street"]`).val(item["name"])
+        }
+
+        if (item["kind"] == "house") {
+          $(`[name="house"]`).val(item["name"])
+        }
+
+        if (item["kind"] == "other") {
+          if (item["name"].startsWith('этаж')) {
+            let name = item["name"].replace("этаж", '').trim();
+            $(`[name="floor"]`).val(name)
+          }
+          if (item["name"].startsWith('кв.')) {
+            let name = item["name"].replace(new RegExp("кв.", 'gi'), '').trim();
+            $(`[name="apartment"]`).val(name)
+          }
+        }
+      })
+
+      $("*[name='coordinates']").val(list_place[id]["latlng"])
+    }
+
+  </script>
+
+
+  <script src="/static/js/betterdoc.js"></script>
+
+  <script>
+    $(document).ready(function () {
+
+      $(".label_input_file.doc_file_1").betterdoc({min: 1, max: 99, exts: ["jpg", "png", "webp", "pdf", "doc", "docx"]})
+      $(".label_input_file.doc_file_2").betterdoc({min: 1, max: 99, exts: ["jpg", "png", "webp", "pdf", "doc", "docx"]})
+      $(".label_input_file.doc_file_3").betterdoc({min: 1, max: 99, exts: ["jpg", "png", "webp", "pdf", "doc", "docx"]})
+      $(".label_input_file.doc_file_4").betterdoc({min: 1, max: 99, exts: ["mp4"]})
+    })
+  </script>
+
+{% endblock %}

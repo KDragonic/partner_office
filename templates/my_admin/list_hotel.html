@@ -1,0 +1,645 @@
+{% extends 'my_admin/v2/base.html' %}
+{% load form static %}
+{% block main_block %}
+
+<style>
+  table {
+    border: 3px solid #FFFFFF;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+  table th,
+  table td {
+    border: 1px solid #FFFFFF;
+    padding: 10px;
+  }
+
+  table tbody td {
+    font-size: 14px;
+  }
+
+  table thead {
+    background: #FFFFFF;
+    border-bottom: 2px solid #CDCDCD;
+  }
+
+  table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333333;
+    background: #f0f0f0;
+    border-bottom: 2px solid #CDCDCD;
+    text-align: left;
+  }
+
+  table td:nth-child(1) {
+    background: #f2f2f2;
+  }
+</style>
+
+<div id="search-form">
+  <input type="text"
+    id="search-input"
+    name="search"
+    placeholder="Поиск..."
+    value="">
+</div>
+
+<style>
+  #search-form {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  #search-form #search-input {
+    height: 45px;
+    width: 100%;
+    border: 1px solid #D2D2D2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .search-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .search-buttons .item {
+    background: #dfdfdf;
+    color: black;
+    padding: 10px;
+    color: black;
+    border-radius: 5px;
+    width: max-content;
+    cursor: pointer;
+  }
+  .search-buttons span {
+    margin-right: 8px;
+  }
+
+  .search-buttons .item:hover {
+    background: #b6b6b6;
+  }
+
+  .search-buttons .item.select {
+    background: #FC7201;
+    color: white;
+  }
+
+  .search-buttons .item.select:hover {
+    background: #ff8929;
+  }
+
+  .search-buttons[data-type="page"] {
+      justify-content: center;
+  }
+
+  .search-buttons[data-type="page"] .item {
+    padding: 0;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    max-width: 95px;
+  }
+</style>
+
+<style>
+  .click_user, .click_hotel {
+    color: #0039ff;
+    cursor: pointer;
+  }
+  .click_user:hover, .click_hotel:hover {
+    color: #567bff;
+  }
+  progress.percentage {
+    max-width: 78px;
+  }
+
+  .section_flex {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  progress.percentage::-webkit-progress-value {
+    background-color: linear-gradient(to right, red, yellow, green) !important;
+  }
+
+  .stars {
+    color: #fc7201;
+  }
+
+  .accordion_header {
+    white-space: nowrap;
+  }
+
+  .white_space_nowrap {
+    white-space: nowrap;
+  }
+
+  .accordion_body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #main_table tr[data-is_report="true"] {
+    background-color: #d7ffdc;
+  }
+
+</style>
+
+<section class="search-buttons" data-type="hotel_type" style="margin-bottom: 5px;">
+  <span>Тип отеля</span>
+  <div class="item select" data-type="all">все</div>
+  <div class="item" data-type="full">полный</div>
+  <div class="item" data-type="parser_hotel_with_owner">с парсера (с владельцем)</div>
+  <div class="item" data-type="parser_hotel_without_owner">с парсера (без владельца)</div>
+</section>
+
+<section class="search-buttons" data-type="hotel_status" style="margin-bottom: 5px;">
+  <span>Статус отеля</span>
+  <div class="item select" data-type="active">активен</div>
+  <div class="item" data-type="on_moderation">на модерации</div>
+  <div class="item" data-type="off">выключен</div>
+  <div class="item" data-type="on">включён</div>
+  <div class="item" data-type="all">все</div>
+</section>
+
+<section class="search-buttons" data-type="hotel_place" style="margin-bottom: 5px;">
+  <span>Выбраное место</span>
+  <div class="item select" data-type="all">Все</div>
+  <div class="item" data-type="city" id="hotel_place_select">Выбрать город</div>
+</section>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  .hotel_place_select_popup {
+    border-radius: 13px;
+    background: #FFF;
+    box-shadow: 0px 0px 18px 0px #D9D9D9;
+    padding: 28px 30px;
+    font-family: Manrope;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 300px;
+    min-width: 300px;
+    max-width: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+
+<script>
+
+function open_hotel_place_select_popup() {
+  hotel_place_select_popup = $(`
+    <div class="hotel_place_select_popup">
+      <span style="font-size: 21px;">Выбирете город</span>
+      <select style="width: 100%">
+        {% for place in places %}
+        <option value="{{place.id}}">{{place.title}}</option>
+        {% endfor %}
+
+      </select>
+      <button class="button hotel_place_select_popup_button" style="background: #5bd565">Выбрать</button>
+    </div>
+    `)
+
+    hotel_place_select_popup.find("select").select2({
+      width : '100%',
+    })
+    $("body").append(hotel_place_select_popup)
+
+    hotel_place_select_popup.find(".hotel_place_select_popup_button").click(function() {
+      let val = hotel_place_select_popup.find("select").val()
+      let name = hotel_place_select_popup.find(`select option[value=${val}]`).text()
+      $(`#hotel_place_select`).attr("data-type", val).text(name)
+      hotel_place_select_popup.remove()
+
+      hotel_place_select_id = val
+
+      table = $('#main_table').DataTable()
+      table.search()
+      table.draw();
+    })
+
+    hotel_place_select
+
+}
+
+$(`#hotel_place_select`).click(function() {
+  open_hotel_place_select_popup()
+});
+</script>
+
+<script defer>
+  hotel_place_select_id = 0
+
+  $(".search-buttons .item").submit(function() {
+    e.preventDefault()
+
+    table = $('#main_table').DataTable()
+    table.search()
+    table.draw();
+  })
+
+  $(".search-buttons .item").not("#hotel_place_select").click(function() {
+    category = $(this).parent(".search-buttons").data("type")
+    type = $(this).data("type")
+
+    $(`.search-buttons[data-type="${category}"] .item`).removeClass("select")
+    $(`.search-buttons[data-type="${category}"] .item[data-type="${type}"]`).addClass("select")
+
+    table = $('#main_table').DataTable()
+    table.search()
+    table.draw();
+  })
+
+  $(".search-buttons .item#hotel_place_select").click(function() {
+    category = $(this).parent(".search-buttons").data("type")
+    type = $(this).data("type")
+
+    $(`.search-buttons[data-type="${category}"] .item`).removeClass("select")
+    $(`.search-buttons[data-type="${category}"] .item#hotel_place_select`).addClass("select")
+  })
+
+  $("#search-input").change(function (e) {
+    table = $('#main_table').DataTable()
+    table.search()
+    table.draw();
+  });
+
+</script>
+
+<div class="section">
+  <table id="main_table" class="display">
+  </table>
+  </div>
+</div>
+
+<link href="https://cdn.datatables.net/v/dt/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/cr-1.6.2/fh-3.3.2/r-2.4.1/sp-2.1.2/sl-1.6.2/sr-1.2.2/datatables.min.css" rel="stylesheet"/>
+<script src="https://cdn.datatables.net/v/dt/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/cr-1.6.2/fh-3.3.2/r-2.4.1/sp-2.1.2/sl-1.6.2/sr-1.2.2/datatables.min.js"></script>
+
+<script defer>
+  $("body").on("click.openAccordion", ".accordion_header", function() {
+    accordion_body = $(this).next(".accordion_body")
+    $(this).hide()
+    $(accordion_body).show()
+  })
+
+
+  $(document).ready(function () {
+    $('#main_table').DataTable({
+      "serverSide": true,
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/ru.json'
+      },
+      ajax: {
+        url: "{% url 'admin.ajax.hotel.list' %}",
+        type: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        data: function (d) {
+          $(".search-buttons .item.select").each(function () {
+            let category = $(this).parent(".search-buttons").data("type")
+
+            if (category=="hotel_place" && $("#hotel_place_select").hasClass("select")) {
+              d[category] = hotel_place_select_id
+            }
+            else {
+              let val = $(this).data("type");
+              d[category] = val
+            }
+
+          });
+          d["search[value]"] = $("#search-input").val()
+        },
+      },
+      "order": [[ 0, "desc" ]],
+      columns: [
+        {
+          data: 'id', name: 'id', title: "ID", orderable: true, render: function (data, type) {
+
+            return data;
+          },
+        },
+        {
+          data: 'name', name: 'name', title: "Название", orderable: true, render: function (data, type) {
+            if (type === 'display') {
+              return `<span class="click_hotel">${data.text}</span>`;
+            }
+            return data;
+          },
+        },
+        {
+          data: 'user_fio', name: 'user_fio', title: "ФИО", orderable: true, render: function (data, type) {
+
+            if (type === 'display') {
+              return `<span class="click_user" style="color: ${data.color}">${data.fio}</span>`;
+            }
+            return data;
+          },
+        },
+        {
+          data: 'user_email', name: 'user_email', title: "Почта", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'user_phone', name: 'user_phone', title: "Телефон", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'type_hotel', name: 'type_hotel', title: "Тип", orderable: false, render: function (data, type) {
+            return data;
+          },
+        },
+        {
+          data: 'status', name: 'status', title: "Статус", orderable: false, render: function (data, type) {
+            if (type === 'display') {
+              return `<span class="hotel_status" data-param="${data.code}">${data.text}</span>`;
+            }
+            return data.text;
+          },
+        },
+        {
+          data: 'rating', name: 'rating', title: "Рейтинг", orderable: true, render: function (data, type) {
+
+              if (type === 'display') {
+                return `
+                <div class="section_flex">
+                  <span class="value white_space_nowrap">${data.stat} [${data.amount}]</span>
+                  <progress value="${data.stat}"
+                    min="0"
+                    max="10"
+                    class="percentage"></progress>
+                </div>
+              `;
+            }
+            return data;
+          },
+        },
+        {
+          data: 'percentage', name: 'percentage', title: "Процент", orderable: true, render: function (data, type) {
+
+            if (type === 'display') {
+              return `
+              <div class="section_flex">
+                <span class="value white_space_nowrap">${data}</span>
+                <progress value="${data}"
+                  min="0"
+                  max="100"
+                  class="percentage"></progress>
+              </div>
+            `;
+            }
+            return data;
+          },
+        },
+        {
+          data: 'moder', name: 'moder', title: "Модер", orderable: false,
+        },
+        {
+          data: 'at', name: 'at', title: "Даты", orderable: false, render: function (data, type) {
+
+            if (type === 'display') {
+              var elem = $(`
+              <div class="section_flex">
+
+              </div>
+              `);
+              elem.append(`<span class="value">Создание:<br>${data.created_at}</span>`)
+
+              elem.append(`<span class="value">Изменение:<br>${data.updated_at}</span>`)
+
+              var html = $('<div>').append(elem).html();
+              return html;
+            }
+            return data;
+          },
+        }
+      ],
+      colReorder: true,
+      fixedHeader: true,
+      responsive: true,
+      "sDom": '<"top"i>rt<"bottom"lp><"clear">'
+    })
+
+  });
+</script>
+
+
+<script defer>
+  $('#main_table').on("click.openPupup", ".click_user", function () {
+    id_hotel = $(this).parents("tr").data("hotel-id")
+    id_user = $(this).parents("tr").data("user-id")
+    user_login = $(this).parents("tr").data("user-login")
+    user_password = $(this).parents("tr").data("user-password")
+
+
+    representative_fio = $(this).parents("tr").data("user-representative_fio")
+    representative_phone = $(this).parents("tr").data("user-representative_phone")
+    channel_manager = $(this).parents("tr").data("user-channel_manager")
+
+
+    text_popup = "Упраление пользователем"
+
+    if (typeof user_login !== "undefined" ) {
+      text_popup += `<br>Логин: ${user_login}`
+      text_popup += `<br>Пароль: ${user_password}`
+
+    }
+
+    if (representative_fio && representative_fio.length > 0) {
+      text_popup += `<br>ФИО представителя: ${representative_fio}`
+    }
+
+    if (representative_phone && representative_phone.length > 0) {
+      text_popup += `<br>Телефон представителя: ${representative_phone}`
+    }
+
+    if (channel_manager && channel_manager.length > 0) {
+      text_popup += `<br>Сhannel manager: ${channel_manager}`
+    }
+
+
+    popup_create("Действие", text_popup,
+      [
+        {
+          name: "Войти из под пользователя", fun: user_fun_action, param: ["login", id_user], type: "action", color: "purple", style: "full",
+        },
+        {
+          name: "Открыть чат", type: "action", color: "green", fun: user_fun_action, param: ["open_chat", id_user], style: "full",
+        },
+        {
+          name: "Взять в работу", type: "action", color: "green", fun: user_fun_action, param: ["take_to_work", id_user], style: "full",
+        },
+        {
+          name: "Редактировать", type: "action", color: "blue", fun: user_fun_action, param: ["edit_user", id_user], style: "full",
+        },
+        {
+          name: "Закрыть", type: "close", color: "gray", style: "full",
+        },
+      ]
+    )
+  })
+
+  function user_fun_action(type, id) {
+
+    if (type == "login") {
+      location.href = `{% url 'admin.ajax.auth_user' %}?user_id=${id}`
+    }
+    if (type == "open_chat") {
+      location.href = `{% url 'admin.redirect.open_user_chat' %}?user_id=${id}`
+    }
+    if (type == "edit_user") {
+      location.href = `/django_admin/user/user/${id}/change/`
+    }
+    if (type == "user_financial_transactions") {
+      location.href = `{% url 'admin.page.user.financial_transactions' %}?user_id=${id}`
+    }
+    if (type == "take_to_work") {
+      $.ajax({
+        method: "POST",
+        data: { "user_id": id},
+        url: "/admin/ajax/add_an_entry_moder_work/",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        },
+        success: function (request) {
+          if (request.status = "ok" && !request.error_text) {
+            window.open(request.url, '_blank');
+          }
+
+          else if (request.status = "error") {
+            popup_create("Ошибка", request.error_text, [], [], "error")
+          }
+        }
+      });
+    }
+  }
+</script>
+
+<script defer>
+  $('#main_table').on("click.openPupup", ".click_hotel", function () {
+    id_hotel = $(this).parents("tr").data("hotel-id")
+    id_user = $(this).parents("tr").data("user-id")
+    address = $(this).parents("tr").data("address")
+    coordinates = $(this).parents("tr").data("coordinates")
+    hotel_name = $(this).parents("tr").data("hotel_name")
+    hotel_enable = $(this).parents("tr").data("hotel_enable")
+
+
+    text_popup = "Упраление объектом"
+
+    text_popup += `<br>${hotel_name}`
+    text_popup += `<br>${address}`
+    text_popup += `<br>${coordinates}`
+
+    let enableOnButtonStyle = ["50%"];
+    if (hotel_enable) {
+      enableOnButtonStyle.push("disabled");
+    }
+
+    let enableOffButtonStyle = ["50%"];
+    if (!hotel_enable) {
+      enableOffButtonStyle.push("disabled");
+    }
+
+    popup_create("Действие", text_popup,
+      [
+        {
+          name: "Детальная отеля", param: [`/hotel/${id_hotel}/`, 1], type: "link", color: "purple", style: "full",
+        },
+        {
+          name: "Добавить в отчёт", type: "action", color: "green", fun: hotel_fun_action, param: ["add_to_report", id_hotel], style: "full",
+        },
+        {
+          name: "Включить", type: "action", color: "green", fun: hotel_fun_action, param: ["enable_on", id_hotel], style: enableOnButtonStyle,
+        },
+        {
+          name: "Выключить", type: "action", color: "red", fun: hotel_fun_action, param: ["enable_off", id_hotel], style: enableOffButtonStyle,
+        },
+        {
+          name: "Редактировать", param: [`/django_admin/hotel/hotel/${id_hotel}/change/`, 1], type: "link", color: "blue", style: "full",
+        },
+        {
+          name: "Закрыть", type: "close", color: "gray", style: "full",
+        },
+      ]
+    )
+  })
+
+  function hotel_fun_action(type, id) {
+    if (type == "detal_hotel") {
+      location.href = `/hotel/${id}/`
+    }
+    if (type == "enable_on" || type == "enable_off") {
+      let type_enable = type
+
+      $.ajax({
+        method: "POST",
+        data: { "hotel_id": id, "type_enable": type_enable },
+        url: "{% url 'admin.ajax.hotel.set_enable' %}",
+        beforeSend: function (request) {
+          request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        },
+        success: function (request) {
+          location.reload()
+        }
+      });
+    }
+    else if (type == "add_to_report") {
+      popup_create("Действие", "Добавить в отчёт",
+      [
+        {
+          name: "Модерация", fun: add_to_report, param: [id, "moderation"], type: "action", color: "green", style: "full",
+        },
+        {
+          name: "Регистрация", fun: add_to_report, param: [id, "registration"], type: "action", color: "green", style: "full",
+        },
+        {
+          name: "Передан", fun: add_to_report, param: [id, "transfer"], type: "action", color: "green", style: "full",
+        },
+        {
+          name: "Закрыть", type: "close", color: "gray", style: "full",
+        },
+      ])
+    }
+  }
+
+  function add_to_report(hotel_id, type) {
+    $.ajax({
+      method: "POST",
+      data: { "hotel_id": hotel_id, "type": type },
+      url: "{% url 'admin.ajax.hotel.add_to_report' %}",
+      beforeSend: function (request) {
+        request.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      },
+      success: function (request) {
+        location.reload()
+      }
+    });
+  }
+
+</script>
+{% endblock main_block %}
